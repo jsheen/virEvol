@@ -1,33 +1,62 @@
+# ------------------------------------------------------------------------------
+# Space modifies predictions of virulence evolution through differential immunization
+# status and contact rate in a backyard poultry farm, live market system
+#
+# @author: Justin Sheen
+# @date: a two-patch, deterministic model that shows the dependency of virulence 
+#        evolution on space due to differential immunization status and contact rate
+# ------------------------------------------------------------------------------
+
+# Assumptions ------------------------------------------------------------------
+# - We assume density independent transmission rates
+# - We assume that there is no transmission of the vaccine
+
+# Load libraries ---------------------------------------------------------------
 library(deSolve)
-# Parameters
-t=20000
-fbet1=0
-fbet2=0.2
-mbet1=0
-mbet2=0.05
-sig=1/5
-gamm=1/12
-p=0.8
-p_r=0.6
-b=1/1000
-m_fm=1/5
-m_mf=1/10
-v=0.008
-v_hat=0.006
-theta=1/20
+
+# Parameters of the model ------------------------------------------------------
+# Strain 1 is a lower virulence strain
+# Strain 2 is a higher virulence strain (evolved)
+t = 20000 # time
+fS_init = 0.5 - 1e-6 # initial susceptible population in farms
+mS_init = 0.5 - 1e-6 # initial susceptible population in markets
+fI1_init = 1e-6 # initial strain 1 infectious population in farms
+fI2_init = 0 # initial strain 2 infectious population in farms
+mI1_init = 1e-6 # initial strain 1 infectious population in markets
+mI2_init = 0 # initial strain 2 infectious population in markets
+if (fS_init + mS_init + fI1_init + fI2_init + mI1_init + mI2_init != 1) {
+  print("Error in initial conditions")
+}
+fbet1 = 0 # transmission rate of strain 1 among farms (instantaneous rate)
+fbet2 = 0.2 # transmission rate of strain 2 among farms (instantaneous rate)
+mbet1 = 0 # transmission rate of strain 1 among markets (instantaneous rate)
+mbet2 = 0.05 # transmission rate of strain 2 among markets (instantaneous rate)
+sig = 1 / 5 # transition rate of infectiousness per chicken (instantaneous rate)
+gamm = 1 / 12 # transition rate of recovery per chicken (instantaneous rate)
+p = 0.8 # probability of death from NDV infection of strain 2 given chicken was never infected
+p_r = 0.6 # probability of death from NDV infection of strain 1 or strain 2 given chicken was previously infected
+b = 1 / ((0.75 / 15) / 30) # birth rate of new chickens in farms per susceptible chicken per day (from Table 2 of household level per month of Annapragada et al. 2019)
+m_fm = 1 / ((0.0270 / 15) / 30) # migration rate of chickens from farms to markets per day (from Table 2 of household level per month of Annapragada et al. 2019)
+m_mf = 1 / ((0.0176 / 15) / 30) # migration rate of chickens from markets to farms per day (from Table 2 of household level per month of Annapragada et al. 2019)
+v =  # vaccination rate of chickens of farms per susceptible chicken of farm
+v_hat = 0.006 # rate of loss of immunity due to vaccination
+theta = 1 / 20 # rate of loss of immunity due to previous infection
 parameters <- c(fbet1=fbet1, fbet2=fbet2, mbet1=mbet1, mbet2=mbet2,
                 sig=sig, gamm=gamm, p, p_r, b=b, m_fm=m_fm, m_mf=m_mf,
                 v=v, v_hat=v_hat, theta=theta)
-# Initial conditions
-init <- c(fS=1-1e-6, fE1=0, fE2=0, fI1=1e-6, fI2=1e-6, fR1=0, fR2=0, D=0, fV=0, fV_r=0,
-          fS_r=0, fE1_r=0, fE2_r=0, fI1_r=0, fI2_r=1e-6, fR1_r=0, fR2_r=0,
-          mS=0, mE1=0, mE2=0, mI1=0, mI2=1e-6, mR1=0, mR2=0, mV=0, mV_r=0,
-          mS_r=0, mE1_r=0, mE2_r=0, mI1_r=0, mI2_r=1e-6, mR1_r=0, mR2_r=0)
-time <- seq(0,t,by=t/(2*length(1:t)))
+
+# Initial conditions of the model ----------------------------------------------
+init <- c(fS=fS_init, fE1=0, fE2=0, fI1=fI1_init, fI2=fI2_init, fR1=0, fR2=0, D=0, fV=0, fV_r=0,
+          fS_r=0, fE1_r=0, fE2_r=0, fI1_r=0, fI2_r=0, fR1_r=0, fR2_r=0,
+          mS=mS_init, mE1=0, mE2=0, mI1=mI1_init, mI2=mI2_init, mR1=0, mR2=0, mV=0, mV_r=0,
+          mS_r=0, mE1_r=0, mE2_r=0, mI1_r=0, mI2_r=0, mR1_r=0, mR2_r=0)
+
+# Model equations --------------------------------------------------------------
+time <- seq(0, t, by = t / (2 * length(1:t)))
 eqn <- function(time,state,parameters){
     with(as.list(c(state,parameters)),{
       # Backyard poultry farms
-      dfS = -fbet1*fS*fI1 -fbet2*fS*fI2 +b*(fS + mS) -v*fS +v_hat*fV -m_fm*fS +m_mf*mS
+      dfS = -fbet1*fS*fI1 -fbet2*fS*fI2 +b*(fS) -v*fS +v_hat*fV -m_fm*fS +m_mf*mS
       dfE1 = fbet1*fS*fI1 -sig*fE1 -m_fm*fE1 +m_mf*mE1
       dfE2 = fbet2*fS*fI2 -sig*fE2 -m_fm*fE2 +m_mf*mE2
       dfI1 = sig*fE1 -gamm*fI1
