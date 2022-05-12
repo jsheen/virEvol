@@ -39,9 +39,9 @@ stopif(fS_init + mS_init + fI1_init + fI2_init + mI1_init + mI2_init != 1e6)
 sig = 1 / 5 # transition rate of infectiousness per chicken per day
 gamm = 1 / 6.25 # transition rate of recovery per chicken per day
 fbet1 = 0.4 / 1e6 # transmission rate of strain 1 among farms per SI contact per day
-mbet1 = 0.6 / 1e6 # transmission rate of strain 1 among markets per SI contact per day
+mbet1 = 0.8 / 1e6 # transmission rate of strain 1 among markets per SI contact per day
 fbet2 = 0.41 / 1e6 # transmission rate of strain 2 among farms per SI contact per day 
-mbet2 = 0.61 / 1e6 # transmission rate of strain 2 among markets per SI contact per day
+mbet2 = 0.81 / 1e6 # transmission rate of strain 2 among markets per SI contact per day
 p_1 = 0.8 # probability of death from NDV infection of strain 1 given chicken was never infected
 p_2 = 0.95 # probability of death from NDV infection of strain 2 given chicken was never infected
 p_r = 0.5 # probability of death from NDV infection of strain 1 or strain 2 given chicken was previously infected
@@ -69,12 +69,6 @@ init <- c(fS=fS_init, fE1=0, fE2=0, fI1=fI1_init, fI2=fI2_init, fR1=0, fR2=0, D=
 time <- seq(0, t_max, by = t_max / (2 * length(1:t_max)))
 eqn <- function(time, state, parameters){
     with(as.list(c(state, parameters)),{
-      if (time == t_intro_vax) {
-        
-      }
-      if (time == t_intro_strain2) {
-        
-      }
       # Backyard poultry farms
       dfS = b*(fS) -fbet1*fS*fI1 -fbet2*fS*fI2 -v*fS +v_hat*fV -m_fm*fS +m_mf*mS
       dfE1 = fbet1*fS*fI1 +fbet1*fS*fI1_r -sig*fE1 -m_fm*fE1 +m_mf*mE1
