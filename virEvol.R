@@ -27,8 +27,8 @@ library(deSolve)
 # Strain 2 is a higher virulence strain
 t_max = 2e4
 pop_size = 1e6
-fS_init = (pop_size / 2) - 1 # initial susceptible population in farms
-mS_init = (pop_size / 2) - 1 # initial susceptible population in markets
+fS_init = (pop_size * 3/4) - 1 # initial susceptible population in farms
+mS_init = (pop_size * 1/4) - 1 # initial susceptible population in markets
 fI1_init = 1 # initial strain 1 infectious population in farms
 mI1_init = 1 # initial strain 1 infectious population in markets
 fI2_init = 1 # initial strain 2 infectious population in farms
@@ -36,23 +36,26 @@ mI2_init = 1 # initial strain 2 infectious population in markets
 stopif(fS_init + mS_init + fI1_init + fI2_init + mI1_init + mI2_init != pop_size)
 sig = 1 / 5 # transition rate of infectiousness per chicken per day
 gamm = 1 / 6.25 # transition rate of recovery per chicken per day
-fbet1 = 0.2 / pop_size # transmission rate of strain 1 among farms per SI contact per day
-mbet1 = 0.8 / pop_size # transmission rate of strain 1 among markets per SI contact per day
-strain_2_multiplication_transmission = 1.001
-strain_2_multiplication_mortality = 1.5
+mort = 1 / (6.25 * 0.6) # mortality rate per chicken per day, modded off of the recovery rate
+fbet1 = 0.4 / pop_size # transmission rate of strain 1 among farms per SI contact per day
+mbet1 = 1 / pop_size # transmission rate of strain 1 among markets per SI contact per day
+strain_2_multiplication_transmission = 1.01
+strain_2_multiplication_mortality = 1.03
 fbet2 = fbet1 * strain_2_multiplication_transmission # transmission rate of strain 2 among farms per SI contact per day 
 mbet2 = mbet1 * strain_2_multiplication_transmission # transmission rate of strain 2 among markets per SI contact per day
 p_1 = 0.6 # probability of death from NDV infection of strain 1 given chicken was never infected
 p_2 = p_1 * strain_2_multiplication_mortality # probability of death from NDV infection of strain 2 given chicken was never infected
+stopif(p_2 > 1)
 p_r = 0.5 # probability of death from NDV infection of strain 1 or strain 2 given chicken was previously infected
-b = ((0.75 / 30) / 15) # birth rate of new chickens in farms per susceptible chicken per day (from Table 2 of household level per month of Annapragada et al. 2019)
+b = ((0.75 / 30) / 15) / 10 # birth rate of new chickens in farms per susceptible chicken per day (from Table 2 of household level per month of Annapragada et al. 2019)
 m_fm = ((0.0270 / 30) / 15) # migration rate of chickens from farms to markets per chicken per day (from Table 2 of household level per month of Annapragada et al. 2019)
 m_mf = ((0.0176 / 30) / 15) # migration rate of chickens from markets to farms per chicken per day (from Table 2 of household level per month of Annapragada et al. 2019)
 v = (1 / 90) # vaccination rate of chickens of farms per susceptible chicken of farm per day
 v_hat = (1 / 60) # rate of loss of immunity due to vaccination per chicken per day
 theta = (1 / 60) # rate of loss of immunity due to previous infection per chicken per day
 parameters <- c(fbet1=fbet1, fbet2=fbet2, mbet1=mbet1, mbet2=mbet2,
-                sig=sig, gamm=gamm, p_1, p_2, p_r, b=b, m_fm=m_fm, m_mf=m_mf,
+                sig=sig, gamm=gamm, mort=mort, p_1=p_1, p_2=p_2, p_r=p_r, b=b, 
+                m_fm=m_fm, m_mf=m_mf,
                 v=v, v_hat=v_hat, theta=theta)
 
 # Initial conditions of the model ----------------------------------------------
@@ -82,10 +85,10 @@ eqn <- function(time, state, parameters){
              sig*fE2 -
              m_fm*fE2 +m_mf*mE2
       dfI1 = sig*fE1 -
-             gamm*(1-p_1)*fI1 -gamm*p_1*fI1 -
+             gamm*(1-p_1)*fI1 -mort*p_1*fI1 -
              m_fm*fI1 +m_mf*mI1
       dfI2 = sig*fE2 -
-             gamm*(1-p_2)*fI2 -gamm*p_2*fI2 -
+             gamm*(1-p_2)*fI2 -mort*p_2*fI2 -
              m_fm*fI2 + m_mf*mI2
       dfR1 = gamm*(1-p_1)*fI1 -
              theta*fR1 -
@@ -93,10 +96,10 @@ eqn <- function(time, state, parameters){
       dfR2 = gamm*(1-p_2)*fI2 -
              theta*fR2 -
              m_fm*fR2 +m_mf*mR2
-      dD = gamm*p_1*fI1 +gamm*p_2*fI2 +
-           gamm*p_r*fR1_r +gamm*p_r*fR2_r +
-           gamm*p_1*mI1 +gamm*p_2*mI2 +
-           gamm*p_r*fR2_r +gamm*p_r*mR2_r
+      dD = mort*p_1*fI1 +mort*p_2*fI2 +
+           mort*p_r*fR1_r +mort*p_r*fR2_r +
+           mort*p_1*mI1 +mort*p_2*mI2 +
+           mort*p_r*fR2_r +mort*p_r*mR2_r
       dfV = v*(fS) -v_hat*fV -
             fbet1*fV*fI1 -fbet2*fV*fI2 -fbet1*fV*fI1_r -fbet2*fV*fI2_r +
             gamm*fV_I1 +gamm*fV_I2 -
@@ -125,10 +128,10 @@ eqn <- function(time, state, parameters){
                sig*fE2_r -
                m_fm*fE2_r +m_mf*mE2_r
       dfI1_r = sig*fE1_r -
-               gamm*(1-p_r)*fI1_r -gamm*p_r*fI1_r -
+               gamm*(1-p_r)*fI1_r -mort*p_r*fI1_r -
                m_fm*fI1_r +m_mf*mI1_r
       dfI2_r = sig*fE2_r -
-               gamm*(1-p_r)*fI2_r -gamm*p_r*fI2_r -
+               gamm*(1-p_r)*fI2_r -mort*p_r*fI2_r -
                m_fm*fI2_r +m_mf*mI2_r
       dfR1_r = gamm*(1-p_r)*fI1_r -
                theta*fR1_r -
@@ -164,10 +167,10 @@ eqn <- function(time, state, parameters){
              sig*mE2 -
              m_mf*mE2 +m_fm*fE2 
       dmI1 = sig*mE1 -
-             gamm*(1-p_1)*mI1 -gamm*p_1*mI1 -
+             gamm*(1-p_1)*mI1 -mort*p_1*mI1 -
              m_mf*mI1 +m_fm*fI1
       dmI2 = sig*mE2 -
-             gamm*(1-p_2)*mI2 -gamm*p_2*mI2 -
+             gamm*(1-p_2)*mI2 -mort*p_2*mI2 -
              m_mf*mI2 +m_fm*fI2
       dmR1 = gamm*(1-p_1)*mI1 -
              theta*mR1 -
@@ -203,10 +206,10 @@ eqn <- function(time, state, parameters){
                sig*mE2_r -
                m_mf*mE2_r +m_fm*fE2_r
       dmI1_r = sig*mE1_r -
-               gamm*(1-p_r)*mI1_r -gamm*p_r*mI1_r -
+               gamm*(1-p_r)*mI1_r -mort*p_r*mI1_r -
                m_mf*mI1_r +m_fm*fI1_r
       dmI2_r = sig*mE2_r -
-               gamm*(1-p_r)*mI2_r -gamm*p_r*mI2_r -
+               gamm*(1-p_r)*mI2_r -mort*p_r*mI2_r -
                m_mf*mI2_r +m_fm*fI2_r
       dmR1_r = gamm*(1-p_r)*mI1_r -
                theta*mR1_r -

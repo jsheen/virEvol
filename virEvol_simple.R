@@ -254,11 +254,11 @@ legend('topright', legend=c("farms", "markets"),
 # Infectious pool + Infectious and previously recovered pool divided into markets and farms
 plot(out.df$time, out.df$fI1, type='l', ylim=c(0, max(out.df$fI1, out.df$mI1, out.df$fI2, out.df$mI2)),
      main='Incubation and Infectious divided into markets and farms', ylab='I + I_r', xlab='days', col='orange', lty=1)
-lines(out.df$time, out.df$mI1, col='orange', lty=2)
+lines(out.df$time, out.df$mI1, col='orange', lty=3)
 lines(out.df$time, out.df$fI2, col='blue', lty=1)
-lines(out.df$time, out.df$mI2, col='blue', lty=2)
+lines(out.df$time, out.df$mI2, col='blue', lty=3)
 legend('topright', legend=c("farms_strain1", "markets_strain1", "farms_strain2", "markets_strain2"),
-       col=c("orange", "orange", "blue", "blue"), lty=c(1,2,1,2), cex=0.8)
+       col=c("orange", "orange", "blue", "blue"), lty=c(1,3,1,3), cex=0.8)
 
 # Comparing strains 1 and 2
 plot(out.df$time, out.df$mI1 + out.df$fI1, col='orange', type='l', ylim=c(0, max((out.df$fI1 + out.df$mI1), (out.df$fI2 + out.df$mI2))),
