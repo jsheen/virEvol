@@ -25,34 +25,36 @@ library(deSolve)
 # Parameters of the model ------------------------------------------------------
 # Strain 1 is a lower virulence strain
 # Strain 2 is a higher virulence strain
-t_max = 1e4 # time of simulation (days)
+t_max = 2e4 # time of simulation (days)
 pop_size = 1e5 # population size
-fS_init = (pop_size * 3/4) - 1 # initial susceptible population in farms
-mS_init = (pop_size * 1/4) - 1 # initial susceptible population in markets
-fI1_init = 1 # initial strain 1 infectious population in farms
-mI1_init = 1 # initial strain 1 infectious population in markets
-fI2_init = 1 # initial strain 2 infectious population in farms
-mI2_init = 1 # initial strain 2 infectious population in markets
+pop_size_pointfive_perc = 0.005 * pop_size
+pop_size_ninetynine_perc = 0.99 * pop_size
+fS_init = (pop_size_ninetynine_perc * 3/4) - pop_size_pointfive_perc # initial susceptible population in farms
+mS_init = (pop_size_ninetynine_perc * 1/4) - pop_size_pointfive_perc # initial susceptible population in markets
+fI1_init = pop_size_pointfive_perc # initial strain 1 infectious population in farms
+mI1_init = pop_size_pointfive_perc # initial strain 1 infectious population in markets
+fI2_init = pop_size_pointfive_perc # initial strain 2 infectious population in farms
+mI2_init = pop_size_pointfive_perc # initial strain 2 infectious population in markets
 sig = 1 / 5 # transition rate of infectiousness per chicken per day
 gamm = 1 / 4.5 # transition rate of recovery per chicken per day
 mort = 1 / 4 # mortality rate per chicken per day
 nat_mort = 1 / 730 # natural mortality rate per chicken per day
-fbet1 = 1 / pop_size # transmission rate of strain 1 among farms per SI contact per day
-mbet1 = 1.2 / pop_size # transmission rate of strain 1 among markets per SI contact per day
-strain_2_multiplication_transmission = 1.001
-strain_2_multiplication_mortality = 1.05
+fbet1 = 0.1 / pop_size # transmission rate of strain 1 among farms per SI contact per day
+mbet1 = 0.4 / pop_size # transmission rate of strain 1 among markets per SI contact per day
+strain_2_multiplication_transmission = 1.002
+strain_2_multiplication_mortality = 1.022
 fbet2 = fbet1 * strain_2_multiplication_transmission # transmission rate of strain 2 among farms per SI contact per day 
 mbet2 = mbet1 * strain_2_multiplication_transmission # transmission rate of strain 2 among markets per SI contact per day
 p_1 = 0.85 # probability of death from NDV infection of strain 1 given chicken was never infected
 p_2 = p_1 * strain_2_multiplication_mortality # probability of death from NDV infection of strain 2 given chicken was never infected
 b = ((0.75 / 30) / 15) * 5 # birth rate of new chickens in farms per susceptible chicken per day (from Table 2 of household level per month of Annapragada et al. 2019)
-perc_sold_per_farm = 0.2 # percent sold at each sale
+perc_sold_per_farm = 0.2 # percent sold in interval
 inter_sell_time_per_farm = 60 # days between successive sales of chickens of a farm
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken per day
 m_mf = (1 / 7) # migration rate of chickens from markets to farms per chicken per day
-coverage_vax = 0.3 # vaccination coverage at each campaign
-inter_vax_time = 365 # time between vaccination campaigns
-v = coverage_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
+perc_vax = 0.3 # percent vaccinated at each campaign
+inter_vax_time = 30#365 # time that perc_vax is vaccinated
+v = perc_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
 v_hat = (1 / 126) # rate of loss of immunity due to vaccination per chicken per day
 theta = (1 / 126) # rate of loss of immunity due to previous infection per chicken per day
 parameters <- c(fbet1=fbet1, fbet2=fbet2, mbet1=mbet1, mbet2=mbet2,
