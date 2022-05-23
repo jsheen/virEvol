@@ -29,8 +29,8 @@ t_max = 2e4 # time of simulation (days)
 pop_size = 1e5 # population size
 pop_size_pointfive_perc = 0.005 * pop_size
 pop_size_ninetynine_perc = 0.99 * pop_size
-fS_init = (pop_size_ninetynine_perc * 3/4) - pop_size_pointfive_perc # initial susceptible population in farms
-mS_init = (pop_size_ninetynine_perc * 1/4) - pop_size_pointfive_perc # initial susceptible population in markets
+fS_init = (pop_size_ninetynine_perc * 1/2) - pop_size_pointfive_perc # initial susceptible population in farms
+mS_init = (pop_size_ninetynine_perc * 1/2) - pop_size_pointfive_perc # initial susceptible population in markets
 fI1_init = pop_size_pointfive_perc # initial strain 1 infectious population in farms
 mI1_init = pop_size_pointfive_perc # initial strain 1 infectious population in markets
 fI2_init = pop_size_pointfive_perc # initial strain 2 infectious population in farms
@@ -39,10 +39,10 @@ sig = 1 / 5 # transition rate of infectiousness per chicken per day
 gamm = 1 / 4.5 # transition rate of recovery per chicken per day
 mort = 1 / 4 # mortality rate per chicken per day
 nat_mort = 1 / 730 # natural mortality rate per chicken per day
-fbet1 = 0.1 / pop_size # transmission rate of strain 1 among farms per SI contact per day
-mbet1 = 0.4 / pop_size # transmission rate of strain 1 among markets per SI contact per day
-strain_2_multiplication_transmission = 1.002
-strain_2_multiplication_mortality = 1.022
+fbet1 = (15 / 30) / pop_size # transmission rate of strain 1 among farms per SI contact per day
+mbet1 = (40 / 7) / pop_size # transmission rate of strain 1 among markets per SI contact per day
+strain_2_multiplication_transmission = 1.0001
+strain_2_multiplication_mortality = 1.1
 fbet2 = fbet1 * strain_2_multiplication_transmission # transmission rate of strain 2 among farms per SI contact per day 
 mbet2 = mbet1 * strain_2_multiplication_transmission # transmission rate of strain 2 among markets per SI contact per day
 p_1 = 0.85 # probability of death from NDV infection of strain 1 given chicken was never infected
@@ -52,8 +52,8 @@ perc_sold_per_farm = 0.2 # percent sold in interval
 inter_sell_time_per_farm = 60 # days between successive sales of chickens of a farm
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken per day
 m_mf = (1 / 7) # migration rate of chickens from markets to farms per chicken per day
-perc_vax = 0.3 # percent vaccinated at each campaign
-inter_vax_time = 30#365 # time that perc_vax is vaccinated
+perc_vax = 0.1 # percent vaccinated at each campaign
+inter_vax_time = 365 # time that perc_vax is vaccinated
 v = perc_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
 v_hat = (1 / 126) # rate of loss of immunity due to vaccination per chicken per day
 theta = (1 / 126) # rate of loss of immunity due to previous infection per chicken per day
@@ -75,14 +75,15 @@ eqn <- function(time, state, parameters){
       # Backyard poultry farms
       dfS = b*(fS + fE1 + fE2 + fI1 + fI2 + fR1 + fR2) -
             fbet1*(1-v)*fS*fI1 -fbet2*(1-v)*fS*fI2 -
+            fbet1*(1-v)*fS*fV_I1 -fbet2*(1-v)*fS*fV_I2 -
             v*fS +v_hat*fV -
             m_fm*(1-v)*fS +m_mf*mS -
             nat_mort*(1-v)*fS
-      dfE1 = fbet1*(1-v)*fS*fI1 -
+      dfE1 = fbet1*(1-v)*fS*fI1 +fbet1*(1-v)*fS*fV_I1 -
              sig*fE1 -
              m_fm*fE1 +m_mf*mE1 -
              nat_mort*fE1
-      dfE2 = fbet2*(1-v)*fS*fI2 -
+      dfE2 = fbet2*(1-v)*fS*fI2 +fbet2*(1-v)*fS*fV_I2 -
              sig*fE2 -
              m_fm*fE2 +m_mf*mE2 -
              nat_mort*fE2
@@ -103,11 +104,12 @@ eqn <- function(time, state, parameters){
              m_fm*fR2 +m_mf*mR2 -
              nat_mort*fR2
       dfV = v*(fS) -v_hat*fV -
-            fbet1*fV*fI1 -fbet2*fV*fI2 +
+            fbet1*fV*fI1 -fbet2*fV*fI2 -
+            fbet1*fV*fV_I1 -fbet2*fV*fV_I2 +
             gamm*fV_I1 +gamm*fV_I2 -
             m_fm*fV + m_mf*mV -
             nat_mort*fV
-      dfV_E1 = fbet1*fV*fI1 -
+      dfV_E1 = fbet1*fV*fI1 +fbet1*fV*fV_I1 -
                sig*fV_E1 -
                m_fm*fV_E1 +m_mf*mV_E1 -
                nat_mort*fV_E1
@@ -115,7 +117,7 @@ eqn <- function(time, state, parameters){
                gamm*fV_I1 -
                m_fm*fV_I1 +m_mf*mV_I1 -
                nat_mort*fV_I1
-      dfV_E2 = fbet2*fV*fI2 -
+      dfV_E2 = fbet2*fV*fI2 +fbet2*fV*fV_I2 -
                sig*fV_E2 -
                m_fm*fV_E2 +m_mf*mV_E2 -
                nat_mort*fV_E2
