@@ -179,9 +179,9 @@ test_invade <- function(res_vir, perc_sold_per_farm, perc_vax) {
     print(paste0("v: ", v))
     
     # Strain specific parameters
-    fbet1 <- (0.05 * res_vir)^(0.45) / pop_size
+    fbet1 <- ((((0.005 * res_vir)^0.45) / 2) + 0.5) / pop_size #(0.05 * res_vir)^(0.45) / pop_size
     mbet1 <- fbet1 * mfbet_ratio
-    fbet2 <- (0.05 * invade_vir)^(0.45) / pop_size
+    fbet2 <- ((((0.005 * invade_vir)^0.45) / 2) + 0.5) / pop_size #(0.05 * invade_vir)^(0.45) / pop_size
     mbet2 <- fbet2 * mfbet_ratio
     p_1 <- ((res_vir * 0.5) / 100) + 0.5
     p_2 <- ((invade_vir * 0.5) / 100) + 0.5
@@ -259,8 +259,8 @@ test_invade <- function(res_vir, perc_sold_per_farm, perc_vax) {
 }
 
 # Modulate migration and vaccination parameters and see how this affect ES -----
-for (perc_sold_per_farm in seq(0.33, 1, 0.33)) {
-  for (perc_vax in seq(0.33, 1, 0.33)) {
+for (perc_sold_per_farm in seq(0, 0.66, 0.33)) {
+  for (perc_vax in seq(0, 0.66, 0.33)) {
     #setup parallel backend to use many processors
     cores=detectCores()
     cl <- makeCluster(cores[1]-1) #not to overload computer
@@ -275,6 +275,6 @@ for (perc_sold_per_farm in seq(0.33, 1, 0.33)) {
     #stop cluster
     stopCluster(cl)
     
-    write.csv(finalMatrix, paste0("~/virEvol/res/mig.", perc_sold_per_farm, "_vax.", perc_vax, ".csv"))
+    write.csv(finalMatrix, paste0("~/virEvol/res/mig.", perc_sold_per_farm, "_vax.", perc_vax, "_sm.csv"))
   }
 }
