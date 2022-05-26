@@ -1,0 +1,280 @@
+# ------------------------------------------------------------------------------
+# Space modifies predictions of virulence evolution through differential immunization
+# status and contact rate in a backyard poultry farm, live market system
+#
+# @author: Justin Sheen
+# @description: a two-patch, deterministic model that shows the dependency of virulence 
+#               evolution on space due to differential immunization status and contact rate.
+#               With this model, we seek to understand whether, from a modeling standpoint,
+#               a higher virulent form of the virus would be permitted, and whether this
+#               higher virulent form will only be able to circulate within farms; acting
+#               as a reservoir that spills into the market population and creates transitory
+#               epidemics. The rate of migration may limit the amount of space the virulent 
+#               virus is able to take over.
+# ------------------------------------------------------------------------------
+
+# Assumptions ------------------------------------------------------------------
+# - We assume density independent transmission rates
+# - We assume that there is no transmission of the vaccine, and that there are no other lower-virulent strains of the virus circulating
+# - We assume that probability of death is the same between strain 1 and strain 2 after first infection
+# - Vaccination completely protects chickens from mortality, and is only conducted in farms
+
+# Load libraries ---------------------------------------------------------------
+library(deSolve)
+library(foreach)
+library(doParallel)
+
+# Fixed parameters of the model ------------------------------------------------
+t_max = 4e4 # time of simulation (days)
+pop_size = 1e5 # population size
+fS_init = (pop_size * 1/2) - 1 # initial susceptible population in farms
+mS_init = (pop_size * 1/2) - 1 # initial susceptible population in markets
+fI1_init = 1 # initial strain 1 infectious population in farms
+mI1_init = 1 # initial strain 1 infectious population in markets
+fI2_init = 0 # initial strain 2 infectious population in farms
+mI2_init = 0 # initial strain 2 infectious population in markets
+sig = 1 / 5 # transition rate of infectiousness per chicken per day
+gamm = 1 / 4.5 # transition rate of recovery per chicken per day
+mort = 1 / 4 # disease mortality rate per chicken per day
+nat_mort = 1 / 730 # natural mortality rate per chicken per day
+b = ((0.75 / 30) / 15) * 5 # birth rate of new chickens in farms per susceptible chicken per day (from Table 2 of household level per month of Annapragada et al. 2019)
+m_mf = (1 / 7) # migration rate of chickens from markets to farms per chicken per day
+v_hat = (1 / 126) # rate of loss of immunity due to vaccination per chicken per day
+theta = (1 / 126) # rate of loss of immunity due to previous infection per chicken per day
+vir_steps = seq(0.01, 100, 15)
+mfbet_ratio = 2
+
+# Model equations --------------------------------------------------------------
+time <- seq(0, t_max, by = t_max / (2 * length(1:t_max)))
+eqn <- function(time, state, parameters){
+  with(as.list(c(state, parameters)),{
+    # Backyard poultry farms
+    dfS = b*(fS + fE1 + fE2 + fI1 + fI2 + fR1 + fR2) -
+      fbet1*(1-v)*fS*fI1 -fbet2*(1-v)*fS*fI2 -
+      fbet1*(1-v)*fS*fV_I1 -fbet2*(1-v)*fS*fV_I2 -
+      v*fS +v_hat*fV -
+      m_fm*(1-v)*fS +m_mf*mS -
+      nat_mort*(1-v)*fS +
+      theta*fR1 + theta*fR2
+    dfE1 = fbet1*(1-v)*fS*fI1 +fbet1*(1-v)*fS*fV_I1 -
+      sig*fE1 -
+      m_fm*fE1 +m_mf*mE1 -
+      nat_mort*fE1
+    dfE2 = fbet2*(1-v)*fS*fI2 +fbet2*(1-v)*fS*fV_I2 -
+      sig*fE2 -
+      m_fm*fE2 +m_mf*mE2 -
+      nat_mort*fE2
+    dfI1 = sig*fE1 -
+      gamm*(1-p_1)*fI1 -mort*p_1*fI1 -
+      m_fm*fI1 +m_mf*mI1 -
+      nat_mort*fI1
+    dfI2 = sig*fE2 -
+      gamm*(1-p_2)*fI2 -mort*p_2*fI2 -
+      m_fm*fI2 + m_mf*mI2 -
+      nat_mort*fI2
+    dfR1 = gamm*(1-p_1)*fI1 -
+      theta*fR1 -
+      m_fm*fR1 +m_mf*mR1 -
+      nat_mort*fR1
+    dfR2 = gamm*(1-p_2)*fI2 -
+      theta*fR2 -
+      m_fm*fR2 +m_mf*mR2 -
+      nat_mort*fR2
+    dfV = v*(fS) -v_hat*fV -
+      fbet1*fV*fI1 -fbet2*fV*fI2 -
+      fbet1*fV*fV_I1 -fbet2*fV*fV_I2 +
+      gamm*fV_I1 +gamm*fV_I2 -
+      m_fm*fV + m_mf*mV -
+      nat_mort*fV
+    dfV_E1 = fbet1*fV*fI1 +fbet1*fV*fV_I1 -
+      sig*fV_E1 -
+      m_fm*fV_E1 +m_mf*mV_E1 -
+      nat_mort*fV_E1
+    dfV_I1 = sig*fV_E1 -
+      gamm*fV_I1 -
+      m_fm*fV_I1 +m_mf*mV_I1 -
+      nat_mort*fV_I1
+    dfV_E2 = fbet2*fV*fI2 +fbet2*fV*fV_I2 -
+      sig*fV_E2 -
+      m_fm*fV_E2 +m_mf*mV_E2 -
+      nat_mort*fV_E2
+    dfV_I2 = sig*fV_E2 -
+      gamm*fV_I2 -
+      m_fm*fV_I2 +m_mf*mV_I2 -
+      nat_mort*fV_I2
+    # Live bird markets
+    dmS =  b*(mS+mE1+mE2+mI1+mI2+mR1+mR2)-
+      mbet1*mS*mI1 -mbet2*mS*mI2 -
+      m_mf*mS +m_fm*(1-v)*fS -
+      nat_mort*mS +
+      theta*mR1 + theta*mR2
+    dmE1 = mbet1*mS*mI1 -
+      sig*mE1 -
+      m_mf*mE1 +m_fm*fE1 -
+      nat_mort*mE1
+    dmE2 = mbet2*mS*mI2 -
+      sig*mE2 -
+      m_mf*mE2 +m_fm*fE2 -
+      nat_mort*mE2
+    dmI1 = sig*mE1 -
+      gamm*(1-p_1)*mI1 -mort*p_1*mI1 -
+      m_mf*mI1 +m_fm*fI1 -
+      nat_mort*mI1
+    dmI2 = sig*mE2 -
+      gamm*(1-p_2)*mI2 -mort*p_2*mI2 -
+      m_mf*mI2 +m_fm*fI2 -
+      nat_mort*mI2
+    dmR1 = gamm*(1-p_1)*mI1 -
+      theta*mR1 -
+      m_mf*mR1 +m_fm*fR1 -
+      nat_mort*mR1
+    dmR2 = gamm*(1-p_2)*mI2 -
+      theta*mR2 -
+      m_mf*mR2 +m_fm*fR2 -
+      nat_mort*mR2
+    dmV = -v_hat*mV -
+      mbet1*mV*mI1 -mbet2*mV*mI2 +
+      gamm*mV_I1 + gamm*mV_I2 +
+      m_fm*fV -m_mf*mV -
+      nat_mort*mV
+    dmV_E1 = mbet1*mV*mI1 -
+      sig*mV_E1 +
+      m_fm*fV_E1 -m_mf*mV_E1 -
+      nat_mort*mV_E1
+    dmV_I1 = sig*mV_E1 -
+      gamm*mV_I1 +
+      m_fm*fV_I1 -m_mf*mV_I1 -
+      nat_mort*mV_I1
+    dmV_E2 = mbet2*mV*fI2 -
+      sig*mV_E2 +
+      m_fm*fV_E2 -m_mf*mV_E2 -
+      nat_mort*mV_E2
+    dmV_I2 = sig*mV_E2 -
+      gamm*mV_I2 +
+      m_fm*fV_I2 -m_mf*mV_I2 -
+      nat_mort*mV_I2
+    return(list(c(dfS, dfE1, dfE2, dfI1, dfI2, dfR1, dfR2,
+                  dfV, dfV_E1, dfV_I1, dfV_E2, dfV_I2, 
+                  dmS, dmE1, dmE2, dmI1, dmI2, dmR1, dmR2, 
+                  dmV, dmV_E1, dmV_I1, dmV_E2, dmV_I2)))})}
+
+# Function to get results of simulated invasion for a given resident strain ----
+# Legend: 0 = res strain wins; 1 = invade strain wins; 
+#         2 = no equilibrium of res strain; 3 = res strain extinct before invader introduced; 
+#         4 = no global equilibrium after invader strain introduced;
+#         5 = both strains are extinct at equilibrium; 6 = both strains are not extinct at equilibrium
+test_invade <- function(res_vir, perc_sold_per_farm, perc_vax) {
+  invade_res <- c()
+  for (invade_vir in vir_steps) {
+    print(paste0("res vir: ", res_vir))
+    print(paste0("invade vir: ", invade_vir))
+    
+    # Migration and vaccination parameters
+    inter_sell_time_per_farm = 120 # days between successive sales of chickens of a farm
+    m_fm = perc_sold_per_farm / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken per day
+    inter_vax_time = 120 # time that perc_vax is vaccinated
+    v = perc_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
+    
+    print(paste0("m_fm: ", m_fm))
+    print(paste0("v: ", v))
+    
+    # Strain specific parameters
+    fbet1 <- (0.05 * res_vir)^(0.45) / pop_size
+    mbet1 <- fbet1 * mfbet_ratio
+    fbet2 <- (0.05 * invade_vir)^(0.45) / pop_size
+    mbet2 <- fbet2 * mfbet_ratio
+    p_1 <- ((res_vir * 0.5) / 100) + 0.5
+    p_2 <- ((invade_vir * 0.5) / 100) + 0.5
+    
+    parameters <- c(fbet1=fbet1, fbet2=fbet2, mbet1=mbet1, mbet2=mbet2,
+                    sig=sig, gamm=gamm, mort=mort, p_1=p_1, p_2=p_2, b=b, 
+                    m_fm=m_fm, m_mf=m_mf,
+                    v=v, v_hat=v_hat, theta=theta)
+    # Run resident strain until equilibrium
+    init <- c(fS=fS_init, fE1=0, fE2=0, fI1=fI1_init, fI2=fI2_init, fR1=0, fR2=0, 
+              fV=0, fV_E1=0, fV_I1=0, fV_E2=0, fV_I2=0,
+              mS=mS_init, mE1=0, mE2=0, mI1=mI1_init, mI2=mI2_init, mR1=0, mR2=0, 
+              mV=0, mV_E1=0, mV_I1=0, mV_E2=0, mV_I2=0)
+    out <- ode(y=init, times=time, eqn, parms=parameters)
+    out.df <- as.data.frame(out)
+    # Check system is in equilibrium
+    is_in_equil <- TRUE
+    for (col_dex in 2:ncol(out.df)) {
+      if ((length(unique(round(out.df[(nrow(out.df) - 10):nrow(out.df),2], digits=2))) != 1) |
+          is.infinite(out.df[nrow(out.df), col_dex]) | is.nan(out.df[nrow(out.df), col_dex])) {
+        is_in_equil <- FALSE
+      }
+    }
+    if (!is_in_equil) {
+      invade_res <- c(invade_res, 2)
+    } else {
+      if (round(out.df$fI1[nrow(out.df)] + out.df$mI1[nrow(out.df)] +
+                 out.df$fV_I1[nrow(out.df)] + out.df$mV_I1[nrow(out.df)]) < 1) {
+        invade_res <- c(invade_res, 3)
+      } else {
+        invade_init <- c(fS=out.df$fS[nrow(out.df)], fE1=out.df$fE1[nrow(out.df)], 
+                         fE2=out.df$fE2[nrow(out.df)], fI1=out.df$fI1[nrow(out.df)], 
+                         fI2=1, fR1=out.df$fR1[nrow(out.df)], 
+                         fR2=out.df$fR2[nrow(out.df)], 
+                         fV=out.df$fV[nrow(out.df)], fV_E1=out.df$fV_E1[nrow(out.df)], 
+                         fV_I1=out.df$fV_I1[nrow(out.df)], fV_E2=out.df$fV_E2[nrow(out.df)], 
+                         fV_I2=out.df$fV_I2[nrow(out.df)],
+                         mS=out.df$mS[nrow(out.df)], mE1=out.df$mE1[nrow(out.df)], 
+                         mE2=out.df$mE2[nrow(out.df)], mI1=out.df$mI1[nrow(out.df)], 
+                         mI2=1, mR1=out.df$mR1[nrow(out.df)], 
+                         mR2=out.df$mR2[nrow(out.df)], 
+                         mV=out.df$mV[nrow(out.df)], mV_E1=out.df$mV_E1[nrow(out.df)], 
+                         mV_I1=out.df$mV_I1[nrow(out.df)], mV_E2=out.df$mV_E2[nrow(out.df)], 
+                         mV_I2=out.df$mV_I2[nrow(out.df)])
+        out_invade <- ode(y=invade_init, times=time, eqn, parms=parameters)
+        out_invade.df <- as.data.frame(out_invade)
+        # Check system is in equilibrium
+        invade_is_in_equil <- TRUE
+        for (col_dex in 2:ncol(out_invade.df)) {
+          if (length(unique(round(out_invade.df[(nrow(out_invade.df) - 10):nrow(out_invade.df),2], digits=2))) != 1) {
+            invade_is_in_equil <- FALSE
+          }
+        }
+        if (!invade_is_in_equil) {
+          invade_res <- c(invade_res, 4)
+        } else {
+          num_I_res <- round(out_invade.df$fI1[nrow(out_invade.df)] + out_invade.df$fV_I1[nrow(out_invade.df)] + 
+                               out_invade.df$mI1[nrow(out_invade.df)] + out_invade.df$mV_I1[nrow(out_invade.df)])
+          num_I_invader <- round(out_invade.df$fI2[nrow(out_invade.df)] + out_invade.df$fV_I2[nrow(out_invade.df)] + 
+                                   out_invade.df$mI2[nrow(out_invade.df)] + out.df$mV_I2[nrow(out_invade.df)])
+          if (num_I_res > 0 & num_I_invader > 0) {
+            invade_res <- c(invade_res, 6)
+          } else if (num_I_res == 0 & num_I_invader == 0) {
+            invade_res <- c(invade_res, 5)
+          } else if (num_I_res > 0 & num_I_invader == 0) {
+            invade_res <- c(invade_res, 0)
+          } else if (num_I_res == 0 & num_I_invader > 0) {
+            invade_res <- c(invade_res, 1)
+          }
+        }
+      }
+    }
+  }
+  return(invade_res)
+}
+
+# Modulate migration and vaccination parameters and see how this affect ES -----
+for (perc_sold_per_farm in seq(0.33, 1, 0.33)) {
+  for (perc_vax in seq(0.33, 1, 0.33)) {
+    #setup parallel backend to use many processors
+    cores=detectCores()
+    cl <- makeCluster(cores[1]-1) #not to overload computer
+    registerDoParallel(cl)
+    finalMatrix <- foreach(i=vir_steps, .combine=cbind) %dopar% {
+      library(deSolve)
+      library(foreach)
+      library(doParallel)
+      tempMatrix = test_invade(res_vir=i, perc_sold_per_farm=perc_sold_per_farm, perc_vax=perc_vax) 
+      tempMatrix
+    }
+    #stop cluster
+    stopCluster(cl)
+    
+    write.csv(finalMatrix, paste0("~/virEvol/res/mig.", perc_sold_per_farm, "_vax.", perc_vax, ".csv"))
+  }
+}
