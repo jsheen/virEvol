@@ -38,17 +38,23 @@ gamm = 1 / 4.5 # transition rate of recovery per chicken per day
 mort = 1 / 4 # disease mortality rate per chicken per day
 nat_mort = 1 / 730 # natural mortality rate per chicken per day
 b = ((0.75 / 30) / 15) * 5 # birth rate of new chickens in farms per susceptible chicken per day (from Table 2 of household level per month of Annapragada et al. 2019)
-perc_sold_per_farm = 0.1 # percent sold in interval
+perc_sold_per_farm = 0.5 # percent sold in interval
 inter_sell_time_per_farm = 120 # days between successive sales of chickens of a farm
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken per day
 m_mf = (1 / 7) # migration rate of chickens from markets to farms per chicken per day
-perc_vax = 0.2 # percent vaccinated at each campaign
+perc_vax = 0.5 # percent vaccinated at each campaign
 inter_vax_time = 120 # time that perc_vax is vaccinated
 v = perc_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
 v_hat = (1 / 126) # rate of loss of immunity due to vaccination per chicken per day
 theta = (1 / 126) # rate of loss of immunity due to previous infection per chicken per day
 vir_steps = seq(0.01, 100, 20)
 mfbet_ratio = 2
+
+# Plot transmission-mortality tradeoff curve -----------------------------------
+# virulences <- seq(0.01, 100, 0.1)
+# morts <- ((virulences * 0.5) / 100) + 0.5
+# betas <- ((((0.005 * virulences)^0.05) / 2) + 0.1)
+# plot(morts, betas, type='l')
 
 # Model equations --------------------------------------------------------------
 time <- seq(0, t_max, by = t_max / (2 * length(1:t_max)))
@@ -166,18 +172,32 @@ eqn <- function(time, state, parameters){
 
 # Function to get results of simulated invasion for a given resident strain ----
 # Legend: 0 = res strain wins; 1 = invade strain wins; 
-#         2 = no equilibrium of res strain; 3 = no equilibrium after invader strain introduced;
-#         4 = both strains are extinct at equilibrium; 5 = both strains are not extinct at equilibrium
-test_invade <- function(res_vir) {
+#         2 = no equilibrium of res strain; 3 = res strain extinct before invader introduced; 
+#         4 = no global equilibrium after invader strain introduced;
+#         5 = both strains are extinct at equilibrium; 6 = both strains are not extinct at equilibrium
+test_invade <- function(res_vir, perc_sold_per_farm, perc_vax) {
   invade_res <- c()
   for (invade_vir in vir_steps) {
+    print(paste0("res vir: ", res_vir))
+    print(paste0("invade vir: ", invade_vir))
+    
+    # Migration and vaccination parameters
+    inter_sell_time_per_farm = 120 # days between successive sales of chickens of a farm
+    m_fm = perc_sold_per_farm / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken per day
+    inter_vax_time = 120 # time that perc_vax is vaccinated
+    v = perc_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
+    
+    print(paste0("m_fm: ", m_fm))
+    print(paste0("v: ", v))
+    
     # Strain specific parameters
-    fbet1 <- (0.05 * res_vir)^(0.45) / pop_size
+    fbet1 <- ((((0.005 * res_vir)^0.05) / 2) + 0.1) / pop_size #(0.05 * res_vir)^(0.45) / pop_size
     mbet1 <- fbet1 * mfbet_ratio
-    fbet2 <- (0.05 * invade_vir)^(0.45) / pop_size
+    fbet2 <- ((((0.005 * invade_vir)^0.05) / 2) + 0.1) / pop_size #(0.05 * invade_vir)^(0.45) / pop_size
     mbet2 <- fbet2 * mfbet_ratio
     p_1 <- ((res_vir * 0.5) / 100) + 0.5
     p_2 <- ((invade_vir * 0.5) / 100) + 0.5
+    
     parameters <- c(fbet1=fbet1, fbet2=fbet2, mbet1=mbet1, mbet2=mbet2,
                     sig=sig, gamm=gamm, mort=mort, p_1=p_1, p_2=p_2, b=b, 
                     m_fm=m_fm, m_mf=m_mf,
@@ -192,51 +212,57 @@ test_invade <- function(res_vir) {
     # Check system is in equilibrium
     is_in_equil <- TRUE
     for (col_dex in 2:ncol(out.df)) {
-      if (length(unique(round(out.df[(nrow(out.df) - 10):nrow(out.df),2], digits=2))) != 1) {
+      if ((length(unique(round(out.df[(nrow(out.df) - 10):nrow(out.df),2], digits=2))) != 1) |
+          is.infinite(out.df[nrow(out.df), col_dex]) | is.nan(out.df[nrow(out.df), col_dex])) {
         is_in_equil <- FALSE
       }
     }
     if (!is_in_equil) {
       invade_res <- c(invade_res, 2)
     } else {
-      invade_init <- c(fS=out.df$fS[nrow(out.df)], fE1=out.df$fE1[nrow(out.df)], 
-                       fE2=out.df$fE2[nrow(out.df)], fI1=out.df$fI1[nrow(out.df)], 
-                       fI2=1, fR1=out.df$fR1[nrow(out.df)], 
-                       fR2=out.df$fR2[nrow(out.df)], 
-                       fV=out.df$fV[nrow(out.df)], fV_E1=out.df$fV_E1[nrow(out.df)], 
-                       fV_I1=out.df$fV_I1[nrow(out.df)], fV_E2=out.df$fV_E2[nrow(out.df)], 
-                       fV_I2=out.df$fV_I2[nrow(out.df)],
-                       mS=out.df$mS[nrow(out.df)], mE1=out.df$mE1[nrow(out.df)], 
-                       mE2=out.df$mE2[nrow(out.df)], mI1=out.df$mI1[nrow(out.df)], 
-                       mI2=1, mR1=out.df$mR1[nrow(out.df)], 
-                       mR2=out.df$mR2[nrow(out.df)], 
-                       mV=out.df$mV[nrow(out.df)], mV_E1=out.df$mV_E1[nrow(out.df)], 
-                       mV_I1=out.df$mV_I1[nrow(out.df)], mV_E2=out.df$mV_E2[nrow(out.df)], 
-                       mV_I2=out.df$mV_I2[nrow(out.df)])
-      out_invade <- ode(y=invade_init, times=time, eqn, parms=parameters)
-      out_invade.df <- as.data.frame(out_invade)
-      # Check system is in equilibrium
-      invade_is_in_equil <- TRUE
-      for (col_dex in 2:ncol(out_invade.df)) {
-        if (length(unique(round(out_invade.df[(nrow(out_invade.df) - 10):nrow(out_invade.df),2], digits=2))) != 1) {
-          invade_is_in_equil <- FALSE
-        }
-      }
-      if (!invade_is_in_equil) {
+      if (round(out.df$fI1[nrow(out.df)] + out.df$mI1[nrow(out.df)] +
+                out.df$fV_I1[nrow(out.df)] + out.df$mV_I1[nrow(out.df)]) < 1) {
         invade_res <- c(invade_res, 3)
       } else {
-        num_I_res <- round(out_invade.df$fI1[nrow(out_invade.df)] + out_invade.df$fV_I1[nrow(out_invade.df)] + 
-                             out_invade.df$mI1[nrow(out_invade.df)] + out_invade.df$mV_I1[nrow(out_invade.df)])
-        num_I_invader <- round(out_invade.df$fI2[nrow(out_invade.df)] + out_invade.df$fV_I2[nrow(out_invade.df)] + 
-                                 out_invade.df$mI2[nrow(out_invade.df)] + out.df$mV_I2[nrow(out_invade.df)])
-        if (num_I_res > 0 & num_I_invader > 0) {
-          invade_res <- c(invade_res, 5)
-        } else if (num_I_res == 0 & num_I_invader == 0) {
+        invade_init <- c(fS=out.df$fS[nrow(out.df)], fE1=out.df$fE1[nrow(out.df)], 
+                         fE2=out.df$fE2[nrow(out.df)], fI1=out.df$fI1[nrow(out.df)], 
+                         fI2=1e-05, fR1=out.df$fR1[nrow(out.df)], 
+                         fR2=out.df$fR2[nrow(out.df)], 
+                         fV=out.df$fV[nrow(out.df)], fV_E1=out.df$fV_E1[nrow(out.df)], 
+                         fV_I1=out.df$fV_I1[nrow(out.df)], fV_E2=out.df$fV_E2[nrow(out.df)], 
+                         fV_I2=out.df$fV_I2[nrow(out.df)],
+                         mS=out.df$mS[nrow(out.df)], mE1=out.df$mE1[nrow(out.df)], 
+                         mE2=out.df$mE2[nrow(out.df)], mI1=out.df$mI1[nrow(out.df)], 
+                         mI2=1e-05, mR1=out.df$mR1[nrow(out.df)], 
+                         mR2=out.df$mR2[nrow(out.df)], 
+                         mV=out.df$mV[nrow(out.df)], mV_E1=out.df$mV_E1[nrow(out.df)], 
+                         mV_I1=out.df$mV_I1[nrow(out.df)], mV_E2=out.df$mV_E2[nrow(out.df)], 
+                         mV_I2=out.df$mV_I2[nrow(out.df)])
+        out_invade <- ode(y=invade_init, times=time, eqn, parms=parameters)
+        out_invade.df <- as.data.frame(out_invade)
+        # Check system is in equilibrium
+        invade_is_in_equil <- TRUE
+        for (col_dex in 2:ncol(out_invade.df)) {
+          if (length(unique(round(out_invade.df[(nrow(out_invade.df) - 10):nrow(out_invade.df),2], digits=2))) != 1) {
+            invade_is_in_equil <- FALSE
+          }
+        }
+        if (!invade_is_in_equil) {
           invade_res <- c(invade_res, 4)
-        } else if (num_I_res > 0 & num_I_invader == 0) {
-          invade_res <- c(invade_res, 0)
-        } else if (num_I_res == 0 & num_I_invader > 0) {
-          invade_res <- c(invade_res, 1)
+        } else {
+          num_I_res <- round(out_invade.df$fI1[nrow(out_invade.df)] + out_invade.df$fV_I1[nrow(out_invade.df)] + 
+                               out_invade.df$mI1[nrow(out_invade.df)] + out_invade.df$mV_I1[nrow(out_invade.df)]) 
+          num_I_invader <- round(out_invade.df$fI2[nrow(out_invade.df)] + out_invade.df$fV_I2[nrow(out_invade.df)] + 
+                                   out_invade.df$mI2[nrow(out_invade.df)] + out.df$mV_I2[nrow(out_invade.df)]) 
+          if (num_I_res > 0 & num_I_invader > 0) {
+            invade_res <- c(invade_res, 6)
+          } else if (num_I_res == 0 & num_I_invader == 0) {
+            invade_res <- c(invade_res, 5)
+          } else if (num_I_res > 0 & num_I_invader == 0) {
+            invade_res <- c(invade_res, 0)
+          } else if (num_I_res == 0 & num_I_invader > 0) {
+            invade_res <- c(invade_res, 1)
+          }
         }
       }
     }
@@ -245,6 +271,17 @@ test_invade <- function(res_vir) {
 }
 
 # Create PIP (and run in parallel) ---------------------------------------------
+# vir_step combinations
+combos <- list()
+combos_dex <- 1
+for (i in vir_steps) {
+  for (j in vir_steps) {
+    combos[[combos_dex]] <- c(i, j)
+    combos_dex <- combos_dex + 1
+  }
+}
+
+
 #setup parallel backend to use many processors
 cores=detectCores()
 cl <- makeCluster(cores[1]-1) #not to overload computer

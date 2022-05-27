@@ -25,7 +25,7 @@ library(foreach)
 library(doParallel)
 
 # Fixed parameters of the model ------------------------------------------------
-t_max = 4e4 # time of simulation (days)
+t_max = 1e4 # time of simulation (days)
 pop_size = 1e5 # population size
 fS_init = (pop_size * 1/2) - 1 # initial susceptible population in farms
 mS_init = (pop_size * 1/2) - 1 # initial susceptible population in markets
@@ -42,7 +42,7 @@ m_mf = (1 / 7) # migration rate of chickens from markets to farms per chicken pe
 v_hat = (1 / 126) # rate of loss of immunity due to vaccination per chicken per day
 theta = (1 / 126) # rate of loss of immunity due to previous infection per chicken per day
 vir_steps = seq(0.01, 100, 15)
-mfbet_ratio = 2
+mfbet_ratio = 10
 
 # Model equations --------------------------------------------------------------
 time <- seq(0, t_max, by = t_max / (2 * length(1:t_max)))
@@ -179,9 +179,9 @@ test_invade <- function(res_vir, perc_sold_per_farm, perc_vax) {
     print(paste0("v: ", v))
     
     # Strain specific parameters
-    fbet1 <- ((((0.005 * res_vir)^0.45) / 2) + 0.5) / pop_size #(0.05 * res_vir)^(0.45) / pop_size
+    fbet1 <- ((((0.005 * res_vir)^0.05) / 2) + 0.1) / pop_size #(0.05 * res_vir)^(0.45) / pop_size
     mbet1 <- fbet1 * mfbet_ratio
-    fbet2 <- ((((0.005 * invade_vir)^0.45) / 2) + 0.5) / pop_size #(0.05 * invade_vir)^(0.45) / pop_size
+    fbet2 <- ((((0.005 * invade_vir)^0.05) / 2) + 0.1) / pop_size #(0.05 * invade_vir)^(0.45) / pop_size
     mbet2 <- fbet2 * mfbet_ratio
     p_1 <- ((res_vir * 0.5) / 100) + 0.5
     p_2 <- ((invade_vir * 0.5) / 100) + 0.5
@@ -214,14 +214,14 @@ test_invade <- function(res_vir, perc_sold_per_farm, perc_vax) {
       } else {
         invade_init <- c(fS=out.df$fS[nrow(out.df)], fE1=out.df$fE1[nrow(out.df)], 
                          fE2=out.df$fE2[nrow(out.df)], fI1=out.df$fI1[nrow(out.df)], 
-                         fI2=1, fR1=out.df$fR1[nrow(out.df)], 
+                         fI2=1e-05, fR1=out.df$fR1[nrow(out.df)], 
                          fR2=out.df$fR2[nrow(out.df)], 
                          fV=out.df$fV[nrow(out.df)], fV_E1=out.df$fV_E1[nrow(out.df)], 
                          fV_I1=out.df$fV_I1[nrow(out.df)], fV_E2=out.df$fV_E2[nrow(out.df)], 
                          fV_I2=out.df$fV_I2[nrow(out.df)],
                          mS=out.df$mS[nrow(out.df)], mE1=out.df$mE1[nrow(out.df)], 
                          mE2=out.df$mE2[nrow(out.df)], mI1=out.df$mI1[nrow(out.df)], 
-                         mI2=1, mR1=out.df$mR1[nrow(out.df)], 
+                         mI2=1e-05, mR1=out.df$mR1[nrow(out.df)], 
                          mR2=out.df$mR2[nrow(out.df)], 
                          mV=out.df$mV[nrow(out.df)], mV_E1=out.df$mV_E1[nrow(out.df)], 
                          mV_I1=out.df$mV_I1[nrow(out.df)], mV_E2=out.df$mV_E2[nrow(out.df)], 
@@ -239,9 +239,9 @@ test_invade <- function(res_vir, perc_sold_per_farm, perc_vax) {
           invade_res <- c(invade_res, 4)
         } else {
           num_I_res <- round(out_invade.df$fI1[nrow(out_invade.df)] + out_invade.df$fV_I1[nrow(out_invade.df)] + 
-                               out_invade.df$mI1[nrow(out_invade.df)] + out_invade.df$mV_I1[nrow(out_invade.df)])
+                               out_invade.df$mI1[nrow(out_invade.df)] + out_invade.df$mV_I1[nrow(out_invade.df)]) 
           num_I_invader <- round(out_invade.df$fI2[nrow(out_invade.df)] + out_invade.df$fV_I2[nrow(out_invade.df)] + 
-                                   out_invade.df$mI2[nrow(out_invade.df)] + out.df$mV_I2[nrow(out_invade.df)])
+                                   out_invade.df$mI2[nrow(out_invade.df)] + out.df$mV_I2[nrow(out_invade.df)]) 
           if (num_I_res > 0 & num_I_invader > 0) {
             invade_res <- c(invade_res, 6)
           } else if (num_I_res == 0 & num_I_invader == 0) {
@@ -259,8 +259,8 @@ test_invade <- function(res_vir, perc_sold_per_farm, perc_vax) {
 }
 
 # Modulate migration and vaccination parameters and see how this affect ES -----
-for (perc_sold_per_farm in seq(0, 0.66, 0.33)) {
-  for (perc_vax in seq(0, 0.66, 0.33)) {
+for (perc_sold_per_farm in seq(0, 1, 0.33)) {
+  for (perc_vax in seq(0, 1, 0.33)) {
     #setup parallel backend to use many processors
     cores=detectCores()
     cl <- makeCluster(cores[1]-1) #not to overload computer
@@ -275,6 +275,6 @@ for (perc_sold_per_farm in seq(0, 0.66, 0.33)) {
     #stop cluster
     stopCluster(cl)
     
-    write.csv(finalMatrix, paste0("~/virEvol/res/mig.", perc_sold_per_farm, "_vax.", perc_vax, "_sm.csv"))
+    write.csv(finalMatrix, paste0("~/virEvol/res/mig.", perc_sold_per_farm, "_vax.", perc_vax, "_smsm.csv"))
   }
 }
