@@ -184,10 +184,11 @@ eqn <- function(time, state, parameters){
                   dmV, dmV_E1, dmV_I1, dmV_E2, dmV_I2)))})}
 
 # Function to get results of simulated invasion for a given resident strain ----
-# Legend: 0 = res strain wins; 1 = invade strain wins; 
-#         2 = no equilibrium of res strain; 3 = res strain extinct before invader introduced; 
-#         4 = no global equilibrium after invader strain introduced;
-#         5 = both strains are extinct after invader introduced; 6 = both strains are not extinct at equilibrium
+# Legend: 0 = res strain wins; 
+#         1 = invade strain wins; 
+#         2 = res strain extinct before invader introduced; 
+#         3 = both strains are extinct at after invader introduced; 
+#         4 = both strains are not extinct at equilibrium
 test_invade <- function(res_vir, invade_vir) {
   print(paste0("res vir: ", res_vir))
   print(paste0("invade vir: ", invade_vir))
@@ -213,77 +214,55 @@ test_invade <- function(res_vir, invade_vir) {
   out <- ode(y=init, times=time, eqn, parms=parameters)
   out.df <- as.data.frame(out)
   #plot.out.df(out.df)
-  # Check system is in equilibrium
-  is_in_equil <- TRUE
-  for (col_dex in 2:ncol(out.df)) {
-    if ((length(unique(round(out.df[(nrow(out.df) - 10):nrow(out.df),2], digits=2))) != 1) |
-        is.infinite(out.df[nrow(out.df), col_dex]) | is.nan(out.df[nrow(out.df), col_dex])) {
-      is_in_equil <- FALSE
-    }
-  }
-  if (!is_in_equil) {
+  if (round(out.df$fI1[nrow(out.df)] + out.df$mI1[nrow(out.df)] +
+            out.df$fE1[nrow(out.df)] + out.df$mE1[nrow(out.df)] +
+            out.df$fV_I1[nrow(out.df)] + out.df$mV_I1[nrow(out.df)] +
+            out.df$fV_E1[nrow(out.df)]) < 1) {
     res <- 2
   } else {
-    if (round(out.df$fI1[nrow(out.df)] + out.df$mI1[nrow(out.df)] +
-              out.df$fV_I1[nrow(out.df)] + out.df$mV_I1[nrow(out.df)]) < 1) {
+    invade_init <- c(fS=out.df$fS[nrow(out.df)], fE1=out.df$fE1[nrow(out.df)], 
+                     fE2=out.df$fE2[nrow(out.df)], fI1=out.df$fI1[nrow(out.df)], 
+                     fI2=1, fR1=out.df$fR1[nrow(out.df)], 
+                     fR2=out.df$fR2[nrow(out.df)], 
+                     fV=out.df$fV[nrow(out.df)], fV_E1=out.df$fV_E1[nrow(out.df)], 
+                     fV_I1=out.df$fV_I1[nrow(out.df)], fV_E2=out.df$fV_E2[nrow(out.df)], 
+                     fV_I2=out.df$fV_I2[nrow(out.df)],
+                     mS=out.df$mS[nrow(out.df)], mE1=out.df$mE1[nrow(out.df)], 
+                     mE2=out.df$mE2[nrow(out.df)], mI1=out.df$mI1[nrow(out.df)], 
+                     mI2=1, mR1=out.df$mR1[nrow(out.df)], 
+                     mR2=out.df$mR2[nrow(out.df)], 
+                     mV=out.df$mV[nrow(out.df)], mV_E1=out.df$mV_E1[nrow(out.df)], 
+                     mV_I1=out.df$mV_I1[nrow(out.df)], mV_E2=out.df$mV_E2[nrow(out.df)], 
+                     mV_I2=out.df$mV_I2[nrow(out.df)])
+    out_invade <- ode(y=invade_init, times=time, eqn, parms=parameters)
+    out_invade.df <- as.data.frame(out_invade)
+    #plot.out.df(out_invade.df)
+    num_EI_res <- round(out_invade.df$fE1[nrow(out_invade.df)] + 
+                          out_invade.df$fI1[nrow(out_invade.df)] + 
+                          out_invade.df$fV_E1[nrow(out_invade.df)] + 
+                          out_invade.df$fV_I1[nrow(out_invade.df)] + 
+                          out_invade.df$mE1[nrow(out_invade.df)] +
+                          out_invade.df$mI1[nrow(out_invade.df)] + 
+                          out_invade.df$mV_E1[nrow(out_invade.df)] +
+                          out_invade.df$mV_I1[nrow(out_invade.df)]) 
+    num_EI_res <- round(out_invade.df$fE2[nrow(out_invade.df)] + 
+                          out_invade.df$fI2[nrow(out_invade.df)] + 
+                          out_invade.df$fV_E2[nrow(out_invade.df)] + 
+                          out_invade.df$fV_I2[nrow(out_invade.df)] + 
+                          out_invade.df$mE2[nrow(out_invade.df)] +
+                          out_invade.df$mI2[nrow(out_invade.df)] + 
+                          out_invade.df$mV_E2[nrow(out_invade.df)] +
+                          out_invade.df$mV_I2[nrow(out_invade.df)]) 
+    if (num_EI_res > 0 & num_EI_invader > 0) {
+      res <- 4
+    } else if (num_EI_res == 0 & num_EI_invader == 0) {
       res <- 3
-    } else {
-      invade_init <- c(fS=out.df$fS[nrow(out.df)], fE1=out.df$fE1[nrow(out.df)], 
-                       fE2=out.df$fE2[nrow(out.df)], fI1=out.df$fI1[nrow(out.df)], 
-                       fI2=1, fR1=out.df$fR1[nrow(out.df)], 
-                       fR2=out.df$fR2[nrow(out.df)], 
-                       fV=out.df$fV[nrow(out.df)], fV_E1=out.df$fV_E1[nrow(out.df)], 
-                       fV_I1=out.df$fV_I1[nrow(out.df)], fV_E2=out.df$fV_E2[nrow(out.df)], 
-                       fV_I2=out.df$fV_I2[nrow(out.df)],
-                       mS=out.df$mS[nrow(out.df)], mE1=out.df$mE1[nrow(out.df)], 
-                       mE2=out.df$mE2[nrow(out.df)], mI1=out.df$mI1[nrow(out.df)], 
-                       mI2=1, mR1=out.df$mR1[nrow(out.df)], 
-                       mR2=out.df$mR2[nrow(out.df)], 
-                       mV=out.df$mV[nrow(out.df)], mV_E1=out.df$mV_E1[nrow(out.df)], 
-                       mV_I1=out.df$mV_I1[nrow(out.df)], mV_E2=out.df$mV_E2[nrow(out.df)], 
-                       mV_I2=out.df$mV_I2[nrow(out.df)])
-      out_invade <- ode(y=invade_init, times=time, eqn, parms=parameters)
-      out_invade.df <- as.data.frame(out_invade)
-      #plot.out.df(out_invade.df)
-      # Check system is in equilibrium
-      invade_is_in_equil <- TRUE
-      for (col_dex in 2:ncol(out_invade.df)) {
-        if (length(unique(round(out_invade.df[(nrow(out_invade.df) - 10):nrow(out_invade.df),2], digits=2))) != 1) {
-          invade_is_in_equil <- FALSE
-        }
-      }
-      if (!invade_is_in_equil) {
-        res <- 4
-      } else {
-        num_EI_res <- round(out_invade.df$fE1[nrow(out_invade.df)] + 
-                              out_invade.df$fI1[nrow(out_invade.df)] + 
-                              out_invade.df$fV_E1[nrow(out_invade.df)] + 
-                              out_invade.df$fV_I1[nrow(out_invade.df)] + 
-                              out_invade.df$mE1[nrow(out_invade.df)] +
-                              out_invade.df$mI1[nrow(out_invade.df)] + 
-                              out_invade.df$mV_E1[nrow(out_invade.df)] +
-                              out_invade.df$mV_I1[nrow(out_invade.df)]) 
-        num_EI_res <- round(out_invade.df$fE2[nrow(out_invade.df)] + 
-                              out_invade.df$fI2[nrow(out_invade.df)] + 
-                              out_invade.df$fV_E2[nrow(out_invade.df)] + 
-                              out_invade.df$fV_I2[nrow(out_invade.df)] + 
-                              out_invade.df$mE2[nrow(out_invade.df)] +
-                              out_invade.df$mI2[nrow(out_invade.df)] + 
-                              out_invade.df$mV_E2[nrow(out_invade.df)] +
-                              out_invade.df$mV_I2[nrow(out_invade.df)]) 
-        if (num_EI_res > 0 & num_EI_invader > 0) {
-          res <- 6
-        } else if (num_EI_res == 0 & num_EI_invader == 0) {
-          res <- 5
-        } else if (num_EI_res > 0 & num_EI_invader == 0) {
-          res <- 0
-        } else if (num_EI_res == 0 & num_EI_invader > 0) {
-          res <- 1
-        }
-      }
+    } else if (num_EI_res > 0 & num_EI_invader == 0) {
+      res <- 0
+    } else if (num_EI_res == 0 & num_EI_invader > 0) {
+      res <- 1
     }
   }
-  
   return(c(res))
 }
 
