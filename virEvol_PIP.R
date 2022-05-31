@@ -70,7 +70,7 @@ betas <- ((((0.05 * virulences)^0.45)) + 0.4)
 plot(morts, betas, type='l')
 
 # Model equations --------------------------------------------------------------
-time <- seq(0, t_max, by = t_max / (2 * length(1:t_max)))
+time <- seq(0, t_max, by = 1)
 eqn <- function(time, state, parameters){
   with(as.list(c(state, parameters)),{
     # Backyard poultry farms
@@ -224,8 +224,14 @@ test_invade <- function(res_vir, invade_vir) {
   if (!is_in_equil) {
     res <- 2
   } else {
-    if (round(out.df$fI1[nrow(out.df)] + out.df$mI1[nrow(out.df)] +
-              out.df$fV_I1[nrow(out.df)] + out.df$mV_I1[nrow(out.df)]) < 1) {
+    if (round(out.df$fE1[nrow(out.df)] + 
+              out.df$fI1[nrow(out.df)] + 
+              out.df$mE1[nrow(out.df)] +
+              out.df$mI1[nrow(out.df)] +
+              out.df$fV_E1[nrow(out.df)] +
+              out.df$fV_I1[nrow(out.df)] + 
+              out.df$mV_E1[nrow(out.df)] +
+              out.df$mV_I1[nrow(out.df)]) < 1) {
       res <- 3
     } else {
       invade_init <- c(fS=out.df$fS[nrow(out.df)], fE1=out.df$fE1[nrow(out.df)], 
@@ -263,14 +269,14 @@ test_invade <- function(res_vir, invade_vir) {
                               out_invade.df$mI1[nrow(out_invade.df)] + 
                               out_invade.df$mV_E1[nrow(out_invade.df)] +
                               out_invade.df$mV_I1[nrow(out_invade.df)]) 
-        num_EI_res <- round(out_invade.df$fE2[nrow(out_invade.df)] + 
-                              out_invade.df$fI2[nrow(out_invade.df)] + 
-                              out_invade.df$fV_E2[nrow(out_invade.df)] + 
-                              out_invade.df$fV_I2[nrow(out_invade.df)] + 
-                              out_invade.df$mE2[nrow(out_invade.df)] +
-                              out_invade.df$mI2[nrow(out_invade.df)] + 
-                              out_invade.df$mV_E2[nrow(out_invade.df)] +
-                              out_invade.df$mV_I2[nrow(out_invade.df)]) 
+        num_EI_invader <- round(out_invade.df$fE2[nrow(out_invade.df)] + 
+                                out_invade.df$fI2[nrow(out_invade.df)] + 
+                                out_invade.df$fV_E2[nrow(out_invade.df)] + 
+                                out_invade.df$fV_I2[nrow(out_invade.df)] + 
+                                out_invade.df$mE2[nrow(out_invade.df)] +
+                                out_invade.df$mI2[nrow(out_invade.df)] + 
+                                out_invade.df$mV_E2[nrow(out_invade.df)] +
+                                out_invade.df$mV_I2[nrow(out_invade.df)]) 
         if (num_EI_res > 0 & num_EI_invader > 0) {
           res <- 6
         } else if (num_EI_res == 0 & num_EI_invader == 0) {

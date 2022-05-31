@@ -83,7 +83,7 @@ init <- c(fS=fS_init, fE1=0, fE2=0, fI1=fI1_init, fI2=fI2_init, fR1=0, fR2=0,
           mV=0, mV_E1=0, mV_I1=0, mV_E2=0, mV_I2=0)
 
 # Model equations --------------------------------------------------------------
-time <- seq(0, t_max, by = t_max / (2 * length(1:t_max)))
+time <- seq(0, t_max, by = 1)
 eqn <- function(time, state, parameters){
     with(as.list(c(state, parameters)),{
       # Backyard poultry farms
