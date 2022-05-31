@@ -25,7 +25,7 @@ library(deSolve)
 # Parameters of the model ------------------------------------------------------
 # Strain 1 is a lower virulence strain
 # Strain 2 is a higher virulence strain
-t_max = 4e4 # time of simulation (days)
+t_max = 1e4 # time of simulation (days)
 pop_size = 1e5 # population size
 fS_init = (pop_size * 1/2) - 2 # initial susceptible population in farms
 mS_init = (pop_size * 1/2) - 2 # initial susceptible population in markets
@@ -37,15 +37,17 @@ sig = 1 / 5 # transition rate of infectiousness per chicken per day
 gamm = 1 / 12#4.5 # transition rate of recovery per chicken per day
 mort = 1 / 4 # disease mortality rate per chicken per day
 nat_mort = 1 / 730 # natural mortality rate per chicken per day
-
+mfbet_ratio = 5
 res_vir = 30.01
-invade_vir = 80.01
-fbet1 = ((((0.005 * res_vir)^0.05) / 100) + 0.5) / pop_size
+invade_vir = 50.01
+fbet1 = ((((0.005 * res_vir)^0.05) / 100) + 0.5) / (pop_size / 2)
+#fbet1 = ((((0.05 * res_vir)^0.45)) + 0.4) / (pop_size / 2)
 mbet1 = fbet1 * mfbet_ratio
-fbet2 = ((((0.005 * invade_vir)^0.05) / 100) + 0.5) / pop_size
+fbet2 = ((((0.005 * invade_vir)^0.05) / 100) + 0.5) / (pop_size / 2)
+#fbet2 = ((((0.05 * invade_vir)^0.45)) + 0.4) / (pop_size / 2)
 mbet2 = fbet2 * mfbet_ratio
-p_1 = ((res_vir * 0.5) / 100) + 0.5
-p_2 = ((invade_vir * 0.5) / 100) + 0.5
+p_1 = ((res_vir * 0.4) / 100) + 0.6
+p_2 = ((invade_vir * 0.4) / 100) + 0.6
 
 # fbet1 = (15 / 30) / pop_size # transmission rate of strain 1 among farms per SI contact per day
 # mbet1 = (40 / 7) / pop_size # transmission rate of strain 1 among markets per SI contact per day

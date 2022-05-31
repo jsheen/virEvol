@@ -40,17 +40,17 @@ gamm = 1 / 12#4.5 # transition rate of recovery per chicken per day
 mort = 1 / 4 # disease mortality rate per chicken per day
 nat_mort = 1 / 730 # natural mortality rate per chicken per day
 b = ((0.75 / 30) / 15) * 5 # birth rate of new chickens in farms per susceptible chicken per day (from Table 2 of household level per month of Annapragada et al. 2019)
-perc_sold_per_farm = 0#0.5 # percent sold in interval
+perc_sold_per_farm = 0 # percent sold in interval
 inter_sell_time_per_farm = 120 # days between successive sales of chickens of a farm
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken per day
 m_mf = (1 / 7) # migration rate of chickens from markets to farms per chicken per day
-perc_vax = 0#0.5 # percent vaccinated at each campaign
+perc_vax = 0 # percent vaccinated at each campaign
 inter_vax_time = 120 # time that perc_vax is vaccinated
 v = perc_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
 v_hat = (1 / 126) # rate of loss of immunity due to vaccination per chicken per day
 theta = (1 / 126) # rate of loss of immunity due to previous infection per chicken per day
-vir_steps = seq(0.01, 80.01, 5)
-mfbet_ratio = 10
+vir_steps = seq(0.01, 80.01, 10)
+mfbet_ratio = 5
 
 # Plotting function ------------------------------------------------------------
 plot.out.df <- function(out.df) {
@@ -66,7 +66,7 @@ plot.out.df <- function(out.df) {
 # # Plot transmission-mortality tradeoff curve -----------------------------------
 virulences <- seq(0.01, 100, 0.1)
 morts <- ((virulences * 0.4) / 100) + 0.6
-betas <- ((((0.05 * virulences)^0.45)) + 0.4)
+betas <- ((((0.005 * virulences)^0.05) / 10) + 0.5)
 plot(morts, betas, type='l')
 
 # Model equations --------------------------------------------------------------
@@ -195,9 +195,9 @@ test_invade <- function(res_vir, invade_vir) {
   res <- NA
   
   # Strain specific parameters
-  fbet1 <- ((((0.05 * res_vir)^0.3)) + 0.4) / pop_size
+  fbet1 <- ((((0.005 * res_vir)^0.05) / 100) + 0.5) / (pop_size / 2)
   mbet1 <- fbet1 * mfbet_ratio
-  fbet2 <- ((((0.05 * invade_vir)^0.3)) + 0.4) / pop_size
+  fbet2 <- ((((0.005 * invade_vir)^0.05) / 100) + 0.5) / (pop_size / 2)
   mbet2 <- fbet2 * mfbet_ratio
   p_1 <- ((res_vir * 0.4) / 100) + 0.6
   p_2 <- ((invade_vir * 0.4) / 100) + 0.6
@@ -302,6 +302,7 @@ pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow
 pip <- pracma::flipud(pip) #columns stay in place, but now from bottom to top is increasing virulence
 pip <- ifelse((pip != 0 & pip != 1), NA, pip)
 plot(pip)
+write.csv(pip, paste0('~/virEvol/res/', perc_sold_per_farm, '_', perc_vax, '.csv'))
 
 
 
