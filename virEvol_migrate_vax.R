@@ -50,17 +50,17 @@ eqn <- function(time, state, parameters){
   with(as.list(c(state, parameters)),{
     # Backyard poultry farms
     dfS = b*(fS + fE1 + fE2 + fI1 + fI2 + fR1 + fR2) -
-      fbet1*(1-v)*fS*fI1 -fbet2*(1-v)*fS*fI2 -
-      fbet1*(1-v)*fS*fV_I1 -fbet2*(1-v)*fS*fV_I2 -
+      fbet1*fS*fI1 -fbet2*fS*fI2 -
+      fbet1*fS*fV_I1 -fbet2*fS*fV_I2 -
       v*fS +v_hat*fV -
-      m_fm*(1-v)*fS +m_mf*mS -
-      nat_mort*(1-v)*fS +
+      m_fm*fS +m_mf*mS -
+      nat_mort*fS +
       theta*fR1 + theta*fR2
-    dfE1 = fbet1*(1-v)*fS*fI1 +fbet1*(1-v)*fS*fV_I1 -
+    dfE1 = fbet1*fS*fI1 +fbet1*fS*fV_I1 -
       sig*fE1 -
       m_fm*fE1 +m_mf*mE1 -
       nat_mort*fE1
-    dfE2 = fbet2*(1-v)*fS*fI2 +fbet2*(1-v)*fS*fV_I2 -
+    dfE2 = fbet2*fS*fI2 +fbet2*fS*fV_I2 -
       sig*fE2 -
       m_fm*fE2 +m_mf*mE2 -
       nat_mort*fE2
@@ -105,7 +105,7 @@ eqn <- function(time, state, parameters){
     # Live bird markets
     dmS =  b*(mS+mE1+mE2+mI1+mI2+mR1+mR2)-
       mbet1*mS*mI1 -mbet2*mS*mI2 -
-      m_mf*mS +m_fm*(1-v)*fS -
+      m_mf*mS +m_fm*fS -
       nat_mort*mS +
       theta*mR1 + theta*mR2
     dmE1 = mbet1*mS*mI1 -
@@ -214,14 +214,14 @@ test_invade <- function(res_vir, perc_sold_per_farm, perc_vax) {
       } else {
         invade_init <- c(fS=out.df$fS[nrow(out.df)], fE1=out.df$fE1[nrow(out.df)], 
                          fE2=out.df$fE2[nrow(out.df)], fI1=out.df$fI1[nrow(out.df)], 
-                         fI2=1e-05, fR1=out.df$fR1[nrow(out.df)], 
+                         fI2=1, fR1=out.df$fR1[nrow(out.df)], 
                          fR2=out.df$fR2[nrow(out.df)], 
                          fV=out.df$fV[nrow(out.df)], fV_E1=out.df$fV_E1[nrow(out.df)], 
                          fV_I1=out.df$fV_I1[nrow(out.df)], fV_E2=out.df$fV_E2[nrow(out.df)], 
                          fV_I2=out.df$fV_I2[nrow(out.df)],
                          mS=out.df$mS[nrow(out.df)], mE1=out.df$mE1[nrow(out.df)], 
                          mE2=out.df$mE2[nrow(out.df)], mI1=out.df$mI1[nrow(out.df)], 
-                         mI2=1e-05, mR1=out.df$mR1[nrow(out.df)], 
+                         mI2=1, mR1=out.df$mR1[nrow(out.df)], 
                          mR2=out.df$mR2[nrow(out.df)], 
                          mV=out.df$mV[nrow(out.df)], mV_E1=out.df$mV_E1[nrow(out.df)], 
                          mV_I1=out.df$mV_I1[nrow(out.df)], mV_E2=out.df$mV_E2[nrow(out.df)], 
