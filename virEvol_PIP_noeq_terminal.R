@@ -1,3 +1,5 @@
+args <- commandArgs(trailingOnly=TRUE)
+print(args)
 # ------------------------------------------------------------------------------
 # Space modifies predictions of virulence evolution through differential immunization
 # status and contact rate in a backyard poultry farm, live market system
@@ -40,16 +42,18 @@ gamm = 1 / 12#4.5 # transition rate of recovery per chicken per day
 mort = 1 / 4 # disease mortality rate per chicken per day
 nat_mort = 1 / 730 # natural mortality rate per chicken per day
 b = ((0.75 / 30) / 15) * 5 # birth rate of new chickens in farms per susceptible chicken per day (from Table 2 of household level per month of Annapragada et al. 2019)
-perc_sold_per_farm = 0 # percent sold in interval
+perc_sold_per_farm = as.numeric(args[1]) / 100 # percent sold in interval
 inter_sell_time_per_farm = 120 # days between successive sales of chickens of a farm
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken per day
 m_mf = (1 / 7) # migration rate of chickens from markets to farms per chicken per day
-perc_vax = 0 # percent vaccinated at each campaign
+perc_vax = as.numeric(args[2]) / 100 # percent vaccinated at each campaign
+print(perc_vax)
+print(perc_sold_per_farm)
 inter_vax_time = 120 # time that perc_vax is vaccinated
 v = perc_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
 v_hat = (1 / 126) # rate of loss of immunity due to vaccination per chicken per day
 theta = (1 / 126) # rate of loss of immunity due to previous infection per chicken per day
-vir_steps = seq(0.01, 80.01, 10)
+vir_steps = seq(0.01, 100, 5)
 mfbet_ratio = 5
 
 # Plotting function ------------------------------------------------------------
@@ -250,13 +254,13 @@ test_invade <- function(res_vir, invade_vir) {
                           out_invade.df$mV_E1[nrow(out_invade.df)] +
                           out_invade.df$mV_I1[nrow(out_invade.df)]) 
     num_EI_invader <- round(out_invade.df$fE2[nrow(out_invade.df)] + 
-                            out_invade.df$fI2[nrow(out_invade.df)] + 
-                            out_invade.df$fV_E2[nrow(out_invade.df)] + 
-                            out_invade.df$fV_I2[nrow(out_invade.df)] + 
-                            out_invade.df$mE2[nrow(out_invade.df)] +
-                            out_invade.df$mI2[nrow(out_invade.df)] + 
-                            out_invade.df$mV_E2[nrow(out_invade.df)] +
-                            out_invade.df$mV_I2[nrow(out_invade.df)]) 
+                              out_invade.df$fI2[nrow(out_invade.df)] + 
+                              out_invade.df$fV_E2[nrow(out_invade.df)] + 
+                              out_invade.df$fV_I2[nrow(out_invade.df)] + 
+                              out_invade.df$mE2[nrow(out_invade.df)] +
+                              out_invade.df$mI2[nrow(out_invade.df)] + 
+                              out_invade.df$mV_E2[nrow(out_invade.df)] +
+                              out_invade.df$mV_I2[nrow(out_invade.df)]) 
     if (num_EI_res > 0 & num_EI_invader > 0) {
       res <- 4
     } else if (num_EI_res == 0 & num_EI_invader == 0) {
