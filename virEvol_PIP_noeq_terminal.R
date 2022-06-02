@@ -71,7 +71,7 @@ plot.out.df <- function(out.df) {
 # # Plot transmission-mortality tradeoff curve -----------------------------------
 virulences <- seq(0.01, 100, 0.1)
 morts <- ((virulences * 0.4) / 100) + 0.6
-betas <- ((((0.005 * virulences)^0.05) / 10) + 0.5)
+betas <- ((((0.005 * virulences)^0.05) / 100) + 1)
 #plot(morts, betas, type='l')
 
 # Model equations --------------------------------------------------------------
@@ -200,9 +200,9 @@ test_invade <- function(res_vir, invade_vir) {
   res <- NA
   
   # Strain specific parameters
-  fbet1 <- ((((0.005 * res_vir)^0.05) / 100) + 0.5) / (pop_size / 2)
+  fbet1 <- ((((0.005 * res_vir)^0.05) / 100) + 1) / (pop_size / 2)
   mbet1 <- fbet1 * mfbet_ratio
-  fbet2 <- ((((0.005 * invade_vir)^0.05) / 100) + 0.5) / (pop_size / 2)
+  fbet2 <- ((((0.005 * invade_vir)^0.05) / 100) + 1) / (pop_size / 2)
   mbet2 <- fbet2 * mfbet_ratio
   p_1 <- ((res_vir * 0.4) / 100) + 0.6
   p_2 <- ((invade_vir * 0.4) / 100) + 0.6
@@ -307,7 +307,7 @@ pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow
 pip <- pracma::flipud(pip) #columns stay in place, but now from bottom to top is increasing virulence
 #pip <- ifelse((pip != 0 & pip != 1), NA, pip)
 #plot(pip)
-write.csv(pip, paste0('~/virEvol/res/', perc_sold_per_farm, '_', perc_vax, '.csv'))
+write.csv(pip, paste0('~/virEvol/res/', perc_sold_per_farm, '_', perc_vax, '_sensitivity.csv'))
 
 
 

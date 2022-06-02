@@ -10,7 +10,7 @@ l <- list()
 l_dex <- 1
 for (perc_sold_per_farm in seq(0, 0.8, by=0.2)) {
   for (perc_vax in seq(0, 0.8, by=0.2)) {
-    pip <- read.csv(paste0('~/virEvol/res/', perc_sold_per_farm, '_', perc_vax, '.csv'))
+    pip <- read.csv(paste0('~/virEvol/res/', perc_sold_per_farm, '_', perc_vax, '_sensitivity.csv'))
     pip <- pip[,c(2:ncol(pip))]
     pip <- data.matrix(pip)
     pip <- ifelse((pip != 0 & pip != 1), NA, pip)
@@ -29,6 +29,9 @@ for (perc_sold_per_farm in seq(0, 0.8, by=0.2)) {
 }
 ggsave(filename="~/virEvol/output.tiff", marrangeGrob(grobs = l, nrow=5, ncol=5, top='Percent sold per farm in 3 months -->',
                                                      left='<-- Percent vaccinated in 3 months'),
+       width=8, height=8, units='in', dpi=600)
+ggsave(filename="~/virEvol/output_sensitivity.tiff", marrangeGrob(grobs = l, nrow=5, ncol=5, top='Percent sold per farm in 3 months -->',
+                                                      left='<-- Percent vaccinated in 3 months'),
        width=8, height=8, units='in', dpi=600)
 
 
