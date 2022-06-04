@@ -40,11 +40,11 @@ gamm = 1 / 12#4.5 # transition rate of recovery per chicken per day
 mort = 1 / 4 # disease mortality rate per chicken per day
 nat_mort = 1 / 730 # natural mortality rate per chicken per day
 b = ((0.75 / 30) / 15) * 5 # birth rate of new chickens in farms per susceptible chicken per day (from Table 2 of household level per month of Annapragada et al. 2019)
-perc_sold_per_farm = 0 # percent sold in interval
+perc_sold_per_farm = 0.2 # percent sold in interval
 inter_sell_time_per_farm = 120 # days between successive sales of chickens of a farm
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken per day
 m_mf = (1 / 7) # migration rate of chickens from markets to farms per chicken per day
-perc_vax = 0 # percent vaccinated at each campaign
+perc_vax = 0.4 # percent vaccinated at each campaign
 inter_vax_time = 120 # time that perc_vax is vaccinated
 v = perc_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
 v_hat = (1 / 126) # rate of loss of immunity due to vaccination per chicken per day
@@ -300,8 +300,8 @@ stopCluster(cl)
 # plot PIP ---------------------------------------------------------------------
 pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow=F)
 pip <- pracma::flipud(pip) #columns stay in place, but now from bottom to top is increasing virulence
-pip <- ifelse((pip != 0 & pip != 1), NA, pip)
-plot(pip)
+#pip <- ifelse((pip != 0 & pip != 1), NA, pip)
+#plot(pip)
 write.csv(pip, paste0('~/virEvol/res/', perc_sold_per_farm, '_', perc_vax, '_singular.csv'))
 
 

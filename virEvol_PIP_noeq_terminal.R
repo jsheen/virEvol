@@ -30,7 +30,7 @@ library(pracma)
 library(plot.matrix)
 
 # Fixed parameters of the model ------------------------------------------------
-t_max = 5e4 # time of simulation (days)
+t_max = 4e4 # time of simulation (days)
 pop_size = 1e5 # population size
 fS_init = (pop_size * 1/2) - 1 # initial susceptible population in farms
 mS_init = (pop_size * 1/2) - 1 # initial susceptible population in markets
@@ -54,7 +54,7 @@ inter_vax_time = 120 # time that perc_vax is vaccinated
 v = perc_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
 v_hat = (1 / 126) # rate of loss of immunity due to vaccination per chicken per day
 theta = (1 / 126) # rate of loss of immunity due to previous infection per chicken per day
-vir_steps = seq(0.01, 95.01, 2)
+vir_steps = seq(0.01, 95.01, 5)
 mfbet_ratio = 5
 
 # Plotting function ------------------------------------------------------------
