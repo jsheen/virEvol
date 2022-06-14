@@ -7,10 +7,9 @@
 #               evolution on space due to differential immunization status and contact rate.
 #               With this model, we seek to understand whether, from a modeling standpoint,
 #               a higher virulent form of the virus would be permitted, and whether this
-#               higher virulent form will only be able to circulate within farms; acting
-#               as a reservoir that spills into the market population and creates transitory
-#               epidemics. The rate of migration may limit the amount of space the virulent 
-#               virus is able to take over.
+#               higher virulent form will only be able to circulate within farms. The rate 
+#               of migration may limit the amount of space the virulent virus is able to 
+#               take over as well.
 # ------------------------------------------------------------------------------
 
 # Assumptions ------------------------------------------------------------------
@@ -18,6 +17,7 @@
 # - We assume that there is no transmission of the vaccine, and that there are no other lower-virulent strains of the virus circulating
 # - We assume that probability of death is the same between strain 1 and strain 2 after first infection
 # - Vaccination completely protects chickens from mortality, and is only conducted in farms
+# - We assume no super-infection in the system
 
 # Load libraries ---------------------------------------------------------------
 library(deSolve)
@@ -27,8 +27,8 @@ library(pracma)
 library(plot.matrix)
 
 # Fixed parameters of the model ------------------------------------------------
-t_max = 5e4 # time of simulation (days)
-pop_size = 1e5 # population size
+t_max = 4e3 # time of simulation (days)
+pop_size = 1e6 # population size
 fS_init = (pop_size * 1/2) - 1 # initial susceptible population in farms
 mS_init = (pop_size * 1/2) - 1 # initial susceptible population in markets
 fI1_init = 1 # initial strain 1 infectious population in farms
@@ -36,10 +36,10 @@ mI1_init = 1 # initial strain 1 infectious population in markets
 fI2_init = 0 # initial strain 2 infectious population in farms
 mI2_init = 0 # initial strain 2 infectious population in markets
 sig = 1 / 5 # transition rate of infectiousness per chicken per day
-gamm = 1 / 12#4.5 # transition rate of recovery per chicken per day
+gamm = 1 / 10 # transition rate of recovery per chicken per day
 mort = 1 / 4 # disease mortality rate per chicken per day
 nat_mort = 1 / 730 # natural mortality rate per chicken per day
-b = ((0.75 / 30) / 15) * 5 # birth rate of new chickens in farms per susceptible chicken per day (from Table 2 of household level per month of Annapragada et al. 2019)
+b = ((0.75 / 30) / 15) * 2 # birth rate of new chickens in farms per susceptible chicken per day (from Table 2 of household level per month of Annapragada et al. 2019)
 perc_sold_per_farm = 0.2 # percent sold in interval
 inter_sell_time_per_farm = 120 # days between successive sales of chickens of a farm
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken per day
@@ -54,6 +54,16 @@ mfbet_ratio = 5
 
 # Plotting function ------------------------------------------------------------
 plot.out.df <- function(out.df) {
+  # Population size
+  plot(out.df$time, rowSums(out.df[-c(1)]), main='Population size', ylab='N', xlab='days', type='l')
+  
+  # Susceptible pool divided into markets and farms
+  plot(out.df$time, out.df$fS, col='black', type='l', ylim=c(0, max(out.df$fS, out.df$mS)), main='Susceptible divided into markets and farms', ylab='S', xlab='days')
+  lines(out.df$time, out.df$mS, col='red')
+  legend('topright', legend=c("farms", "markets"),
+         col=c("black", "red"), lty=1, cex=0.8)
+  
+  # Infectious pool + Infectious and previously recovered pool divided into markets and farms
   plot(out.df$time, out.df$fI1, type='l', ylim=c(0, max(out.df$fI1, out.df$mI1, out.df$fI2, out.df$mI2)),
        main='Incubation and Infectious divided into markets and farms', ylab='I', xlab='days', col='orange', lty=1)
   lines(out.df$time, out.df$mI1, col='orange', lty=2)
@@ -61,6 +71,19 @@ plot.out.df <- function(out.df) {
   lines(out.df$time, out.df$mI2, col='blue', lty=2)
   legend('topright', legend=c("farms_strain1", "markets_strain1", "farms_strain2", "markets_strain2"),
          col=c("orange", "orange", "blue", "blue"), lty=c(1,2,1,2), cex=0.8)
+  
+  # Comparing strains 1 and 2
+  plot(out.df$time, out.df$mI1 + out.df$fI1, col='orange', type='l', ylim=c(0, max((out.df$fI1 + out.df$mI1), (out.df$fI2 + out.df$mI2))),
+       main='Strain 1 vs. Strain 2', ylab='I', xlab='days')
+  lines(out.df$time, out.df$mI2 + out.df$fI2, col='blue')
+  legend('topright', legend=c("strain 1", "strain 2"),
+         col=c("orange", "blue"), lty=1, cex=0.8)
+  
+  # Vaccination divided into markets and farms
+  plot(out.df$time, out.df$mV, col='red', type='l', ylim=c(0, max(out.df$mV, out.df$fV)), main='Vaccination divided into markets and farms', ylab='V', xlab='days')
+  lines(out.df$time, out.df$fV, col='black')
+  legend('topright', legend=c("farms", "markets"),
+         col=c("black", "red"), lty=1, cex=0.8)
 }
 
 # # Plot transmission-mortality tradeoff curve -----------------------------------
@@ -302,7 +325,7 @@ pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow
 pip <- pracma::flipud(pip) #columns stay in place, but now from bottom to top is increasing virulence
 #pip <- ifelse((pip != 0 & pip != 1), NA, pip)
 #plot(pip)
-write.csv(pip, paste0('~/virEvol/res/', perc_sold_per_farm, '_', perc_vax, '_singular.csv'))
+#write.csv(pip, paste0('~/virEvol/res/', perc_sold_per_farm, '_', perc_vax, '_singular.csv'))
 
 
 
