@@ -27,25 +27,25 @@ library(pracma)
 library(plot.matrix)
 
 # Fixed parameters of the model ------------------------------------------------
-t_max_eq1 = 1e4 # time of simulation to first equilibrium (days)
+t_max_eq1 = 2e3 # time of simulation to first equilibrium (days)
 t_max_eq2 = 2e3 # time of simulation to second equilibrium (days)
 pop_size = 1e6 # population size
-fS_init = pop_size - 1#(pop_size * 1/2) - 1 # initial susceptible population in farms
-mS_init = #(pop_size * 1/2) - 1 # initial susceptible population in markets
-fI1_init = 0#1 # initial strain 1 infectious population in farms
-mI1_init = 0#1 # initial strain 1 infectious population in markets
+fS_init = (pop_size * 1/2) - 1 # initial susceptible population in farms
+mS_init = (pop_size * 1/2) - 1 # initial susceptible population in markets
+fI1_init = 1 # initial strain 1 infectious population in farms
+mI1_init = 1 # initial strain 1 infectious population in markets
 fI2_init = 0 # initial strain 2 infectious population in farms
 mI2_init = 0 # initial strain 2 infectious population in markets
 sig = 1 / 5 # transition rate of infectiousness per chicken per day
 gamm = 1 / 10 # transition rate of recovery per chicken per day
 mort = 1 / 4 # disease mortality rate per chicken per day
 nat_mort = 1 / 730 # natural mortality rate per chicken per day
-b = 1 / 120 # average birth rate for chickens for raising is once every 4 months
-perc_sold_per_farm = 0 # percent sold in interval
+b = 1 / 120 # average birth rate of chickens for raising
+perc_sold_per_farm = 0.3 # percent sold in interval
 inter_sell_time_per_farm = 120 # days between successive sales of chickens of a farm
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken per day
 m_mf = (1 / 7) # migration rate of chickens from markets to farms per chicken per day
-perc_vax = 0 # percent vaccinated at each campaign
+perc_vax = 0.1 # percent vaccinated at each campaign
 inter_vax_time = 120 # time that perc_vax is vaccinated
 v = perc_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
 v_hat = (1 / 126) # rate of loss of immunity due to vaccination per chicken per day
@@ -64,7 +64,7 @@ plot.out.df <- function(out.df) {
   legend('topright', legend=c("farms", "markets"),
          col=c("black", "red"), lty=1, cex=0.8)
   
-  # Infectious pool + Infectious and previously recovered pool divided into markets and farms
+  # Infectious pool divided into markets and farms
   plot(out.df$time, out.df$fI1, type='l', ylim=c(0, max(out.df$fI1, out.df$mI1, out.df$fI2, out.df$mI2)),
        main='Incubation and Infectious divided into markets and farms', ylab='I', xlab='days', col='orange', lty=1)
   lines(out.df$time, out.df$mI1, col='orange', lty=2)
@@ -77,6 +77,13 @@ plot.out.df <- function(out.df) {
   plot(out.df$time, out.df$mI1 + out.df$fI1, col='orange', type='l', ylim=c(0, max((out.df$fI1 + out.df$mI1), (out.df$fI2 + out.df$mI2))),
        main='Strain 1 vs. Strain 2', ylab='I', xlab='days')
   lines(out.df$time, out.df$mI2 + out.df$fI2, col='blue')
+  legend('topright', legend=c("strain 1", "strain 2"),
+         col=c("orange", "blue"), lty=1, cex=0.8)
+  
+  # Plot recovered pool
+  plot(out.df$time, out.df$mR1 + out.df$fR1, col='orange', type='l', ylim=c(0, max((out.df$fR1 + out.df$mR1), (out.df$fR2 + out.df$mR2))),
+       main='Strain 1 vs. Strain 2', ylab='R', xlab='days')
+  lines(out.df$time, out.df$mR2 + out.df$fR2, col='blue')
   legend('topright', legend=c("strain 1", "strain 2"),
          col=c("orange", "blue"), lty=1, cex=0.8)
   
@@ -95,34 +102,17 @@ morts <- ((virulences * 0.5) / 100) + 0.5
 betas <- (0.5 * (virulences)^0.33) + 0.1 # beta is, roughly, the number of chickens a single infectious chicken infects in a month
 plot(morts, betas, type='l')
 
-
 # Model equations --------------------------------------------------------------
 eqn <- function(time, state, parameters){
   with(as.list(c(state, parameters)),{
     # Backyard poultry farms
-    dfS = b*(fS + fE1 + fE2 + fI1 + fI2 + fR1 + fR2 + fV + fV_E1 + fV_I1 + fV_E2 + fV_I2)*(1 - ((fS + fE1 + fE2 + fI1 + fI2 + fR1 + fR2 + fV + fV_E1 + fV_I1 + fV_E2 + fV_I2) / ((b / (b - nat_mort)) * (fS + fE1 + fE2 + fI1 + fI2 + fR1 + fR2 + fV + fV_E1 + fV_I1 + fV_E2 + fV_I2)))) -
+    dfS = b*(fS + fE1 + fE2 + fI1 + fI2 + fR1 + fR2 + fV + fV_E1 + fV_I1 + fV_E2 + fV_I2)*(1 - ((fS + fE1 + fE2 + fI1 + fI2 + fR1 + fR2 + fV + fV_E1 + fV_I1 + fV_E2 + fV_I2) / ((b / (b - nat_mort)) * (pop_size)))) -
       (fbet1*fS*fI1) -(fbet2*fS*fI2) -
       (fbet1*fS*fV_I1) -(fbet2*fS*fV_I2) -
       v*fS +v_hat*fV -
       m_fm*fS +m_mf*mS -
       nat_mort*fS +
       theta*fR1 + theta*fR2
-    print(b)
-    print(fS)
-    print(fE1)
-    print(fE2)
-    print(fI1)
-    print(fI2)
-    print(fR1)
-    print(fR2)
-    print(fV)
-    print(fV_E1)
-    print(fV_I1)
-    print(fV_E2)
-    print(fV_I2)
-    print(b*(fS + fE1 + fE2 + fI1 + fI2 + fR1 + fR2 + fV + fV_E1 + fV_I1 + fV_E2 + fV_I2))
-    print('hi')
-    print((1 - ((fS + fE1 + fE2 + fI1 + fI2 + fR1 + fR2 + fV + fV_E1 + fV_I1 + fV_E2 + fV_I2) / ((b / (b - nat_mort)) * (fS + fE1 + fE2 + fI1 + fI2 + fR1 + fR2 + fV + fV_E1 + fV_I1 + fV_E2 + fV_I2)))))
     dfE1 = (fbet1*fS*fI1) +(fbet1*fS*fV_I1) -
       sig*fE1 -
       m_fm*fE1 +m_mf*mE1 -
@@ -170,7 +160,7 @@ eqn <- function(time, state, parameters){
       m_fm*fV_I2 +m_mf*mV_I2 -
       nat_mort*fV_I2
     # Live bird markets
-    dmS = b*(mS + mE1 + mE2 + mI1 + mI2 + mR1 + mR2 + mV + mV_E1 + mV_I1 + mV_E2 + mV_I2)*(1 - ((mS + mE1 + mE2 + mI1 + mI2 + mR1 + mR2 + mV + mV_E1 + mV_I1 + mV_E2 + mV_I2) / ((b / (b - nat_mort)) * (mS + mE1 + mE2 + mI1 + mI2 + mR1 + mR2 + mV + mV_E1 + mV_I1 + mV_E2 + mV_I2)))) -
+    dmS = b*(mS + mE1 + mE2 + mI1 + mI2 + mR1 + mR2 + mV + mV_E1 + mV_I1 + mV_E2 + mV_I2)*(1 - ((mS + mE1 + mE2 + mI1 + mI2 + mR1 + mR2 + mV + mV_E1 + mV_I1 + mV_E2 + mV_I2) / ((b / (b - nat_mort)) * (pop_size)))) -
       (mbet1*mS*mI1) -(mbet2*mS*mI2) -
       (mbet1*mS*mV_I1) -(mbet2*mS*mV_I2) -
       m_mf*mS +m_fm*fS -
@@ -239,9 +229,9 @@ test_invade <- function(res_vir, invade_vir) {
   res <- NA
   
   # Strain specific parameters
-  fbet1 <- (((0.5 * (res_vir)^0.33) + 0.1) / 30) / fS_init
+  fbet1 <- ((0.5 * (res_vir)^0.33) + 0.1) / pop_size
   mbet1 <- fbet1 * mfbet_ratio
-  fbet2 <- (((0.5 * (invade_vir)^0.33) + 0.1) / 30) / fS_init
+  fbet2 <- ((0.5 * (invade_vir)^0.33) + 0.1) / pop_size
   mbet2 <- fbet2 * mfbet_ratio
   p_1 <- ((res_vir * 0.5) / 100) + 0.5
   p_2 <- ((invade_vir * 0.5) / 100) + 0.5
