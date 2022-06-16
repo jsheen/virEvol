@@ -27,8 +27,8 @@ library(pracma)
 library(plot.matrix)
 
 # Fixed parameters of the model ------------------------------------------------
-t_max_eq1 = 2e3 # time of simulation to first equilibrium (days)
-t_max_eq2 = 2e3 # time of simulation to second equilibrium (days)
+t_max_eq1 = 6e3 # time of simulation to first equilibrium (days)
+t_max_eq2 = 2e3 # time of simulation to third equilibrium (days)
 pop_size = 1e6 # population size
 fS_init = (pop_size * 1/2) - 1 # initial susceptible population in farms
 mS_init = (pop_size * 1/2) - 1 # initial susceptible population in markets
@@ -50,7 +50,7 @@ inter_vax_time = 120 # time that perc_vax is vaccinated
 v = perc_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
 v_hat = (1 / 126) # rate of loss of immunity due to vaccination per chicken per day
 theta = (1 / 126) # rate of loss of immunity due to previous infection per chicken per day
-vir_steps = seq(0.01, 95.01, 5)
+vir_steps = seq(0.01, 100.01, 2)
 mfbet_ratio = 5
 
 # Plotting function ------------------------------------------------------------
@@ -97,9 +97,9 @@ plot.out.df <- function(out.df) {
 }
 
 # # Plot transmission-mortality tradeoff curve -----------------------------------
-virulences <- seq(0.01, 100, 0.1)
+virulences <- seq(0.01, 100.01, 0.01)
 morts <- ((virulences * 0.5) / 100) + 0.5
-betas <- (0.5 * (virulences)^0.33) + 0.1 # beta is, roughly, the number of chickens a single infectious chicken infects in a month
+betas <- ((virulences)^0.1) # beta is, roughly, the number of chickens a single infectious chicken infects in a month
 plot(morts, betas, type='l')
 
 # Model equations --------------------------------------------------------------
@@ -229,73 +229,72 @@ test_invade <- function(res_vir, invade_vir) {
   res <- NA
   
   # Strain specific parameters
-  fbet1 <- ((0.5 * (res_vir)^0.33) + 0.1) / pop_size
+  fbet1 <- ((res_vir)^0.1) / pop_size
   mbet1 <- fbet1 * mfbet_ratio
-  fbet2 <- ((0.5 * (invade_vir)^0.33) + 0.1) / pop_size
+  fbet2 <- ((invade_vir)^0.1) / pop_size
   mbet2 <- fbet2 * mfbet_ratio
   p_1 <- ((res_vir * 0.5) / 100) + 0.5
   p_2 <- ((invade_vir * 0.5) / 100) + 0.5
   
+  # Run resident strain until equilibrium (no vaccination)
   parameters <- c(fbet1=fbet1, fbet2=fbet2, mbet1=mbet1, mbet2=mbet2,
                   sig=sig, gamm=gamm, mort=mort, p_1=p_1, p_2=p_2, b=b, 
                   m_fm=m_fm, m_mf=m_mf,
                   v=v, v_hat=v_hat, theta=theta)
-  # Run resident strain until equilibrium
   init <- c(fS=fS_init, fE1=0, fE2=0, fI1=fI1_init, fI2=fI2_init, fR1=0, fR2=0, 
             fV=0, fV_E1=0, fV_I1=0, fV_E2=0, fV_I2=0,
             mS=mS_init, mE1=0, mE2=0, mI1=mI1_init, mI2=mI2_init, mR1=0, mR2=0, 
             mV=0, mV_E1=0, mV_I1=0, mV_E2=0, mV_I2=0)
   time_eq1 <- seq(0, t_max_eq1, by = 1)
-  out <- ode(y=init, times=time_eq1, eqn, parms=parameters)
-  out.df <- as.data.frame(out)
-  plot.out.df(out.df)
-  # Introduce vaccination
+  out_eq1 <- ode(y=init, times=time_eq1, eqn, parms=parameters)
+  out_eq1.df <- as.data.frame(out_eq1)
+  #plot.out.df(out_eq1.df)
   
-  
-  if (round(out.df$fE1[nrow(out.df)] + 
-            out.df$fI1[nrow(out.df)] + 
-            out.df$mE1[nrow(out.df)] +
-            out.df$mI1[nrow(out.df)] +
-            out.df$fV_E1[nrow(out.df)] +
-            out.df$fV_I1[nrow(out.df)] + 
-            out.df$mV_E1[nrow(out.df)] +
-            out.df$mV_I1[nrow(out.df)]) < 1) {
+  # If resident has not gone extinct, then 
+  if (round(out_eq1.df$fE1[nrow(out_eq1.df)] + 
+            out_eq1.df$fI1[nrow(out_eq1.df)] + 
+            out_eq1.df$mE1[nrow(out_eq1.df)] +
+            out_eq1.df$mI1[nrow(out_eq1.df)] +
+            out_eq1.df$fV_E1[nrow(out_eq1.df)] +
+            out_eq1.df$fV_I1[nrow(out_eq1.df)] + 
+            out_eq1.df$mV_E1[nrow(out_eq1.df)] +
+            out_eq1.df$mV_I1[nrow(out_eq1.df)]) < 1) {
     res <- 2
   } else {
-    invade_init <- c(fS=out.df$fS[nrow(out.df)], fE1=out.df$fE1[nrow(out.df)], 
-                     fE2=out.df$fE2[nrow(out.df)], fI1=out.df$fI1[nrow(out.df)], 
-                     fI2=1, fR1=out.df$fR1[nrow(out.df)], 
-                     fR2=out.df$fR2[nrow(out.df)], 
-                     fV=out.df$fV[nrow(out.df)], fV_E1=out.df$fV_E1[nrow(out.df)], 
-                     fV_I1=out.df$fV_I1[nrow(out.df)], fV_E2=out.df$fV_E2[nrow(out.df)], 
-                     fV_I2=out.df$fV_I2[nrow(out.df)],
-                     mS=out.df$mS[nrow(out.df)], mE1=out.df$mE1[nrow(out.df)], 
-                     mE2=out.df$mE2[nrow(out.df)], mI1=out.df$mI1[nrow(out.df)], 
-                     mI2=1, mR1=out.df$mR1[nrow(out.df)], 
-                     mR2=out.df$mR2[nrow(out.df)], 
-                     mV=out.df$mV[nrow(out.df)], mV_E1=out.df$mV_E1[nrow(out.df)], 
-                     mV_I1=out.df$mV_I1[nrow(out.df)], mV_E2=out.df$mV_E2[nrow(out.df)], 
-                     mV_I2=out.df$mV_I2[nrow(out.df)])
+    eq2_init <- c(fS=out_eq1.df$fS[nrow(out_eq1.df)], fE1=out_eq1.df$fE1[nrow(out_eq1.df)], 
+                  fE2=out_eq1.df$fE2[nrow(out_eq1.df)], fI1=out_eq1.df$fI1[nrow(out_eq1.df)], 
+                  fI2=1, fR1=out_eq1.df$fR1[nrow(out_eq1.df)], 
+                  fR2=out_eq1.df$fR2[nrow(out_eq1.df)], 
+                  fV=out_eq1.df$fV[nrow(out_eq1.df)], fV_E1=out_eq1.df$fV_E1[nrow(out_eq1.df)], 
+                  fV_I1=out_eq1.df$fV_I1[nrow(out_eq1.df)], fV_E2=out_eq1.df$fV_E2[nrow(out_eq1.df)], 
+                  fV_I2=out_eq1.df$fV_I2[nrow(out_eq1.df)],
+                  mS=out_eq1.df$mS[nrow(out_eq1.df)], mE1=out_eq1.df$mE1[nrow(out_eq1.df)], 
+                  mE2=out_eq1.df$mE2[nrow(out_eq1.df)], mI1=out_eq1.df$mI1[nrow(out_eq1.df)], 
+                  mI2=1, mR1=out_eq1.df$mR1[nrow(out_eq1.df)], 
+                  mR2=out_eq1.df$mR2[nrow(out_eq1.df)], 
+                  mV=out_eq1.df$mV[nrow(out_eq1.df)], mV_E1=out_eq1.df$mV_E1[nrow(out_eq1.df)], 
+                  mV_I1=out_eq1.df$mV_I1[nrow(out_eq1.df)], mV_E2=out_eq1.df$mV_E2[nrow(out_eq1.df)], 
+                  mV_I2=out_eq1.df$mV_I2[nrow(out_eq1.df)])
     time_eq2 <- seq(0, t_max_eq2, by = 1)
-    out_invade <- ode(y=invade_init, times=time_eq2, eqn, parms=parameters)
-    out_invade.df <- as.data.frame(out_invade)
-    plot.out.df(out_invade.df)
-    num_EI_res <- round(out_invade.df$fE1[nrow(out_invade.df)] + 
-                          out_invade.df$fI1[nrow(out_invade.df)] + 
-                          out_invade.df$fV_E1[nrow(out_invade.df)] + 
-                          out_invade.df$fV_I1[nrow(out_invade.df)] + 
-                          out_invade.df$mE1[nrow(out_invade.df)] +
-                          out_invade.df$mI1[nrow(out_invade.df)] + 
-                          out_invade.df$mV_E1[nrow(out_invade.df)] +
-                          out_invade.df$mV_I1[nrow(out_invade.df)]) 
-    num_EI_invader <- round(out_invade.df$fE2[nrow(out_invade.df)] + 
-                            out_invade.df$fI2[nrow(out_invade.df)] + 
-                            out_invade.df$fV_E2[nrow(out_invade.df)] + 
-                            out_invade.df$fV_I2[nrow(out_invade.df)] + 
-                            out_invade.df$mE2[nrow(out_invade.df)] +
-                            out_invade.df$mI2[nrow(out_invade.df)] + 
-                            out_invade.df$mV_E2[nrow(out_invade.df)] +
-                            out_invade.df$mV_I2[nrow(out_invade.df)]) 
+    out_eq2 <- ode(y=eq2_init, times=time_eq2, eqn, parms=parameters)
+    out_eq2.df <- as.data.frame(out_eq2)
+    #plot.out.df(out_eq2.df)
+    num_EI_res <- round(out_eq2.df$fE1[nrow(out_eq2.df)] + 
+                          out_eq2.df$fI1[nrow(out_eq2.df)] + 
+                          out_eq2.df$fV_E1[nrow(out_eq2.df)] + 
+                          out_eq2.df$fV_I1[nrow(out_eq2.df)] + 
+                          out_eq2.df$mE1[nrow(out_eq2.df)] +
+                          out_eq2.df$mI1[nrow(out_eq2.df)] + 
+                          out_eq2.df$mV_E1[nrow(out_eq2.df)] +
+                          out_eq2.df$mV_I1[nrow(out_eq2.df)]) 
+    num_EI_invader <- round(out_eq2.df$fE2[nrow(out_eq2.df)] + 
+                            out_eq2.df$fI2[nrow(out_eq2.df)] + 
+                            out_eq2.df$fV_E2[nrow(out_eq2.df)] + 
+                            out_eq2.df$fV_I2[nrow(out_eq2.df)] + 
+                            out_eq2.df$mE2[nrow(out_eq2.df)] +
+                            out_eq2.df$mI2[nrow(out_eq2.df)] + 
+                            out_eq2.df$mV_E2[nrow(out_eq2.df)] +
+                            out_eq2.df$mV_I2[nrow(out_eq2.df)]) 
     if (num_EI_res > 0 & num_EI_invader > 0) {
       res <- 4
     } else if (num_EI_res == 0 & num_EI_invader == 0) {
@@ -340,7 +339,7 @@ stopCluster(cl)
 pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow=F)
 pip <- pracma::flipud(pip) #columns stay in place, but now from bottom to top is increasing virulence
 #pip <- ifelse((pip != 0 & pip != 1), NA, pip)
-plot(pip)
+plot(pip, col=c('black', 'white'), breaks=c(0, 0.5, 1))
 #write.csv(pip, paste0('~/virEvol/res/', perc_sold_per_farm, '_', perc_vax, '.csv'))
 
 
