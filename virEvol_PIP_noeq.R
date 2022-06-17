@@ -18,6 +18,7 @@
 # - We assume that probability of death is the same between strain 1 and strain 2 after first infection
 # - Vaccination completely protects chickens from mortality, and is only conducted in farms
 # - We assume no super-infection in the system
+# - We assume when vaccinated infectious chickens transmit, they have the same transmission rate as non-vaccinated infectious chickens
 
 # Load libraries ---------------------------------------------------------------
 library(deSolve)
@@ -27,30 +28,28 @@ library(pracma)
 library(plot.matrix)
 
 # Fixed parameters of the model ------------------------------------------------
-t_max_eq1 = 6e3 # time of simulation to first equilibrium (days)
-t_max_eq2 = 2e3 # time of simulation to third equilibrium (days)
+t_max_eq1 = 8e3 # time of simulation to first equilibrium (days)
+t_max_eq2 = 8e3 # time of simulation to third equilibrium (days)
 pop_size = 1e6 # population size
 fS_init = (pop_size * 1/2) - 1 # initial susceptible population in farms
 mS_init = (pop_size * 1/2) - 1 # initial susceptible population in markets
 fI1_init = 1 # initial strain 1 infectious population in farms
 mI1_init = 1 # initial strain 1 infectious population in markets
-fI2_init = 0 # initial strain 2 infectious population in farms
-mI2_init = 0 # initial strain 2 infectious population in markets
 sig = 1 / 5 # transition rate of infectiousness per chicken per day
 gamm = 1 / 10 # transition rate of recovery per chicken per day
 mort = 1 / 4 # disease mortality rate per chicken per day
 nat_mort = 1 / 730 # natural mortality rate per chicken per day
 b = 1 / 120 # average birth rate of chickens for raising
-perc_sold_per_farm = 0.3 # percent sold in interval
+perc_sold_per_farm = 0.1 # percent sold in interval
 inter_sell_time_per_farm = 120 # days between successive sales of chickens of a farm
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken per day
 m_mf = (1 / 7) # migration rate of chickens from markets to farms per chicken per day
-perc_vax = 0.1 # percent vaccinated at each campaign
+perc_vax = 0.99 # percent vaccinated at each campaign
 inter_vax_time = 120 # time that perc_vax is vaccinated
 v = perc_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
 v_hat = (1 / 126) # rate of loss of immunity due to vaccination per chicken per day
 theta = (1 / 126) # rate of loss of immunity due to previous infection per chicken per day
-vir_steps = seq(0.01, 100.01, 2)
+vir_steps = seq(5.01, 99.01, 10)
 mfbet_ratio = 5
 
 # Plotting function ------------------------------------------------------------
@@ -98,8 +97,8 @@ plot.out.df <- function(out.df) {
 
 # # Plot transmission-mortality tradeoff curve -----------------------------------
 virulences <- seq(0.01, 100.01, 0.01)
-morts <- ((virulences * 0.5) / 100) + 0.5
-betas <- ((virulences)^0.1) # beta is, roughly, the number of chickens a single infectious chicken infects in a month
+morts <- ((virulences) / 100)
+betas <- ((virulences)^0.45) # beta is, roughly, the number of chickens a single infectious chicken infects in a month
 plot(morts, betas, type='l')
 
 # Model equations --------------------------------------------------------------
@@ -229,37 +228,37 @@ test_invade <- function(res_vir, invade_vir) {
   res <- NA
   
   # Strain specific parameters
-  fbet1 <- ((res_vir)^0.1) / pop_size
+  fbet1 <- ((res_vir)^0.3) / pop_size
   mbet1 <- fbet1 * mfbet_ratio
-  fbet2 <- ((invade_vir)^0.1) / pop_size
+  fbet2 <- ((invade_vir)^0.3) / pop_size
   mbet2 <- fbet2 * mfbet_ratio
-  p_1 <- ((res_vir * 0.5) / 100) + 0.5
-  p_2 <- ((invade_vir * 0.5) / 100) + 0.5
+  p_1 <- ((res_vir) / 100)
+  p_2 <- ((invade_vir) / 100)
   
   # Run resident strain until equilibrium (no vaccination)
   parameters <- c(fbet1=fbet1, fbet2=fbet2, mbet1=mbet1, mbet2=mbet2,
                   sig=sig, gamm=gamm, mort=mort, p_1=p_1, p_2=p_2, b=b, 
                   m_fm=m_fm, m_mf=m_mf,
                   v=v, v_hat=v_hat, theta=theta)
-  init <- c(fS=fS_init, fE1=0, fE2=0, fI1=fI1_init, fI2=fI2_init, fR1=0, fR2=0, 
+  init <- c(fS=fS_init, fE1=0, fE2=0, fI1=fI1_init, fI2=0, fR1=0, fR2=0, 
             fV=0, fV_E1=0, fV_I1=0, fV_E2=0, fV_I2=0,
-            mS=mS_init, mE1=0, mE2=0, mI1=mI1_init, mI2=mI2_init, mR1=0, mR2=0, 
+            mS=mS_init, mE1=0, mE2=0, mI1=mI1_init, mI2=0, mR1=0, mR2=0, 
             mV=0, mV_E1=0, mV_I1=0, mV_E2=0, mV_I2=0)
   time_eq1 <- seq(0, t_max_eq1, by = 1)
   out_eq1 <- ode(y=init, times=time_eq1, eqn, parms=parameters)
   out_eq1.df <- as.data.frame(out_eq1)
   #plot.out.df(out_eq1.df)
   
-  # If resident has not gone extinct, then 
-  if (round(out_eq1.df$fE1[nrow(out_eq1.df)] + 
-            out_eq1.df$fI1[nrow(out_eq1.df)] + 
-            out_eq1.df$mE1[nrow(out_eq1.df)] +
-            out_eq1.df$mI1[nrow(out_eq1.df)] +
-            out_eq1.df$fV_E1[nrow(out_eq1.df)] +
-            out_eq1.df$fV_I1[nrow(out_eq1.df)] + 
-            out_eq1.df$mV_E1[nrow(out_eq1.df)] +
-            out_eq1.df$mV_I1[nrow(out_eq1.df)]) < 1) {
-    res <- 2
+  # If resident has not gone extinct
+  if ((out_eq1.df$fE1[nrow(out_eq1.df)] + 
+       out_eq1.df$fI1[nrow(out_eq1.df)] + 
+       out_eq1.df$mE1[nrow(out_eq1.df)] +
+       out_eq1.df$mI1[nrow(out_eq1.df)] +
+       out_eq1.df$fV_E1[nrow(out_eq1.df)] +
+       out_eq1.df$fV_I1[nrow(out_eq1.df)] + 
+       out_eq1.df$mV_E1[nrow(out_eq1.df)] +
+       out_eq1.df$mV_I1[nrow(out_eq1.df)]) < 1) {
+    res <- 5
   } else {
     eq2_init <- c(fS=out_eq1.df$fS[nrow(out_eq1.df)], fE1=out_eq1.df$fE1[nrow(out_eq1.df)], 
                   fE2=out_eq1.df$fE2[nrow(out_eq1.df)], fI1=out_eq1.df$fI1[nrow(out_eq1.df)], 
@@ -279,30 +278,34 @@ test_invade <- function(res_vir, invade_vir) {
     out_eq2 <- ode(y=eq2_init, times=time_eq2, eqn, parms=parameters)
     out_eq2.df <- as.data.frame(out_eq2)
     #plot.out.df(out_eq2.df)
-    num_EI_res <- round(out_eq2.df$fE1[nrow(out_eq2.df)] + 
-                          out_eq2.df$fI1[nrow(out_eq2.df)] + 
-                          out_eq2.df$fV_E1[nrow(out_eq2.df)] + 
-                          out_eq2.df$fV_I1[nrow(out_eq2.df)] + 
-                          out_eq2.df$mE1[nrow(out_eq2.df)] +
-                          out_eq2.df$mI1[nrow(out_eq2.df)] + 
-                          out_eq2.df$mV_E1[nrow(out_eq2.df)] +
-                          out_eq2.df$mV_I1[nrow(out_eq2.df)]) 
-    num_EI_invader <- round(out_eq2.df$fE2[nrow(out_eq2.df)] + 
-                            out_eq2.df$fI2[nrow(out_eq2.df)] + 
-                            out_eq2.df$fV_E2[nrow(out_eq2.df)] + 
-                            out_eq2.df$fV_I2[nrow(out_eq2.df)] + 
-                            out_eq2.df$mE2[nrow(out_eq2.df)] +
-                            out_eq2.df$mI2[nrow(out_eq2.df)] + 
-                            out_eq2.df$mV_E2[nrow(out_eq2.df)] +
-                            out_eq2.df$mV_I2[nrow(out_eq2.df)]) 
-    if (num_EI_res > 0 & num_EI_invader > 0) {
-      res <- 4
-    } else if (num_EI_res == 0 & num_EI_invader == 0) {
-      res <- 3
-    } else if (num_EI_res > 0 & num_EI_invader == 0) {
-      res <- 0
-    } else if (num_EI_res == 0 & num_EI_invader > 0) {
-      res <- 1
+    num_EI_res <- out_eq2.df$fE1[nrow(out_eq2.df)] + 
+                  out_eq2.df$fI1[nrow(out_eq2.df)] + 
+                  out_eq2.df$fV_E1[nrow(out_eq2.df)] + 
+                  out_eq2.df$fV_I1[nrow(out_eq2.df)] + 
+                  out_eq2.df$mE1[nrow(out_eq2.df)] +
+                  out_eq2.df$mI1[nrow(out_eq2.df)] + 
+                  out_eq2.df$mV_E1[nrow(out_eq2.df)] +
+                  out_eq2.df$mV_I1[nrow(out_eq2.df)]
+    num_EI_invader <- out_eq2.df$fE2[nrow(out_eq2.df)] + 
+                      out_eq2.df$fI2[nrow(out_eq2.df)] + 
+                      out_eq2.df$fV_E2[nrow(out_eq2.df)] + 
+                      out_eq2.df$fV_I2[nrow(out_eq2.df)] + 
+                      out_eq2.df$mE2[nrow(out_eq2.df)] +
+                      out_eq2.df$mI2[nrow(out_eq2.df)] + 
+                      out_eq2.df$mV_E2[nrow(out_eq2.df)] +
+                      out_eq2.df$mV_I2[nrow(out_eq2.df)]
+    if (num_EI_res >= 2) { # if resident is not extinct
+      if (num_EI_invader < 2) { # if invader is extinct
+        res <- 0 # resident wins
+      } else { # if invader is not extinct
+        res <- 3 # coexistence
+      }
+    } else { # if resident is extinct
+      if (num_EI_invader > 2) { # if invader is not extinct
+        res <- 1 # invader wins
+      } else { # if invader is extinct
+        res <- 4 # both extinct
+      }
     }
   }
   return(c(res))
@@ -338,8 +341,8 @@ stopCluster(cl)
 # plot PIP ---------------------------------------------------------------------
 pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow=F)
 pip <- pracma::flipud(pip) #columns stay in place, but now from bottom to top is increasing virulence
-#pip <- ifelse((pip != 0 & pip != 1), NA, pip)
-plot(pip, col=c('black', 'white'), breaks=c(0, 0.5, 1))
+pip_toPlot <- ifelse((pip == 3), 1, pip)
+plot(pip_toPlot)
 #write.csv(pip, paste0('~/virEvol/res/', perc_sold_per_farm, '_', perc_vax, '.csv'))
 
 
