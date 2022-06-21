@@ -37,21 +37,20 @@ fI1_init = 1 # initial strain 1 infectious population in farms
 mI1_init = 1 # initial strain 1 infectious population in markets
 sig = 1 / 5 # transition rate of infectiousness per chicken per day
 gamm = 1 / 10 # transition rate of recovery per chicken per day
-mort = 1 / 4 # disease mortality rate per chicken per day
 nat_mort = 1 / 730 # natural mortality rate per chicken per day
 b = 1 / 120 # average birth rate of chickens for raising
-perc_sold_per_farm = 0.1 # percent sold in interval
+perc_sold_per_farm = 0 # percent sold in interval
 inter_sell_time_per_farm = 120 # days between successive sales of chickens of a farm
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken per day
-m_fm_vax = (perc_sold_per_farm * 0.1 / inter_sell_time_per_farm) # migration rate of chickens from farms to markets per chicken, if vaccinated
+m_fm_vax = m_fm # migration rate of chickens from farms to markets per chicken, if vaccinated
 m_mf = (1 / 7) # migration rate of chickens from markets to farms per chicken per day
-perc_vax = 0.33 # percent vaccinated at each campaign
+perc_vax = 0 # percent vaccinated at each campaign
 inter_vax_time = 120 # time that perc_vax is vaccinated
 v = perc_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
 v_hat = (1 / 126) # rate of loss of immunity due to vaccination per chicken per day
 theta = (1 / 126) # rate of loss of immunity due to previous infection per chicken per day
 vir_steps = seq(5.01, 99.01, 10)
-mfbet_ratio = 5
+mfbet_ratio = 10
 
 # Plotting function ------------------------------------------------------------
 plot.out.df <- function(out.df) {
@@ -99,7 +98,7 @@ plot.out.df <- function(out.df) {
 # # Plot transmission-mortality tradeoff curve -----------------------------------
 virulences <- seq(0.01, 100.01, 0.01)
 morts <- ((virulences) / 100)
-betas <- ((virulences)^0.45) # beta is, roughly, the number of chickens a single infectious chicken infects in a month
+betas <- ((virulences)^0.2) # beta is, roughly, the number of chickens a single infectious chicken infects in a month
 plot(morts, betas, type='l')
 
 # Model equations --------------------------------------------------------------
@@ -122,11 +121,11 @@ eqn <- function(time, state, parameters){
       m_fm*fE2 +m_mf*mE2 -
       nat_mort*fE2
     dfI1 = sig*fE1 -
-      gamm*(1-p_1)*fI1 -mort*p_1*fI1 -
+      gamm*(1-p_1)*fI1 -gamm*p_1*fI1 -
       m_fm*fI1 +m_mf*mI1 -
       nat_mort*fI1
     dfI2 = sig*fE2 -
-      gamm*(1-p_2)*fI2 -mort*p_2*fI2 -
+      gamm*(1-p_2)*fI2 -gamm*p_2*fI2 -
       m_fm*fI2 + m_mf*mI2 -
       nat_mort*fI2
     dfR1 = gamm*(1-p_1)*fI1 -
@@ -175,11 +174,11 @@ eqn <- function(time, state, parameters){
       m_mf*mE2 +m_fm*fE2 -
       nat_mort*mE2
     dmI1 = sig*mE1 -
-      gamm*(1-p_1)*mI1 -mort*p_1*mI1 -
+      gamm*(1-p_1)*mI1 -gamm*p_1*mI1 -
       m_mf*mI1 +m_fm*fI1 -
       nat_mort*mI1
     dmI2 = sig*mE2 -
-      gamm*(1-p_2)*mI2 -mort*p_2*mI2 -
+      gamm*(1-p_2)*mI2 -gamm*p_2*mI2 -
       m_mf*mI2 +m_fm*fI2 -
       nat_mort*mI2
     dmR1 = gamm*(1-p_1)*mI1 -
@@ -229,16 +228,16 @@ test_invade <- function(res_vir, invade_vir) {
   res <- NA
   
   # Strain specific parameters
-  fbet1 <- ((res_vir)^0.3) / pop_size
+  fbet1 <- ((res_vir)^0.2) / pop_size
   mbet1 <- fbet1 * mfbet_ratio
-  fbet2 <- ((invade_vir)^0.3) / pop_size
+  fbet2 <- ((invade_vir)^0.2) / pop_size
   mbet2 <- fbet2 * mfbet_ratio
   p_1 <- ((res_vir) / 100)
   p_2 <- ((invade_vir) / 100)
   
   # Run resident strain until equilibrium (no vaccination)
   parameters <- c(fbet1=fbet1, fbet2=fbet2, mbet1=mbet1, mbet2=mbet2,
-                  sig=sig, gamm=gamm, mort=mort, p_1=p_1, p_2=p_2, b=b, 
+                  sig=sig, gamm=gamm, p_1=p_1, p_2=p_2, b=b, 
                   m_fm=m_fm, m_mf=m_mf,
                   v=v, v_hat=v_hat, theta=theta)
   init <- c(fS=fS_init, fE1=0, fE2=0, fI1=fI1_init, fI2=0, fR1=0, fR2=0, 
@@ -344,7 +343,6 @@ pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow
 pip <- pracma::flipud(pip) #columns stay in place, but now from bottom to top is increasing virulence
 pip_toPlot <- ifelse((pip == 3), 1, pip)
 plot(pip_toPlot)
-#write.csv(pip, paste0('~/virEvol/res/', perc_sold_per_farm, '_', perc_vax, '.csv'))
 
 
 
