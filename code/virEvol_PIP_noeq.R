@@ -28,8 +28,8 @@ library(pracma)
 library(plot.matrix)
 
 # Fixed parameters of the model ------------------------------------------------
-t_max_eq1 = 8e3 # time of simulation to first equilibrium (days)
-t_max_eq2 = 8e3 # time of simulation to third equilibrium (days)
+t_max_eq1 = 4e3 # time of simulation to first equilibrium (days)
+t_max_eq2 = 4e3 # time of simulation to third equilibrium (days)
 pop_size = 1e6 # population size
 fS_init = (pop_size * 1/2) - 1 # initial susceptible population in farms
 mS_init = (pop_size * 1/2) - 1 # initial susceptible population in markets
@@ -37,25 +37,64 @@ fI1_init = 1 # initial strain 1 infectious population in farms
 mI1_init = 1 # initial strain 1 infectious population in markets
 sig = 1 / 5 # transition rate of infectiousness per chicken per day
 gamm = 1 / 10 # transition rate of recovery per chicken per day
+mort = 1 / 4 # mortality due to disease
 nat_mort = 1 / 730 # natural mortality rate per chicken per day
 b = 1 / 120 # average birth rate of chickens for raising
-perc_sold_per_farm = 0 # percent sold in interval
+perc_sold_per_farm = 0.33 # percent sold in interval
 inter_sell_time_per_farm = 120 # days between successive sales of chickens of a farm
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken per day
-m_fm_vax = m_fm # migration rate of chickens from farms to markets per chicken, if vaccinated
+m_fm_vax = (perc_sold_per_farm * 0.1) / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken, if vaccinated
 m_mf = (1 / 7) # migration rate of chickens from markets to farms per chicken per day
-perc_vax = 0 # percent vaccinated at each campaign
+perc_vax = 0.33 # percent vaccinated at each campaign
 inter_vax_time = 120 # time that perc_vax is vaccinated
 v = perc_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
 v_hat = (1 / 126) # rate of loss of immunity due to vaccination per chicken per day
 theta = (1 / 126) # rate of loss of immunity due to previous infection per chicken per day
-vir_steps = seq(5.01, 99.01, 10)
+vir_steps = seq(1.01, 99.01, 10)
 mfbet_ratio = 10
 
 # Plotting function ------------------------------------------------------------
 plot.out.df <- function(out.df) {
+  # Global parameters
+  unvax_farm_patch <- out.df$fS + out.df$fE1 + out.df$fI1 + out.df$fE2 + out.df$fI2 + out.df$fR1 + out.df$fR2
+  vax_farm_patch <- out.df$fV + out.df$fV_E1 + out.df$fV_E2 + out.df$fV_I1 + out.df$fV_I2
+  unvax_market_patch <- out.df$mS + out.df$mE1 + out.df$mI1 + out.df$mE2 + out.df$mI2 + out.df$mR1 + out.df$mR2
+  vax_market_patch <- out.df$mV + out.df$mV_E1 + out.df$mV_E2 + out.df$mV_I1 + out.df$mV_I2
+  total_infectious <- out.df$fE1 + out.df$fI1 + out.df$fE2 + out.df$fI2 + out.df$mE1 + out.df$mI1 + out.df$mE2 + out.df$mI2 + 
+    out.df$fV_E1 + out.df$fV_E2 + out.df$fV_I1 + out.df$fV_I2 + out.df$mV_E1 + out.df$mV_E2 + out.df$mV_I1 + out.df$mV_I2
+  
   # Population size
-  plot(out.df$time, rowSums(out.df[-c(1)]), main='Population size', ylab='N', xlab='days', type='l')
+  plot(out.df$time, rowSums(out.df[-c(1)]), main='Population size', ylab='N', xlab='days', type='l', lwd=2, ylim=c(0, max(rowSums(out.df[-c(1)]))))
+  lines(out.df$time, unvax_farm_patch, type='l', col='black')
+  lines(out.df$time, vax_farm_patch, type='l', col='black', lty='dashed')
+  lines(out.df$time, unvax_market_patch, type='l', col='red')
+  lines(out.df$time, vax_market_patch, type='l', col='red', lty='dashed')
+  legend('topright', legend=c("farms", "markets", 'farms (vax)', 'markets (vax)'),
+         col=c("black", "red", 'black', 'red'), lty=c(1, 1, 2, 2), cex=0.8)
+  
+  print('At the last time step (pseudo-equilibrium), what % of total population is in...:')
+  print(paste0('...unvaccinated, farm patch?: ', round(100 * (unvax_farm_patch[nrow(out.df)] / rowSums(out.df[-c(1)])[nrow(out.df)]), digits=2)))
+  print(paste0('...vaccinated, farm patch?: ', round(100 * (vax_farm_patch[nrow(out.df)] / rowSums(out.df[-c(1)])[nrow(out.df)]), digits=2)))
+  print(paste0('...unvaccinated, market patch?: ', round(100 * (unvax_market_patch[nrow(out.df)] / rowSums(out.df[-c(1)])[nrow(out.df)]), digits=2)))
+  print(paste0('...vaccinated, market patch?: ', round(100 * (vax_market_patch[nrow(out.df)] / rowSums(out.df[-c(1)])[nrow(out.df)]),digits=2)))
+  print('--------------------------------------------------------------')
+  print('Of N in each patch, how infectious is each patch? (including incubation):')
+  print(paste0('Farm patch: ', round(100 * ((out.df$fE1 + out.df$fI1 + out.df$fV_E1 + out.df$fV_I1 + out.df$fE2 + out.df$fI2 + out.df$fV_E2 + out.df$fV_I2)[nrow(out.df)] / (unvax_farm_patch[nrow(out.df)] + vax_farm_patch[nrow(out.df)])), digits=2)))
+  print(paste0('Market patch: ', round(100 * ((out.df$mE1 + out.df$mI1 + out.df$mV_E1 + out.df$mV_I1 + out.df$mE2 + out.df$mI2 + out.df$mV_E2 + out.df$mV_I2)[nrow(out.df)] / (unvax_market_patch[nrow(out.df)] + vax_market_patch[nrow(out.df)])), digits=2)))
+  print(paste0('Unvaccinated, farm patch: Resident strain = ', round(100 * ((out.df$fE1 + out.df$fI1)[nrow(out.df)] / unvax_farm_patch[nrow(out.df)]), digits=2), 
+               '; Invader strain = ',  round(100 * ((out.df$fE2 + out.df$fI2)[nrow(out.df)] / unvax_farm_patch[nrow(out.df)]), digits=2)))
+  print(paste0('Vaccinated, farm patch: Resident strain = ', round(100 * ((out.df$fV_E1 + out.df$fV_I1)[nrow(out.df)] / vax_farm_patch[nrow(out.df)]), digits=2), 
+               '; Invader strain = ',  round(100 * ((out.df$fV_E2 + out.df$fV_I2)[nrow(out.df)] / vax_farm_patch[nrow(out.df)]), digits=2)))
+  print(paste0('Unvaccinated, market patch: Resident strain = ', round(100 * ((out.df$mE1 + out.df$mI1)[nrow(out.df)] / unvax_market_patch[nrow(out.df)]), digits=2), 
+               '; Invader strain = ',  round(100 * ((out.df$mE2 + out.df$mI2)[nrow(out.df)] / unvax_market_patch[nrow(out.df)]), digits=2)))
+  print(paste0('Vaccinated, market patch: Resident strain = ', round(100 * ((out.df$mV_E1 + out.df$mV_I1)[nrow(out.df)] / vax_market_patch[nrow(out.df)]), digits=2), 
+               '; Invader strain = ',  round(100 * ((out.df$mV_E2 + out.df$mV_I2)[nrow(out.df)] / vax_market_patch[nrow(out.df)]), digits=2)))
+  print('--------------------------------------------------------------')
+  print('Of total N of infectious chickens, in which patch are they located? (including incubation):')
+  print(paste0('Unvaccinated, farm patch: ', round(100 * ((out.df$fE1[nrow(out.df)] + out.df$fE2[nrow(out.df)] + out.df$fI1[nrow(out.df)] + out.df$fI2[nrow(out.df)]) / total_infectious[nrow(out.df)]), digits=2)))
+  print(paste0('Vaccinated, farm patch: ', round(100 * ((out.df$fV_E1[nrow(out.df)] + out.df$fV_E2[nrow(out.df)] + out.df$fV_I1[nrow(out.df)] + out.df$fV_I2[nrow(out.df)]) / total_infectious[nrow(out.df)]), digits=2)))
+  print(paste0('Unvaccinated, market patch: ', round(100 * ((out.df$mE1[nrow(out.df)] + out.df$mE2[nrow(out.df)] + out.df$mI1[nrow(out.df)] + out.df$mI2[nrow(out.df)]) / total_infectious[nrow(out.df)]), digits=2)))
+  print(paste0('Vaccinated, market patch: ', round(100 * ((out.df$mV_E1[nrow(out.df)] + out.df$mV_E2[nrow(out.df)] + out.df$mV_I1[nrow(out.df)] + out.df$mV_I2[nrow(out.df)]) / total_infectious[nrow(out.df)]), digits=2)))
   
   # Susceptible pool divided into markets and farms
   plot(out.df$time, out.df$fS, col='black', type='l', ylim=c(0, max(out.df$fS, out.df$mS)), main='Susceptible divided into markets and farms', ylab='S', xlab='days')
@@ -63,7 +102,7 @@ plot.out.df <- function(out.df) {
   legend('topright', legend=c("farms", "markets"),
          col=c("black", "red"), lty=1, cex=0.8)
   
-  # Infectious pool divided into markets and farms
+  # Infectious pool divided into markets and farms (excluding incubation)
   plot(out.df$time, out.df$fI1, type='l', ylim=c(0, max(out.df$fI1, out.df$mI1, out.df$fI2, out.df$mI2)),
        main='Incubation and Infectious divided into markets and farms', ylab='I', xlab='days', col='orange', lty=1)
   lines(out.df$time, out.df$mI1, col='orange', lty=2)
@@ -72,7 +111,7 @@ plot.out.df <- function(out.df) {
   legend('topright', legend=c("farms_strain1", "markets_strain1", "farms_strain2", "markets_strain2"),
          col=c("orange", "orange", "blue", "blue"), lty=c(1,2,1,2), cex=0.8)
   
-  # Comparing strains 1 and 2
+  # Comparing strains 1 and 2 (excluding incubation)
   plot(out.df$time, out.df$mI1 + out.df$fI1, col='orange', type='l', ylim=c(0, max((out.df$fI1 + out.df$mI1), (out.df$fI2 + out.df$mI2))),
        main='Strain 1 vs. Strain 2', ylab='I', xlab='days')
   lines(out.df$time, out.df$mI2 + out.df$fI2, col='blue')
@@ -87,18 +126,20 @@ plot.out.df <- function(out.df) {
          col=c("orange", "blue"), lty=1, cex=0.8)
   
   # Vaccination divided into markets and farms
-  plot(out.df$time, out.df$mV, col='red', type='l', ylim=c(0, max(out.df$mV, out.df$fV)), main='Vaccination divided into markets and farms', ylab='V', xlab='days')
+  plot(out.df$time, out.df$mV, col='red', type='l', ylim=c(0, max(out.df$mV, out.df$fV,
+                                                                  out.df$mV_I1 + out.df$mV_I2,
+                                                                  out.df$fV_I1 + out.df$fV_I2)), main='Vaccination divided into markets and farms', ylab='V', xlab='days')
   lines(out.df$time, out.df$fV, col='black')
   lines(out.df$time, out.df$mV_I1 + out.df$mV_I2, col='red', lty=2)
   lines(out.df$time, out.df$fV_I1 + out.df$fV_I2, col='black', lty=2)
-  legend('topright', legend=c("farms", "markets", 'farms (infectious)', 'markets (infectious)'),
+  legend('topright', legend=c("farms", "markets", 'farms (vaccinated, infectious)', 'markets (vaccinated, infectious)'),
          col=c("black", "red", 'black', 'red'), lty=c(1, 1, 2, 2), cex=0.8)
 }
 
 # # Plot transmission-mortality tradeoff curve -----------------------------------
 virulences <- seq(0.01, 100.01, 0.01)
 morts <- ((virulences) / 100)
-betas <- ((virulences)^0.2) # beta is, roughly, the number of chickens a single infectious chicken infects in a month
+betas <- (0.1 * ((virulences)^0.3)) # beta is, roughly, the number of chickens a single infectious chicken infects in a month
 plot(morts, betas, type='l')
 
 # Model equations --------------------------------------------------------------
@@ -121,11 +162,11 @@ eqn <- function(time, state, parameters){
       m_fm*fE2 +m_mf*mE2 -
       nat_mort*fE2
     dfI1 = sig*fE1 -
-      gamm*(1-p_1)*fI1 -gamm*p_1*fI1 -
+      gamm*(1-p_1)*fI1 -mort*p_1*fI1 -
       m_fm*fI1 +m_mf*mI1 -
       nat_mort*fI1
     dfI2 = sig*fE2 -
-      gamm*(1-p_2)*fI2 -gamm*p_2*fI2 -
+      gamm*(1-p_2)*fI2 -mort*p_2*fI2 -
       m_fm*fI2 + m_mf*mI2 -
       nat_mort*fI2
     dfR1 = gamm*(1-p_1)*fI1 -
@@ -174,11 +215,11 @@ eqn <- function(time, state, parameters){
       m_mf*mE2 +m_fm*fE2 -
       nat_mort*mE2
     dmI1 = sig*mE1 -
-      gamm*(1-p_1)*mI1 -gamm*p_1*mI1 -
+      gamm*(1-p_1)*mI1 -mort*p_1*mI1 -
       m_mf*mI1 +m_fm*fI1 -
       nat_mort*mI1
     dmI2 = sig*mE2 -
-      gamm*(1-p_2)*mI2 -gamm*p_2*mI2 -
+      gamm*(1-p_2)*mI2 -mort*p_2*mI2 -
       m_mf*mI2 +m_fm*fI2 -
       nat_mort*mI2
     dmR1 = gamm*(1-p_1)*mI1 -
@@ -219,8 +260,8 @@ eqn <- function(time, state, parameters){
 # Function to get results of simulated invasion for a given resident strain ----
 # Legend: 0 = res strain wins; 
 #         1 = invade strain wins; 
-#         2 = res strain extinct before invader introduced; 
-#         3 = both strains are extinct at after invader introduced; 
+#         2 = res strain extinct before invader introduced
+#         3 = both strains are extinct at after invader introduced
 #         4 = both strains are not extinct at equilibrium
 test_invade <- function(res_vir, invade_vir) {
   print(paste0("res vir: ", res_vir))
@@ -228,17 +269,17 @@ test_invade <- function(res_vir, invade_vir) {
   res <- NA
   
   # Strain specific parameters
-  fbet1 <- ((res_vir)^0.2) / pop_size
+  fbet1 <- (0.1 * (res_vir)^0.3) / pop_size
   mbet1 <- fbet1 * mfbet_ratio
-  fbet2 <- ((invade_vir)^0.2) / pop_size
+  fbet2 <- (0.1 * (invade_vir)^0.3) / pop_size
   mbet2 <- fbet2 * mfbet_ratio
   p_1 <- ((res_vir) / 100)
   p_2 <- ((invade_vir) / 100)
   
   # Run resident strain until equilibrium (no vaccination)
   parameters <- c(fbet1=fbet1, fbet2=fbet2, mbet1=mbet1, mbet2=mbet2,
-                  sig=sig, gamm=gamm, p_1=p_1, p_2=p_2, b=b, 
-                  m_fm=m_fm, m_mf=m_mf,
+                  sig=sig, gamm=gamm, p_1=p_1, p_2=p_2, mort=mort, b=b, 
+                  m_fm=m_fm, m_fm_vax=m_fm_vax, m_mf=m_mf, 
                   v=v, v_hat=v_hat, theta=theta)
   init <- c(fS=fS_init, fE1=0, fE2=0, fI1=fI1_init, fI2=0, fR1=0, fR2=0, 
             fV=0, fV_E1=0, fV_I1=0, fV_E2=0, fV_I2=0,
@@ -247,7 +288,7 @@ test_invade <- function(res_vir, invade_vir) {
   time_eq1 <- seq(0, t_max_eq1, by = 1)
   out_eq1 <- ode(y=init, times=time_eq1, eqn, parms=parameters)
   out_eq1.df <- as.data.frame(out_eq1)
-  #plot.out.df(out_eq1.df)
+  plot.out.df(out_eq1.df)
   
   # If resident has not gone extinct
   if ((out_eq1.df$fE1[nrow(out_eq1.df)] + 
@@ -258,7 +299,7 @@ test_invade <- function(res_vir, invade_vir) {
        out_eq1.df$fV_I1[nrow(out_eq1.df)] + 
        out_eq1.df$mV_E1[nrow(out_eq1.df)] +
        out_eq1.df$mV_I1[nrow(out_eq1.df)]) < 1) {
-    res <- 5
+    res <- 2
   } else {
     eq2_init <- c(fS=out_eq1.df$fS[nrow(out_eq1.df)], fE1=out_eq1.df$fE1[nrow(out_eq1.df)], 
                   fE2=out_eq1.df$fE2[nrow(out_eq1.df)], fI1=out_eq1.df$fI1[nrow(out_eq1.df)], 
@@ -277,7 +318,7 @@ test_invade <- function(res_vir, invade_vir) {
     time_eq2 <- seq(0, t_max_eq2, by = 1)
     out_eq2 <- ode(y=eq2_init, times=time_eq2, eqn, parms=parameters)
     out_eq2.df <- as.data.frame(out_eq2)
-    #plot.out.df(out_eq2.df)
+    plot.out.df(out_eq2.df)
     num_EI_res <- out_eq2.df$fE1[nrow(out_eq2.df)] + 
                   out_eq2.df$fI1[nrow(out_eq2.df)] + 
                   out_eq2.df$fV_E1[nrow(out_eq2.df)] + 
