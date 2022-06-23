@@ -40,7 +40,7 @@ gamm = 1 / 10 # transition rate of recovery per chicken per day
 mort = 1 / 4 # mortality due to disease
 nat_mort = 1 / 730 # natural mortality rate per chicken per day
 b = 1 / 120 # average birth rate of chickens for raising
-perc_sold_per_farm = 0.33 # percent sold in interval
+perc_sold_per_farm = 0.66 # percent sold in interval
 inter_sell_time_per_farm = 120 # days between successive sales of chickens of a farm
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken per day
 m_fm_vax = (perc_sold_per_farm * 0.1) / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken, if vaccinated
@@ -134,6 +134,11 @@ plot.out.df <- function(out.df) {
   lines(out.df$time, out.df$fV_I1 + out.df$fV_I2, col='black', lty=2)
   legend('topright', legend=c("farms", "markets", 'farms (vaccinated, infectious)', 'markets (vaccinated, infectious)'),
          col=c("black", "red", 'black', 'red'), lty=c(1, 1, 2, 2), cex=0.8)
+  # Plot market migration flow
+  plot(migration_df$time, migration_df$market_to_farm, ylim=c(0, max(migration_df$market_to_farm, migration_df$farm_to_market)), 
+       main='Market migration', ylab='N', xlab='days', col='black', type='l')
+  lines(migration_df$time, migration_df$farm_to_market, col='red')
+  legend('topright', legend=c('Market to farm', 'Farm to market'), col=c('black', 'red'), lty=c(1,1), cex=0.8)
 }
 
 # # Plot transmission-mortality tradeoff curve -----------------------------------
@@ -144,6 +149,16 @@ plot(morts, betas, type='l')
 
 # Model equations --------------------------------------------------------------
 eqn <- function(time, state, parameters){
+  # Counter for migration flows
+  FM = c(m_fm*state[1:7], m_fm_vax*state[8:12])
+  MF = m_mf*state[13:24]
+  new_row <- data.frame(matrix(ncol=3, nrow=1))
+  colnames(new_row) <- c('time', 'market_to_farm', 'farm_to_market')
+  new_row$time[1] <- time
+  new_row$market_to_farm[1] <- sum(MF)
+  new_row$farm_to_market[1] <- sum(FM)
+  migration_ls[[migration_ls_dex]] <<- new_row
+  migration_ls_dex <<- migration_ls_dex + 1
   with(as.list(c(state, parameters)),{
     # Farm patch
     dfS = b*(fS + fE1 + fE2 + fI1 + fI2 + fR1 + fR2 + fV + fV_E1 + fV_I1 + fV_E2 + fV_I2)*(1 - ((fS + fE1 + fE2 + fI1 + fI2 + fR1 + fR2 + fV + fV_E1 + fV_I1 + fV_E2 + fV_I2) / ((b / (b - nat_mort)) * (pop_size)))) -
@@ -286,7 +301,12 @@ test_invade <- function(res_vir, invade_vir) {
             mS=mS_init, mE1=0, mE2=0, mI1=mI1_init, mI2=0, mR1=0, mR2=0, 
             mV=0, mV_E1=0, mV_I1=0, mV_E2=0, mV_I2=0)
   time_eq1 <- seq(0, t_max_eq1, by = 1)
+  migration_ls <- list()
+  migration_ls_dex <- 1
   out_eq1 <- ode(y=init, times=time_eq1, eqn, parms=parameters)
+  migration_df <- do.call(rbind, migration_ls)
+  migration_ls <- list()
+  migration_ls_dex <- 1
   out_eq1.df <- as.data.frame(out_eq1)
   plot.out.df(out_eq1.df)
   
