@@ -40,18 +40,19 @@ gamm = 1 / 10 # transition rate of recovery per chicken per day
 mort = 1 / 4 # mortality due to disease
 nat_mort = 1 / 730 # natural mortality rate per chicken per day
 b = 1 / 120 # average birth rate of chickens for raising
-perc_sold_per_farm = 0.66 # percent sold in interval
+perc_sold_per_farm = 0.33 # percent sold in interval
 inter_sell_time_per_farm = 120 # days between successive sales of chickens of a farm
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken per day
 m_fm_vax = (perc_sold_per_farm * 0.1) / inter_sell_time_per_farm # migration rate of chickens from farms to markets per chicken, if vaccinated
 m_mf = (1 / 7) # migration rate of chickens from markets to farms per chicken per day
-perc_vax = 0.33 # percent vaccinated at each campaign
+perc_vax = 0 # percent vaccinated at each campaign
 inter_vax_time = 120 # time that perc_vax is vaccinated
 v = perc_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
 v_hat = (1 / 126) # rate of loss of immunity due to vaccination per chicken per day
 theta = (1 / 126) # rate of loss of immunity due to previous infection per chicken per day
-vir_steps = seq(1.01, 99.01, 10)
+threshold_extinction = 2
 mfbet_ratio = 10
+vir_steps = seq(2.01, 99.01, 10)
 
 # Plotting function ------------------------------------------------------------
 plot.out.df <- function(out.df) {
@@ -134,11 +135,12 @@ plot.out.df <- function(out.df) {
   lines(out.df$time, out.df$fV_I1 + out.df$fV_I2, col='black', lty=2)
   legend('topright', legend=c("farms", "markets", 'farms (vaccinated, infectious)', 'markets (vaccinated, infectious)'),
          col=c("black", "red", 'black', 'red'), lty=c(1, 1, 2, 2), cex=0.8)
+  
   # Plot market migration flow
-  plot(migration_df$time, migration_df$market_to_farm, ylim=c(0, max(migration_df$market_to_farm, migration_df$farm_to_market)), 
-       main='Market migration', ylab='N', xlab='days', col='black', type='l')
-  lines(migration_df$time, migration_df$farm_to_market, col='red')
-  legend('topright', legend=c('Market to farm', 'Farm to market'), col=c('black', 'red'), lty=c(1,1), cex=0.8)
+  # plot(migration_df$time, migration_df$market_to_farm, ylim=c(0, max(migration_df$market_to_farm, migration_df$farm_to_market)), 
+  #      main='Market migration', ylab='N', xlab='days', col='black', type='l')
+  # lines(migration_df$time, migration_df$farm_to_market, col='red')
+  # legend('topright', legend=c('Market to farm', 'Farm to market'), col=c('black', 'red'), lty=c(1,1), cex=0.8)
 }
 
 # # Plot transmission-mortality tradeoff curve -----------------------------------
@@ -150,15 +152,15 @@ plot(morts, betas, type='l')
 # Model equations --------------------------------------------------------------
 eqn <- function(time, state, parameters){
   # Counter for migration flows
-  FM = c(m_fm*state[1:7], m_fm_vax*state[8:12])
-  MF = m_mf*state[13:24]
-  new_row <- data.frame(matrix(ncol=3, nrow=1))
-  colnames(new_row) <- c('time', 'market_to_farm', 'farm_to_market')
-  new_row$time[1] <- time
-  new_row$market_to_farm[1] <- sum(MF)
-  new_row$farm_to_market[1] <- sum(FM)
-  migration_ls[[migration_ls_dex]] <<- new_row
-  migration_ls_dex <<- migration_ls_dex + 1
+  # FM = c(m_fm*state[1:7], m_fm_vax*state[8:12])
+  # MF = m_mf*state[13:24]
+  # new_row <- data.frame(matrix(ncol=3, nrow=1))
+  # colnames(new_row) <- c('time', 'market_to_farm', 'farm_to_market')
+  # new_row$time[1] <- time
+  # new_row$market_to_farm[1] <- sum(MF)
+  # new_row$farm_to_market[1] <- sum(FM)
+  # migration_ls[[migration_ls_dex]] <<- new_row
+  # migration_ls_dex <<- migration_ls_dex + 1
   with(as.list(c(state, parameters)),{
     # Farm patch
     dfS = b*(fS + fE1 + fE2 + fI1 + fI2 + fR1 + fR2 + fV + fV_E1 + fV_I1 + fV_E2 + fV_I2)*(1 - ((fS + fE1 + fE2 + fI1 + fI2 + fR1 + fR2 + fV + fV_E1 + fV_I1 + fV_E2 + fV_I2) / ((b / (b - nat_mort)) * (pop_size)))) -
@@ -308,9 +310,9 @@ test_invade <- function(res_vir, invade_vir) {
   migration_ls <- list()
   migration_ls_dex <- 1
   out_eq1.df <- as.data.frame(out_eq1)
-  plot.out.df(out_eq1.df)
+  #plot.out.df(out_eq1.df)
   
-  # If resident has not gone extinct
+  # If resident has gone extinct
   if ((out_eq1.df$fE1[nrow(out_eq1.df)] + 
        out_eq1.df$fI1[nrow(out_eq1.df)] + 
        out_eq1.df$mE1[nrow(out_eq1.df)] +
@@ -318,7 +320,7 @@ test_invade <- function(res_vir, invade_vir) {
        out_eq1.df$fV_E1[nrow(out_eq1.df)] +
        out_eq1.df$fV_I1[nrow(out_eq1.df)] + 
        out_eq1.df$mV_E1[nrow(out_eq1.df)] +
-       out_eq1.df$mV_I1[nrow(out_eq1.df)]) < 1) {
+       out_eq1.df$mV_I1[nrow(out_eq1.df)]) < threshold_extinction) {
     res <- 2
   } else {
     eq2_init <- c(fS=out_eq1.df$fS[nrow(out_eq1.df)], fE1=out_eq1.df$fE1[nrow(out_eq1.df)], 
@@ -338,7 +340,7 @@ test_invade <- function(res_vir, invade_vir) {
     time_eq2 <- seq(0, t_max_eq2, by = 1)
     out_eq2 <- ode(y=eq2_init, times=time_eq2, eqn, parms=parameters)
     out_eq2.df <- as.data.frame(out_eq2)
-    plot.out.df(out_eq2.df)
+    #plot.out.df(out_eq2.df)
     num_EI_res <- out_eq2.df$fE1[nrow(out_eq2.df)] + 
                   out_eq2.df$fI1[nrow(out_eq2.df)] + 
                   out_eq2.df$fV_E1[nrow(out_eq2.df)] + 
@@ -355,14 +357,14 @@ test_invade <- function(res_vir, invade_vir) {
                       out_eq2.df$mI2[nrow(out_eq2.df)] + 
                       out_eq2.df$mV_E2[nrow(out_eq2.df)] +
                       out_eq2.df$mV_I2[nrow(out_eq2.df)]
-    if (num_EI_res >= 2) { # if resident is not extinct
-      if (num_EI_invader < 2) { # if invader is extinct
+    if (num_EI_res >= threshold_extinction) { # if resident is not extinct
+      if (num_EI_invader < threshold_extinction) { # if invader is extinct
         res <- 0 # resident wins
       } else { # if invader is not extinct
         res <- 3 # coexistence
       }
     } else { # if resident is extinct
-      if (num_EI_invader > 2) { # if invader is not extinct
+      if (num_EI_invader >= threshold_extinction) { # if invader is not extinct
         res <- 1 # invader wins
       } else { # if invader is extinct
         res <- 4 # both extinct
@@ -402,6 +404,7 @@ stopCluster(cl)
 # plot PIP ---------------------------------------------------------------------
 pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow=F)
 pip <- pracma::flipud(pip) #columns stay in place, but now from bottom to top is increasing virulence
+pip_toPlot <- pip
 pip_toPlot <- ifelse((pip == 3), 1, pip)
 plot(pip_toPlot)
 

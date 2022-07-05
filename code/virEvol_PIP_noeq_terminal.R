@@ -53,8 +53,10 @@ inter_vax_time = 120 # time that perc_vax is vaccinated
 v = perc_vax / inter_vax_time # vaccination rate of chickens of farms per susceptible chicken of farm per day
 v_hat = (1 / 126) # rate of loss of immunity due to vaccination per chicken per day
 theta = (1 / 126) # rate of loss of immunity due to previous infection per chicken per day
-vir_steps = seq(1.01, 99.01, 1)
+threshold_extinction = 2
 mfbet_ratio = 10
+vir_steps = seq(2.01, 100.01, 5)
+
 
 # Plotting function ------------------------------------------------------------
 plot.out.df <- function(out.df) {
@@ -270,9 +272,9 @@ test_invade <- function(res_vir, invade_vir) {
   res <- NA
   
   # Strain specific parameters
-  fbet1 <- ((res_vir)^0.3) / pop_size
+  fbet1 <- (0.1 * (res_vir)^0.3) / pop_size
   mbet1 <- fbet1 * mfbet_ratio
-  fbet2 <- ((invade_vir)^0.3) / pop_size
+  fbet2 <- (0.1 * (invade_vir)^0.3) / pop_size
   mbet2 <- fbet2 * mfbet_ratio
   p_1 <- ((res_vir) / 100)
   p_2 <- ((invade_vir) / 100)
@@ -299,7 +301,7 @@ test_invade <- function(res_vir, invade_vir) {
        out_eq1.df$fV_E1[nrow(out_eq1.df)] +
        out_eq1.df$fV_I1[nrow(out_eq1.df)] + 
        out_eq1.df$mV_E1[nrow(out_eq1.df)] +
-       out_eq1.df$mV_I1[nrow(out_eq1.df)]) < 1) {
+       out_eq1.df$mV_I1[nrow(out_eq1.df)]) < threshold_extinction) {
     res <- 2
   } else {
     eq2_init <- c(fS=out_eq1.df$fS[nrow(out_eq1.df)], fE1=out_eq1.df$fE1[nrow(out_eq1.df)], 
@@ -336,14 +338,14 @@ test_invade <- function(res_vir, invade_vir) {
       out_eq2.df$mI2[nrow(out_eq2.df)] + 
       out_eq2.df$mV_E2[nrow(out_eq2.df)] +
       out_eq2.df$mV_I2[nrow(out_eq2.df)]
-    if (num_EI_res >= 2) { # if resident is not extinct
-      if (num_EI_invader < 2) { # if invader is extinct
+    if (num_EI_res >= threshold_extinction) { # if resident is not extinct
+      if (num_EI_invader < threshold_extinction) { # if invader is extinct
         res <- 0 # resident wins
       } else { # if invader is not extinct
         res <- 3 # coexistence
       }
     } else { # if resident is extinct
-      if (num_EI_invader > 2) { # if invader is not extinct
+      if (num_EI_invader >= threshold_extinction) { # if invader is not extinct
         res <- 1 # invader wins
       } else { # if invader is extinct
         res <- 4 # both extinct
@@ -385,7 +387,7 @@ pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow
 pip <- pracma::flipud(pip) #columns stay in place, but now from bottom to top is increasing virulence
 #pip_toPlot <- ifelse((pip == 3), 1, pip)
 #plot(pip_toPlot)
-write.csv(pip, paste0('~/virEvol/code_output/pips/', perc_sold_per_farm, '_', perc_vax, '_nodiff.csv'))
+write.csv(pip, paste0('~/virEvol/code_output/pips/', perc_sold_per_farm, '_', perc_vax, '_diff.csv'))
 
 
 
