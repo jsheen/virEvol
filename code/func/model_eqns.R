@@ -1,5 +1,15 @@
-
 # Model 1: SEIR model ----------------------------------------------------------
+eqn_mod1 <- function(time, state, parameters){
+  with(as.list(c(state, parameters)),{
+    dfS = b*(fS + fE1 + fE2 + fI1 + fI2 + fR)*(1 - ((fS + fE1 + fE2 + fI1 + fI2 + fR) / ((b / (b - nat_mort)) * (pop_size)))) -
+      (fbet1*fS*fI1) -(fbet2*fS*fI2) -nat_mort*fS
+    dfE1 = (fbet1*fS*fI1) -sig*fE1 -nat_mort*fE1
+    dfE2 = (fbet2*fS*fI2) -sig*fE2 -nat_mort*fE2
+    dfI1 = sig*fE1 -gamm*(1-p_1)*fI1 -mort*p_1*fI1 -nat_mort*fI1
+    dfI2 = sig*fE2 -gamm*(1-p_2)*fI2 -mort*p_2*fI2 -nat_mort*fI2
+    dfR = gamm*(1-p_1)*fI1 +gamm*(1-p_2)*fI2 -nat_mort*fR
+    return(list(c(dfS, dfE1, dfE2, dfI1, dfI2, dfR)))})}
+
 # Model 2: SEIR model with vaccination -----------------------------------------
 # Model 3: SEIR model with vaccination and space -------------------------------
 eqn_mod3 <- function(time, state, parameters){
@@ -115,3 +125,5 @@ eqn_mod3 <- function(time, state, parameters){
                   dfV, dfV_E1, dfV_I1, dfV_E2, dfV_I2, 
                   dmS, dmE1, dmE2, dmI1, dmI2, dmR1, dmR2, 
                   dmV, dmV_E1, dmV_I1, dmV_E2, dmV_I2)))})}
+
+

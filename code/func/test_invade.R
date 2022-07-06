@@ -1,37 +1,33 @@
-# Function to get results of simulated invasion for a given resident strain ----
-# Legend: 0 = res strain wins
-#         1 = invade strain wins
-#         2 = res strain extinct before invader introduced
-#         3 = both strains are not extinct at equilibrium
-#         4 = both strains are extinct at after invader introduced
-test_invade <- function(res_vir, invade_vir) {
-  #print(paste0("res vir: ", res_vir))
-  #print(paste0("invade vir: ", invade_vir))
-  res <- NA
-  
+# Test invasion function -------------------------------------------------------
+# Legend: 0 = Resident wins (resident above extinction threshold, invader is not above extinction threshold)
+#         1 = Invader wins (invader above extinction threshold, resident is not above extinction threshold)
+#         2 = If there is extinction of the resident strain before invader introduced
+#         3 = Coexistence (both resident and invader are above extinction threshold)
+#         4 = If invader is extinct (both resident and invader are below extinction threshold)
+#         5 = Error in code
+test_invade <- function(res_vir, invade_vir, markets) {
   # Strain specific parameters
   fbet1 <- (c1 * (res_vir)^c2) / pop_size
-  mbet1 <- fbet1 * mfbet_ratio
   fbet2 <- (c1 * (invade_vir)^c2) / pop_size
-  mbet2 <- fbet2 * mfbet_ratio
   p_1 <- ((res_vir) / 100)
   p_2 <- ((invade_vir) / 100)
   
+  # If markets are in model
+  if (markets) {
+    mbet1 <- fbet1 * mfbet_ratio
+    mbet2 <- fbet2 * mfbet_ratio
+  }
+  
   # Run resident strain until equilibrium (no vaccination)
-  parameters <- c(fbet1=fbet1, fbet2=fbet2, mbet1=mbet1, mbet2=mbet2,
-                  sig=sig, gamm=gamm, p_1=p_1, p_2=p_2, mort=mort, b=b, 
-                  m_fm=m_fm, m_fm_vax=m_fm_vax, m_mf=m_mf, 
-                  v=v, v_hat=v_hat, theta=theta)
-  init <- c(fS=fS_init, fE1=0, fE2=0, fI1=fI1_init, fI2=0, fR1=0, fR2=0, 
-            fV=0, fV_E1=0, fV_I1=0, fV_E2=0, fV_I2=0,
-            mS=mS_init, mE1=0, mE2=0, mI1=mI1_init, mI2=0, mR1=0, mR2=0, 
-            mV=0, mV_E1=0, mV_I1=0, mV_E2=0, mV_I2=0)
   time_eq1 <- seq(0, t_max_eq1, by = 1)
   out_eq1 <- ode(y=init, times=time_eq1, eqn, parms=parameters)
   out_eq1.df <- as.data.frame(out_eq1)
-  #plot.out.df(out_eq1.df)
   
-  # If resident has not gone extinct
+  # For debugging
+  # plot.out.df(out_eq1.df)
+  
+  # Output result for res_vir and invade_vir combination
+  res <- 5
   if ((out_eq1.df$fE1[nrow(out_eq1.df)] + 
        out_eq1.df$fI1[nrow(out_eq1.df)] + 
        out_eq1.df$mE1[nrow(out_eq1.df)] +
@@ -40,6 +36,7 @@ test_invade <- function(res_vir, invade_vir) {
        out_eq1.df$fV_I1[nrow(out_eq1.df)] + 
        out_eq1.df$mV_E1[nrow(out_eq1.df)] +
        out_eq1.df$mV_I1[nrow(out_eq1.df)]) < threshold_extinction) {
+    # If there is extinction of the resident strain before invader introduced
     res <- 2
   } else {
     eq2_init <- c(fS=out_eq1.df$fS[nrow(out_eq1.df)], fE1=out_eq1.df$fE1[nrow(out_eq1.df)], 
@@ -59,7 +56,10 @@ test_invade <- function(res_vir, invade_vir) {
     time_eq2 <- seq(0, t_max_eq2, by = 1)
     out_eq2 <- ode(y=eq2_init, times=time_eq2, eqn, parms=parameters)
     out_eq2.df <- as.data.frame(out_eq2)
-    #plot.out.df(out_eq2.df)
+    
+    # For debugging purposes
+    # plot.out.df(out_eq2.df)
+    
     num_EI_res <- out_eq2.df$fE1[nrow(out_eq2.df)] + 
       out_eq2.df$fI1[nrow(out_eq2.df)] + 
       out_eq2.df$fV_E1[nrow(out_eq2.df)] + 
@@ -76,17 +76,21 @@ test_invade <- function(res_vir, invade_vir) {
       out_eq2.df$mI2[nrow(out_eq2.df)] + 
       out_eq2.df$mV_E2[nrow(out_eq2.df)] +
       out_eq2.df$mV_I2[nrow(out_eq2.df)]
-    if (num_EI_res >= threshold_extinction) { # if resident is not extinct
-      if (num_EI_invader < threshold_extinction) { # if invader is extinct
-        res <- 0 # resident wins
-      } else { # if invader is not extinct
-        res <- 3 # coexistence
+    if (num_EI_res >= threshold_extinction) { # If resident is not extinct
+      if (num_EI_invader < threshold_extinction) { # If invader is extinct
+        # Resident wins (resident above extinction threshold, invader is not above extinction threshold)
+        res <- 0
+      } else { # If invader is not extinct
+        # Coexistence (both resident and invader are above extinction threshold)
+        res <- 3
       }
-    } else { # if resident is extinct
-      if (num_EI_invader >= threshold_extinction) { # if invader is not extinct
-        res <- 1 # invader wins
-      } else { # if invader is extinct
-        res <- 4 # both extinct
+    } else { # If resident is extinct
+      if (num_EI_invader >= threshold_extinction) { # If invader is not extinct
+        # Invader wins (invader above extinction threshold, resident is not above extinction threshold)
+        res <- 1
+      } else { # If invader is extinct (both resident and invader are below extinction threshold)
+        # Both extinct
+        res <- 4
       }
     }
   }
