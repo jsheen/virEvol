@@ -1,4 +1,4 @@
-# Model 1: SEIR model ----------------------------------------------------------
+# Model 1: SEIR ----------------------------------------------------------------
 eqn_mod1 <- function(time, state, parameters){
   with(as.list(c(state, parameters)),{
     dfS = b*(fS + fE1 + fE2 + fI1 + fI2 + fR)*(1 - ((fS + fE1 + fE2 + fI1 + fI2 + fR) / ((b / (b - nat_mort)) * (pop_size)))) -
@@ -10,8 +10,19 @@ eqn_mod1 <- function(time, state, parameters){
     dfR = gamm*(1-p_1)*fI1 +gamm*(1-p_2)*fI2 -nat_mort*fR
     return(list(c(dfS, dfE1, dfE2, dfI1, dfI2, dfR)))})}
 
-# Model 2: SEIR model with vaccination -----------------------------------------
-# Model 3: SEIR model with vaccination and space -------------------------------
+eqn_mod1_ian <- function(time, state, parameters){
+  with(as.list(c(state, parameters)),{
+    dfS = b*(fS + fE1 + fE2 + fI1 + fI2 + fR)*(1 - ((fS + fE1 + fE2 + fI1 + fI2 + fR) / ((b / (b - nat_mort)) * (pop_size)))) -
+      (fbet1*fS*fI1) -(fbet2*fS*fI2) -nat_mort*fS
+    dfE1 = (fbet1*fS*fI1) -sig*fE1 -nat_mort*fE1
+    dfE2 = (fbet2*fS*fI2) -sig*fE2 -nat_mort*fE2
+    dfI1 = sig*fE1 -gamm*fI1 -p_1*100*fI1 -nat_mort*fI1
+    dfI2 = sig*fE2 -gamm*fI2 -p_2*100*fI2 -nat_mort*fI2
+    dfR = gamm*fI1 +gamm*fI2 -nat_mort*fR
+    return(list(c(dfS, dfE1, dfE2, dfI1, dfI2, dfR)))})}
+
+# Model 2: SEIR with vaccination -----------------------------------------------
+# Model 3: SEIR with vaccination and migration ---------------------------------
 eqn_mod3 <- function(time, state, parameters){
   with(as.list(c(state, parameters)),{
     # Farm patch

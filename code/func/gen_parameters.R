@@ -5,11 +5,8 @@ library(doParallel)
 library(pracma)
 library(plot.matrix)
 
-# Time of simulation to first equilibrium (days)
-t_max_eq1 = 4e3
-
-# Time of simulation to second equilibrium (days)
-t_max_eq2 = 4e3 
+# Time of simulation to first and second equilibria (days)
+t_max_eq1 = t_max_eq2 = 2e3
 
 # Population size
 pop_size = 1e6
@@ -22,9 +19,11 @@ gamm = 1 / 10
 
 # Natural birth rate per chicken per day
 b = 1 / 120
+# b = 0.07 # Ian's parameter
 
 # Natural mortality rate per chicken per day
-nat_mort = 1 / 730
+nat_mort = 1 / 365
+# nat_mort = 0.05 # Ian's parameter
 
 # Mortality rate due to disease per chicken per day
 mort = 1 / 4
@@ -70,5 +69,7 @@ vir_steps = seq(2.01, 100.01, 5)
 #           mS=mS_init, mE1=0, mE2=0, mI1=mI1_init, mI2=0, mR1=0, mR2=0, 
 #           mV=0, mV_E1=0, mV_I1=0, mV_E2=0, mV_I2=0)
 
-
-
+# 
+# # Read arguments from command line ---------------------------------------------
+# args <- commandArgs(trailingOnly=TRUE)
+# print(args)
