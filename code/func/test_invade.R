@@ -220,7 +220,7 @@ test_invade_mod3 <- function(res_vir, invade_vir) {
                   fVI1=out_eq1.df$fVI1[nrow(out_eq1.df)], fVI2=out_eq1.df$fVI2[nrow(out_eq1.df)],
                   mS=out_eq1.df$mS[nrow(out_eq1.df)], 
                   mE1=out_eq1.df$mE1[nrow(out_eq1.df)], mE2=out_eq1.df$mE2[nrow(out_eq1.df)], 
-                  mI1=out_eq1.df$mI1[nrow(out_eq1.df)], mI2=out_eq1.df$mI2[nrow(out_eq1.df)],
+                  mI1=out_eq1.df$mI1[nrow(out_eq1.df)], mI2=1,
                   mR=out_eq1.df$mR[nrow(out_eq1.df)],
                   mV=out_eq1.df$mV[nrow(out_eq1.df)],
                   mVE1=out_eq1.df$mVE1[nrow(out_eq1.df)], mVE2=out_eq1.df$mVE2[nrow(out_eq1.df)],

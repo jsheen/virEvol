@@ -22,7 +22,7 @@ b = 1 / 120
 # b = 0.07 # Ian's parameter
 
 # Natural mortality rate per chicken per day
-nat_mort = 1 / 365
+nat_mort = 1 / 730
 # nat_mort = 0.05 # Ian's parameter
 
 # Mortality rate due to disease per chicken per day
