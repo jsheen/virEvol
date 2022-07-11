@@ -61,7 +61,7 @@ eqn_mod3 <- function(time, state, parameters){
     dmI1 = sig*mE1 -gamm*(1-p_1)*mI1 -mort*p_1*mI1 -nat_mort*mI1 -m_mf*mI1 +m_fm*fI1
     dmI2 = sig*mE2 -gamm*(1-p_2)*mI2 -mort*p_2*mI2 -nat_mort*mI2 -m_mf*mI2 +m_fm*fI2
     dmR = gamm*(1-p_1)*mI1 +gamm*(1-p_2)*mI2 +gamm*mVI1 +gamm*mVI2 -nat_mort*mR -m_mf*mR +m_fm*fR
-    dmV = -(mbet1*mV*mI1) -(mbet2*mV*mI2) -(mbet1*mV*mVI1) -(mbet2*mV*mVI2) +v*mS -v_hat*mV -nat_mort*mV -m_mf*mV +m_fm_vax*fV
+    dmV = -(mbet1*mV*mI1) -(mbet2*mV*mI2) -(mbet1*mV*mVI1) -(mbet2*mV*mVI2) -v_hat*mV -nat_mort*mV -m_mf*mV +m_fm_vax*fV
     dmVE1 = (mbet1*mV*mI1) +(mbet1*mV*mVI1) -sig*mVE1 -nat_mort*mVE1 -m_mf*mVE1 +m_fm_vax*fVE1
     dmVE2 = (mbet2*mV*mI2) +(mbet2*mV*mVI2) -sig*mVE2 -nat_mort*mVE2 -m_mf*mVE2 +m_fm_vax*fVE2
     dmVI1 = sig*mVE1 -gamm*mVI1 -nat_mort*mVI1 -m_mf*mVI1 +m_fm_vax*fVI1

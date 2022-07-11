@@ -187,7 +187,7 @@ test_invade_mod3 <- function(res_vir, invade_vir) {
   init <- c(fS=fS_init, fE1=0, fE2=0, fI1=fI1_init, fI2=0, fR=0, fV=0, fVE1=0, fVE2=0, fVI1=0, fVI2=0,
             mS=mS_init, mE1=0, mE2=0, mI1=mI1_init, mI2=0, mR=0, mV=0, mVE1=0, mVE2=0, mVI1=0, mVI2=0)
   time_eq1 <- seq(0, t_max_eq1, by = 0.1)
-  out_eq1 <- ode(y=init, times=time_eq1, func=eqn, parms=parameters)
+  out_eq1 <- ode(y=init, times=time_eq1, eqn, parms=parameters)
   out_eq1.df <- as.data.frame(out_eq1)
   
   # For debugging purposes
@@ -214,16 +214,15 @@ test_invade_mod3 <- function(res_vir, invade_vir) {
     eq2_init <- c(fS=out_eq1.df$fS[nrow(out_eq1.df)], 
                   fE1=out_eq1.df$fE1[nrow(out_eq1.df)], fE2=out_eq1.df$fE2[nrow(out_eq1.df)], 
                   fI1=out_eq1.df$fI1[nrow(out_eq1.df)], fI2=1,
-                  fR=out_eq1.df$fR[nrow(out_eq1.df)],
-                  fV=out_eq1.df$fV[nrow(out_eq1.df)],
-                  fVE1=out_eq1.df$fVE1[nrow(out_eq1.df)], fVE2=out_eq1.df$fVE2[nrow(out_eq1.df)],
+                  fR=out_eq1.df$fR[nrow(out_eq1.df)], fV=out_eq1.df$fV[nrow(out_eq1.df)],
+                  fVE1=out_eq1.df$fVE1[nrow(out_eq1.df)], fVE2=out_eq1.df$fVE2[nrow(out_eq1.df)], 
                   fVI1=out_eq1.df$fVI1[nrow(out_eq1.df)], fVI2=out_eq1.df$fVI2[nrow(out_eq1.df)],
                   mS=out_eq1.df$mS[nrow(out_eq1.df)], 
                   mE1=out_eq1.df$mE1[nrow(out_eq1.df)], mE2=out_eq1.df$mE2[nrow(out_eq1.df)], 
                   mI1=out_eq1.df$mI1[nrow(out_eq1.df)], mI2=1,
                   mR=out_eq1.df$mR[nrow(out_eq1.df)],
                   mV=out_eq1.df$mV[nrow(out_eq1.df)],
-                  mVE1=out_eq1.df$mVE1[nrow(out_eq1.df)], mVE2=out_eq1.df$mVE2[nrow(out_eq1.df)],
+                  mVE1=out_eq1.df$mVE1[nrow(out_eq1.df)], mVE2=out_eq1.df$mVE2[nrow(out_eq1.df)], 
                   mVI1=out_eq1.df$mVI1[nrow(out_eq1.df)], mVI2=out_eq1.df$mVI2[nrow(out_eq1.df)])
     
     # Run model until second equilibrium
