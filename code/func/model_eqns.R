@@ -66,5 +66,8 @@ eqn_mod3 <- function(time, state, parameters){
     dmVE2 = (mbet2*mV*mI2) +(mbet2*mV*mVI2) -sig*mVE2 -nat_mort*mVE2 -m_mf*mVE2 +m_fm_vax*fVE2
     dmVI1 = sig*mVE1 -gamm*mVI1 -nat_mort*mVI1 -m_mf*mVI1 +m_fm_vax*fVI1
     dmVI2 = sig*mVE2 -gamm*mVI2 -nat_mort*mVI2 -m_mf*mVI2 +m_fm_vax*fVI2
+    dM_FM = -M_FM +m_fm*fS +m_fm*fE1 +m_fm*fE2 +m_fm*fI1 +m_fm*fI2 +m_fm*fR +m_fm_vax*fV +m_fm_vax*fVE1 +m_fm_vax*fVE2 +m_fm_vax*fVI1 +m_fm_vax*fVI2
+    dM_MF = -M_MF +m_mf*mS +m_mf*mE1 +m_mf*mE2 +m_mf*mI1 +m_mf*mI2 +m_mf*mR +m_mf*mV +m_mf*mVE1 +m_mf*mVE2 +m_mf*mVI1 +m_mf*mVI2
     return(list(c(dfS, dfE1, dfE2, dfI1, dfI2, dfR, dfV, dfVE1, dfVE2, dfVI1, dfVI2,
-                  dmS, dmE1, dmE2, dmI1, dmI2, dmR, dmV, dmVE1, dmVE2, dmVI1, dmVI2)))})}
+                  dmS, dmE1, dmE2, dmI1, dmI2, dmR, dmV, dmVE1, dmVE2, dmVI1, dmVI2,
+                  dM_FM, dM_MF)))})}

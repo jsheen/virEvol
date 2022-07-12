@@ -159,4 +159,9 @@ plot.out.df.mod3 <- function(out.df) {
   lines(out.df$time, out.df$fVI1 + out.df$fVI2, col='black', lty=2)
   legend('topright', legend=c("farms", "markets", 'farms (infectious)', 'markets (infectious)'),
          col=c("black", "red", 'black', 'red'), lty=c(1, 1, 2, 2), cex=0.8)
+  
+  # Migration
+  plot(out.df$time, out.df$M_FM, col='black', type='l', ylim=c(0, max(out.df$M_FM, out.df$M_MF)))
+  lines(out.df$time, out.df$M_MF, col='red', type='l')
+  legend('bottomright', legend=c('M_FM', 'M_MF'), col=c('black', 'red'), lty=c(1,1), cex=0.8)
 }

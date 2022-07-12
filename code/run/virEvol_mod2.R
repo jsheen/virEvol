@@ -20,6 +20,8 @@ inter_vax_time = 120
 v = perc_vax / inter_vax_time 
 # Rate of loss of immunity due to vaccination per chicken per day
 v_hat = (1 / 120)
+# Threshold value for extinction
+threshold_extinction = 1
 
 # Assign model 2 specific equation and test_invade -----------------------------
 eqn <- eqn_mod2

@@ -39,7 +39,7 @@ test_invade_mod1 <- function(res_vir, invade_vir) {
   out_eq1.df <- as.data.frame(out_eq1)
   
   # For debugging purposes
-  plot.out.df.mod1(out_eq1.df)
+  # plot.out.df.mod1(out_eq1.df)
   
   # Check equilibrium 1
   if (!check_equil(out_eq1.df, uniq_vals_threshold=1000)) {
@@ -185,7 +185,8 @@ test_invade_mod3 <- function(res_vir, invade_vir) {
   
   # Run resident strain until equilibrium (no vaccination)
   init <- c(fS=fS_init, fE1=0, fE2=0, fI1=fI1_init, fI2=0, fR=0, fV=0, fVE1=0, fVE2=0, fVI1=0, fVI2=0,
-            mS=mS_init, mE1=0, mE2=0, mI1=mI1_init, mI2=0, mR=0, mV=0, mVE1=0, mVE2=0, mVI1=0, mVI2=0)
+            mS=mS_init, mE1=0, mE2=0, mI1=mI1_init, mI2=0, mR=0, mV=0, mVE1=0, mVE2=0, mVI1=0, mVI2=0,
+            M_FM=0, M_MF=0)
   time_eq1 <- seq(0, t_max_eq1, by = 0.1)
   out_eq1 <- ode(y=init, times=time_eq1, eqn, parms=parameters)
   out_eq1.df <- as.data.frame(out_eq1)
@@ -223,10 +224,12 @@ test_invade_mod3 <- function(res_vir, invade_vir) {
                   mR=out_eq1.df$mR[nrow(out_eq1.df)],
                   mV=out_eq1.df$mV[nrow(out_eq1.df)],
                   mVE1=out_eq1.df$mVE1[nrow(out_eq1.df)], mVE2=out_eq1.df$mVE2[nrow(out_eq1.df)], 
-                  mVI1=out_eq1.df$mVI1[nrow(out_eq1.df)], mVI2=out_eq1.df$mVI2[nrow(out_eq1.df)])
+                  mVI1=out_eq1.df$mVI1[nrow(out_eq1.df)], mVI2=out_eq1.df$mVI2[nrow(out_eq1.df)],
+                  M_FM=out_eq1.df$M_FM[nrow(out_eq1.df)], M_MF=out_eq1.df$M_MF[nrow(out_eq1.df)])
     
     # Run model until second equilibrium
     time_eq2 <- seq(0, t_max_eq2, by = 1)
+    time_eq2 <- seq(0, 1e4, by = 1)
     out_eq2 <- ode(y=eq2_init, times=time_eq2, func=eqn, parms=parameters)
     out_eq2.df <- as.data.frame(out_eq2)
     

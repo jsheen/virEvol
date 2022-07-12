@@ -12,6 +12,8 @@ source('~/virEvol/code/func/test_invade.R')
 fS_init = pop_size - 1
 # Initial strain 1 infectious population in farms
 fI1_init = 1
+# Threshold value for extinction
+threshold_extinction = 1
 
 # Assign model 1 specific equation and test_invade -----------------------------
 eqn <- eqn_mod1

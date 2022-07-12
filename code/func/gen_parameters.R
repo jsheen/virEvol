@@ -28,12 +28,9 @@ nat_mort = 1 / 730
 # Mortality rate due to disease per chicken per day
 mort = 1 / 4
 
-# Threshold value for extinction
-threshold_extinction = 2
-
 # Parameters to define transmission rate from virulence level
 c1 = 0.1
 c2 = 0.3
 
 # Virulence steps virus is allowed to take
-vir_steps = seq(2.01, 100.01, 5)
+vir_steps = seq(2, 100, 1)

@@ -38,6 +38,8 @@ m_fm_vax = (perc_sold_per_farm * diff_vax) / inter_sell_time_per_farm
 m_mf = 1 / 7
 # Ratio of contact rate in markets vs. farms
 bet_mf_ratio = 10
+# Threshold value for extinction
+threshold_extinction = 2
 
 # Assign model 3 specific equation and test_invade -----------------------------
 eqn <- eqn_mod3
