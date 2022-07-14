@@ -69,3 +69,35 @@ temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, f
 l <- list()
 l[[1]] <- temp_plot
 ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_nodiff.tiff", marrangeGrob(grobs = l, nrow=1, ncol=1), width=3, height=3, units='in', dpi=600)
+
+# Model 3 (mpatch): SEIR with vaccination and migration, differential migration ---------
+pip <- read.csv(paste0('~/virEvol/code_output/pips/mod3_diff_mpatch.csv'))
+pip <- pip[,c(2:ncol(pip))]
+pip <- data.matrix(pip)
+colnames(pip) <- vir_steps
+rownames(pip) <- rev(vir_steps)
+pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
+if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
+melted <- melt(pip_toPlot)
+colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
+temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
+  scale_fill_manual(values = c("black", "white"), na.value='grey') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none")
+l <- list()
+l[[1]] <- temp_plot
+ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_diff_mpatch.tiff", marrangeGrob(grobs = l, nrow=1, ncol=1), width=3, height=3, units='in', dpi=600)
+
+# Model 3 (mpatch): SEIR with vaccination and migration, non-differential migration -----
+pip <- read.csv(paste0('~/virEvol/code_output/pips/mod3_nodiff_mpatch.csv'))
+pip <- pip[,c(2:ncol(pip))]
+pip <- data.matrix(pip)
+colnames(pip) <- vir_steps
+rownames(pip) <- rev(vir_steps)
+pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
+if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
+melted <- melt(pip_toPlot)
+colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
+temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
+  scale_fill_manual(values = c("black", "white"), na.value='grey') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none")
+l <- list()
+l[[1]] <- temp_plot
+ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_nodiff_mpatch.tiff", marrangeGrob(grobs = l, nrow=1, ncol=1), width=3, height=3, units='in', dpi=600)

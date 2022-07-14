@@ -33,4 +33,4 @@ c1 = 0.1
 c2 = 0.3
 
 # Virulence steps virus is allowed to take
-vir_steps = seq(2, 100, 1)
+vir_steps = seq(2, 100, 10)
