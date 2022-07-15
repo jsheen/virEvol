@@ -20,7 +20,7 @@ temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, f
   scale_fill_manual(values = c("black", "white"), na.value='grey') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none")
 l <- list()
 l[[1]] <- temp_plot
-ggsave(filename="~/virEvol/code_output/plots/virEvol_mod1.tiff", marrangeGrob(grobs = l, nrow=1, ncol=1), width=3, height=3, units='in', dpi=600)
+ggsave(filename="~/virEvol/code_output/plots/virEvol_mod1.png", marrangeGrob(grobs = l, nrow=1, ncol=1), width=3, height=3, units='in', dpi=600)
 
 # Model 2: SEIR with vaccination -----------------------------------------------
 pip <- read.csv(paste0('~/virEvol/code_output/pips/mod2.csv'))
@@ -36,7 +36,7 @@ temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, f
   scale_fill_manual(values = c("black", "white"), na.value='grey') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none")
 l <- list()
 l[[1]] <- temp_plot
-ggsave(filename="~/virEvol/code_output/plots/virEvol_mod2.tiff", marrangeGrob(grobs = l, nrow=1, ncol=1), width=3, height=3, units='in', dpi=600)
+ggsave(filename="~/virEvol/code_output/plots/virEvol_mod2.png", marrangeGrob(grobs = l, nrow=1, ncol=1), width=3, height=3, units='in', dpi=600)
 
 # Model 3: SEIR with vaccination and migration, differential migration ---------
 pip <- read.csv(paste0('~/virEvol/code_output/pips/mod3_diff.csv'))
@@ -52,7 +52,7 @@ temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, f
   scale_fill_manual(values = c("black", "white"), na.value='grey') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none")
 l <- list()
 l[[1]] <- temp_plot
-ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_diff.tiff", marrangeGrob(grobs = l, nrow=1, ncol=1), width=3, height=3, units='in', dpi=600)
+ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_diff.png", marrangeGrob(grobs = l, nrow=1, ncol=1), width=3, height=3, units='in', dpi=600)
 
 # Model 3: SEIR with vaccination and migration, non-differential migration -----
 pip <- read.csv(paste0('~/virEvol/code_output/pips/mod3_nodiff.csv'))
@@ -68,7 +68,7 @@ temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, f
   scale_fill_manual(values = c("black", "white"), na.value='grey') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none")
 l <- list()
 l[[1]] <- temp_plot
-ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_nodiff.tiff", marrangeGrob(grobs = l, nrow=1, ncol=1), width=3, height=3, units='in', dpi=600)
+ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_nodiff.png", marrangeGrob(grobs = l, nrow=1, ncol=1), width=3, height=3, units='in', dpi=600)
 
 # Model 3 (mpatch): SEIR with vaccination and migration, differential migration ---------
 pip <- read.csv(paste0('~/virEvol/code_output/pips/mod3_diff_mpatch.csv'))
@@ -84,7 +84,7 @@ temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, f
   scale_fill_manual(values = c("black", "white"), na.value='grey') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none")
 l <- list()
 l[[1]] <- temp_plot
-ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_diff_mpatch.tiff", marrangeGrob(grobs = l, nrow=1, ncol=1), width=3, height=3, units='in', dpi=600)
+ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_diff_mpatch.png", marrangeGrob(grobs = l, nrow=1, ncol=1), width=3, height=3, units='in', dpi=600)
 
 # Model 3 (mpatch): SEIR with vaccination and migration, non-differential migration -----
 pip <- read.csv(paste0('~/virEvol/code_output/pips/mod3_nodiff_mpatch.csv'))
@@ -100,4 +100,5 @@ temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, f
   scale_fill_manual(values = c("black", "white"), na.value='grey') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none")
 l <- list()
 l[[1]] <- temp_plot
-ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_nodiff_mpatch.tiff", marrangeGrob(grobs = l, nrow=1, ncol=1), width=3, height=3, units='in', dpi=600)
+ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_nodiff_mpatch.png", marrangeGrob(grobs = l, nrow=1, ncol=1), width=3, height=3, units='in', dpi=600)
+
