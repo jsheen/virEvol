@@ -34,3 +34,13 @@ c2 = 0.3
 
 # Virulence steps virus is allowed to take
 vir_steps = seq(2, 100, 10)
+
+# Plot tradeoff curve
+# virulences <- seq(0, 100, 0.01)
+# transmissions <- (c1 * virulences)^c2
+# mortalities <- virulences / 100
+# plot(mortalities, transmissions, type='l', main='Transmission-Mortality Tradeoff Curve',
+#      xlab=expression(mu), ylab=expression(beta), lwd=5, col='red', cex.lab=1.2)
+
+
+
