@@ -62,7 +62,7 @@ finalMatrix <- foreach(i=combos, .combine=cbind) %dopar% {
   library(foreach)
   library(doParallel)
   tempMatrix = test_invade(res_vir=i[1], invade_vir=i[2])
-  # write.csv(tempMatrix, paste0("~/virEvol/scratch/", i[1], "_", i[2], ".csv")) # for debugging purposes
+  write.csv(tempMatrix, paste0("~/virEvol/scratch/diff", i[1], "_", i[2], ".csv")) # for debugging purposes
   tempMatrix
 }
 stopCluster(cl)
@@ -88,7 +88,7 @@ finalMatrix <- foreach(i=combos, .combine=cbind) %dopar% {
   library(foreach)
   library(doParallel)
   tempMatrix = test_invade(res_vir=i[1], invade_vir=i[2])
-  # write.csv(tempMatrix, paste0("~/virEvol/scratch/", i[1], "_", i[2], ".csv")) # for debugging purposes
+  write.csv(tempMatrix, paste0("~/virEvol/scratch/nodiff", i[1], "_", i[2], ".csv")) # for debugging purposes
   tempMatrix
 }
 stopCluster(cl)

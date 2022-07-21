@@ -86,7 +86,7 @@ melted <- melt(pip_toPlot)
 colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
 temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
   scale_fill_manual(values = c("black", "white"), na.value='grey') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none")+
-  xlab('Resident virulence') + ylab('Invader virulence') + ggtitle('With vax and non-differential\nmigration (Model 3)')
+  xlab('Resident virulence') + ylab('Invader virulence') + ggtitle('With vaccination and\ndifferential migration (Model 3)')
 l <- list()
 l[[1]] <- temp_plot
 ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_diff_mpatch.png", marrangeGrob(grobs = l, nrow=1, ncol=1, top=NULL), width=3, height=3, units='in', dpi=600)
@@ -103,7 +103,7 @@ melted <- melt(pip_toPlot)
 colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
 temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
   scale_fill_manual(values = c("black", "white"), na.value='grey') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none")+
-  xlab('Resident virulence') + ylab('Invader virulence') + ggtitle('With vax and non-differential\nmigration (Model 3)')
+  xlab('Resident virulence') + ylab('Invader virulence') + ggtitle('With vaccination and non-\ndifferential migration (Model 3)')
 l <- list()
 l[[1]] <- temp_plot
 ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_nodiff_mpatch.png", marrangeGrob(grobs = l, nrow=1, ncol=1, top=NULL), width=3, height=3, units='in', dpi=600)
