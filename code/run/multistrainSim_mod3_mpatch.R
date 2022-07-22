@@ -37,7 +37,7 @@ diff_vax = 0.1
 # Migration rate of chickens from farms to markets per chicken, if vaccinated
 m_fm_vax = (perc_sold_per_farm * diff_vax) / inter_sell_time_per_farm
 # Migration rate of chickens from markets to farms per chicken per day
-m_mf = 1 / 7
+m_mf = 1 / 60
 # Ratio of contact rate in markets vs. farms
 bet_mf_ratio = 10
 # Threshold value for extinction
@@ -46,7 +46,7 @@ threshold_extinction = 3
 eqn <- multi_eqn_mod3
 
 # Create function that will output the virulence strategies every interyear ----
-multistrainSim_mod3 <- function(interyear=interyear_input, maxyear=maxyear_input) {
+multistrainSim_mod3_mpatch <- function(interyear=interyear_input, maxyear=maxyear_input) {
   # Check that maxyear divisible by interyear
   if (maxyear %% interyear != 0) {
     stop('Maxyear must be divisible by interyear in order for while loop to work.')
@@ -222,10 +222,10 @@ finalMatrix <- foreach(i=1:nsim, .combine=rbind) %dopar% {
   library(deSolve)
   library(foreach)
   library(doParallel)
-  tempMatrix = multistrainSim_mod3()
+  tempMatrix = multistrainSim_mod3_mpatch()
   write.csv(tempMatrix, paste0("~/virEvol/scratch/", i, ".csv")) # for debugging purposes
   tempMatrix
 }
 stopCluster(cl)
-write.csv(finalMatrix, paste0('~/virEvol/code_output/multistrain_res/mod3_interyear', interyear_input, '_maxyear', maxyear_input, '.csv'))
+write.csv(finalMatrix, paste0('~/virEvol/code_output/multistrain_res/mod3_mpatch_interyear', interyear_input, '_maxyear', maxyear_input, '.csv'))
 
