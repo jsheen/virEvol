@@ -5,7 +5,7 @@
 source('~/virEvol/code/func/gen_parameters.R')
 source('~/virEvol/code/func/multistrain_eqns.R')
 set.seed(0)
-nsim <- 100
+nsim <- 1000
 interyear_input <- 10
 maxyear_input <- 100
 
