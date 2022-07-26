@@ -5,106 +5,79 @@
 library(ggplot2)
 library(reshape2)
 library(gridExtra)
+library(ggpubr)
 
-# Model 1: SEIR ---------------------------------------------------------------- 
-pip <- read.csv(paste0('~/virEvol/code_output/pips/mod1.csv'))
-pip <- pip[,c(2:ncol(pip))]
-pip <- data.matrix(pip)
-colnames(pip) <- vir_steps
-rownames(pip) <- rev(vir_steps)
-pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
-if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
-melted <- melt(pip_toPlot)
-colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
-temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-  scale_fill_manual(values = c("black", "white"), na.value='grey') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none") +
-  xlab('Resident virulence') + ylab('Invader virulence') + ggtitle('Without vaccination (Model 1)')
-l <- list()
-l[[1]] <- temp_plot
-ggsave(filename="~/virEvol/code_output/plots/virEvol_mod1.png", marrangeGrob(grobs = l, nrow=1, ncol=1, top=NULL), width=3, height=3, units='in', dpi=600)
+# Load global variables --------------------------------------------------------
+vir_steps <- seq(2, 100, 1)
 
-# Model 2: SEIR with vaccination -----------------------------------------------
-pip <- read.csv(paste0('~/virEvol/code_output/pips/mod2.csv'))
-pip <- pip[,c(2:ncol(pip))]
-pip <- data.matrix(pip)
-colnames(pip) <- vir_steps
-rownames(pip) <- rev(vir_steps)
-pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
-if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
-melted <- melt(pip_toPlot)
-colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
-temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-  scale_fill_manual(values = c("black", "white"), na.value='grey') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none") +
-  xlab('Resident virulence') + ylab('Invader virulence') + ggtitle('With vaccination (Model 2)')
-l <- list()
-l[[1]] <- temp_plot
-ggsave(filename="~/virEvol/code_output/plots/virEvol_mod2.png", marrangeGrob(grobs = l, nrow=1, ncol=1, top=NULL), width=3, height=3, units='in', dpi=600)
+# Function to find singular strategy -------------------------------------------
+find_singular_strat <- function(name, vir_steps) {
+  
+}
 
-# Model 3: SEIR with vaccination and migration, differential migration ---------
-pip <- read.csv(paste0('~/virEvol/code_output/pips/mod3_diff.csv'))
-pip <- pip[,c(2:ncol(pip))]
-pip <- data.matrix(pip)
-colnames(pip) <- vir_steps
-rownames(pip) <- rev(vir_steps)
-pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
-if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
-melted <- melt(pip_toPlot)
-colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
-temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-  scale_fill_manual(values = c("black", "white"), na.value='grey') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none")+
-  xlab('Resident virulence') + ylab('Invader virulence') + ggtitle('With vax and differential\nmigration (Model 3)')
-l <- list()
-l[[1]] <- temp_plot
-ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_diff.png", marrangeGrob(grobs = l, nrow=1, ncol=1, top=NULL), width=3, height=3, units='in', dpi=600)
+# Function to plot each of the results -----------------------------------------
+plot_pip <- function(name, vir_steps, title) {
+  pip <- read.csv(paste0('~/virEvol/code_output/pips/', name, '.csv'))
+  pip <- pip[,c(2:ncol(pip))]
+  pip <- data.matrix(pip)
+  colnames(pip) <- vir_steps
+  rownames(pip) <- rev(vir_steps)
+  pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
+  if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
+  melted <- melt(pip_toPlot)
+  colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
+  temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
+    scale_fill_manual(values = c("black", "gray"), na.value='white') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none") +
+    xlab('Resident virulence') + ylab('Invader virulence') + ggtitle(title)
+  l <- list()
+  l[[1]] <- temp_plot
+  ggsave(filename=paste0("~/virEvol/code_output/plots/virEvol_", name, ".png"), marrangeGrob(grobs = l, nrow=1, ncol=1, top=NULL), width=3, height=3, units='in', dpi=600)
+}
 
-# Model 3: SEIR with vaccination and migration, non-differential migration -----
-pip <- read.csv(paste0('~/virEvol/code_output/pips/mod3_nodiff.csv'))
-pip <- pip[,c(2:ncol(pip))]
-pip <- data.matrix(pip)
-colnames(pip) <- vir_steps
-rownames(pip) <- rev(vir_steps)
-pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
-if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
-melted <- melt(pip_toPlot)
-colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
-temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-  scale_fill_manual(values = c("black", "white"), na.value='grey') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none")+
-  xlab('Resident virulence') + ylab('Invader virulence') + ggtitle('With vax and non-differential\nmigration (Model 3)')
-l <- list()
-l[[1]] <- temp_plot
-ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_nodiff.png", marrangeGrob(grobs = l, nrow=1, ncol=1, top=NULL), width=3, height=3, units='in', dpi=600)
+# Plot each model result -------------------------------------------------------
+plot_pip('mod1', vir_steps=vir_steps, 'Without vaccination\n(Model 1)')
+plot_pip('mod2', vir_steps=vir_steps, 'With vaccination\n(Model 2)')
+plot_pip('mod3_nodiff', vir_steps=vir_steps, 'With vaccination and\nnon-differential migration\n(Model 3)')
+plot_pip('mod3_diff', vir_steps=vir_steps, 'With vaccination and\ndifferential migration\n(Model 3)')
+plot_pip('mod3_nodiff_mpatch', vir_steps=vir_steps, 'With vaccination and\nnon-differential migration\n(Model 3 mpatch)')
+plot_pip('mod3_diff_mpatch', vir_steps=vir_steps, 'With vaccination and\ndifferential migration\n(Model 3 mpatch)')
 
-# Model 3 (mpatch): SEIR with vaccination and migration, differential migration ---------
-pip <- read.csv(paste0('~/virEvol/code_output/pips/mod3_diff_mpatch.csv'))
-pip <- pip[,c(2:ncol(pip))]
-pip <- data.matrix(pip)
-colnames(pip) <- vir_steps
-rownames(pip) <- rev(vir_steps)
-pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
-if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
-melted <- melt(pip_toPlot)
-colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
-temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-  scale_fill_manual(values = c("black", "white"), na.value='grey') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none")+
-  xlab('Resident virulence') + ylab('Invader virulence') + ggtitle('With vaccination and\ndifferential migration (Model 3)')
+# Plot figure 1 of paper -------------------------------------------------------
 l <- list()
-l[[1]] <- temp_plot
-ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_diff_mpatch.png", marrangeGrob(grobs = l, nrow=1, ncol=1, top=NULL), width=3, height=3, units='in', dpi=600)
+l_dex <- 1
+titles <- c("(A) Without vaccination\n", "(B) With vaccination\n", 
+            "(C) With vaccination &\nnon-differential migration", 
+            "(D) With vaccination &\ndifferential migration")
+for (name in c('mod1', 'mod2', 'mod3_nodiff_mpatch', 'mod3_diff_mpatch')) {
+  pip <- read.csv(paste0('~/virEvol/code_output/pips/', name, '.csv'))
+  pip <- pip[,c(2:ncol(pip))]
+  pip <- data.matrix(pip)
+  colnames(pip) <- vir_steps
+  rownames(pip) <- rev(vir_steps)
+  pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
+  if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
+  melted <- melt(pip_toPlot)
+  colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
+  if (l_dex == 1) {
+    temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
+      scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
+      xlab('Resident virulence') + ylab('Invader virulence') + ggtitle(titles[l_dex]) +
+      theme(text = element_text(size = 24)) + 
+      theme(plot.title = element_text(size=18)) +theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                                       panel.background = element_blank(), axis.line = element_line(colour = "black"))
+  } else {
+    temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
+      scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
+      xlab('Resident virulence') + ylab('') + ggtitle(titles[l_dex]) +
+      theme(text = element_text(size = 24)) + 
+      theme(plot.title = element_text(size=18)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                                        panel.background = element_blank(), axis.line = element_line(colour = "black"))
+  }
+  l[[l_dex]] <- temp_plot
+  l_dex <- l_dex + 1
+}
+ggsave(filename=paste0("~/virEvol/code_output/plots/Fig1.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=4, top=NULL, common.legend = TRUE, legend="bottom"), width=15, height=4, units='in', dpi=600)
 
-# Model 3 (mpatch): SEIR with vaccination and migration, non-differential migration -----
-pip <- read.csv(paste0('~/virEvol/code_output/pips/mod3_nodiff_mpatch.csv'))
-pip <- pip[,c(2:ncol(pip))]
-pip <- data.matrix(pip)
-colnames(pip) <- vir_steps
-rownames(pip) <- rev(vir_steps)
-pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
-if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
-melted <- melt(pip_toPlot)
-colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
-temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-  scale_fill_manual(values = c("black", "white"), na.value='grey') +geom_abline(intercept = 0, slope = 1, col='red') +theme(legend.position="none")+
-  xlab('Resident virulence') + ylab('Invader virulence') + ggtitle('With vaccination and non-\ndifferential migration (Model 3)')
-l <- list()
-l[[1]] <- temp_plot
-ggsave(filename="~/virEvol/code_output/plots/virEvol_mod3_nodiff_mpatch.png", marrangeGrob(grobs = l, nrow=1, ncol=1, top=NULL), width=3, height=3, units='in', dpi=600)
+
+
 
