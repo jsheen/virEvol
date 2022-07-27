@@ -6,7 +6,7 @@ source('~/virEvol/code/func/gen_parameters.R')
 source('~/virEvol/code/func/multistrain_eqns.R')
 set.seed(0)
 nsim <- 1000
-interyear_input <- 10
+interyear_input <- 1
 maxyear_input <- 100
 
 # Set model 3 specific parameters and functions --------------------------------
@@ -33,7 +33,7 @@ inter_sell_time_per_farm = 120
 # Migration rate of chickens from farms to markets per chicken per day, if unvaccinated
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm
 # Frac of base migration rate for vaccinated chickens
-diff_vax = 0.1
+diff_vax = 1
 # Migration rate of chickens from farms to markets per chicken, if vaccinated
 m_fm_vax = (perc_sold_per_farm * diff_vax) / inter_sell_time_per_farm
 # Migration rate of chickens from markets to farms per chicken per day
