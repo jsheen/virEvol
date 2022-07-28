@@ -223,7 +223,7 @@ finalMatrix <- foreach(i=1:nsim, .combine=rbind) %dopar% {
   library(foreach)
   library(doParallel)
   tempMatrix = multistrainSim_mod3_mpatch()
-  write.csv(tempMatrix, paste0("~/virEvol/scratch/", i, ".csv")) # for debugging purposes
+  # write.csv(tempMatrix, paste0("~/virEvol/scratch/", i, ".csv")) # for debugging purposes
   tempMatrix
 }
 stopCluster(cl)
