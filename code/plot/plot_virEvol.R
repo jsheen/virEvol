@@ -12,8 +12,29 @@ vir_steps <- seq(2, 100, 1)
 
 # Function to find singular strategy -------------------------------------------
 find_singular_strat <- function(name, vir_steps) {
-  
+  pip <- read.csv(paste0('~/virEvol/code_output/pips/', name, '.csv'))
+  pip <- pip[,c(2:ncol(pip))]
+  pip <- data.matrix(pip)
+  colnames(pip) <- vir_steps
+  rownames(pip) <- rev(vir_steps)
+  pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
+  if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
+  singular_strats <- c()
+  for (col_dex in 1:ncol(pip)) {
+    if (length(which(pip[,col_dex] == 0)) == nrow(pip)) {
+      singular_strats <- c(singular_strats, col_dex)
+    }
+  }
+  col_singular_strat <- singular_strats[floor(length(singular_strats) / 2)]
+  vir_singular_strat <- vir_steps[col_singular_strat]
+  print(paste0(name, ": ", vir_singular_strat))
 }
+find_singular_strat('mod1', vir_steps=vir_steps)
+find_singular_strat('mod2', vir_steps=vir_steps)
+find_singular_strat('mod3_nodiff', vir_steps=vir_steps)
+find_singular_strat('mod3_diff', vir_steps=vir_steps)
+find_singular_strat('mod3_nodiff_mpatch', vir_steps=vir_steps)
+find_singular_strat('mod3_diff_mpatch', vir_steps=vir_steps)
 
 # Function to plot each of the results -----------------------------------------
 plot_pip <- function(name, vir_steps, title) {

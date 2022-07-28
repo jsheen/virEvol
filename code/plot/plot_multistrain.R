@@ -130,20 +130,8 @@ for (name in c('mod1_interyear1_maxyear100', 'mod2_interyear1_maxyear100',
       ggtitle(titles[l_dex]) + theme(text = element_text(size = 24)) + ylim(0, 0.1) +
       theme(plot.title = element_text(size=18))
   }
+  print(paste0(titles[l_dex], ": ", mean(forhist.df$forhist), " [", var(forhist.df$forhist), "]"))
   l_dex <- l_dex + 1
 }
 ggsave(filename=paste0("~/virEvol/code_output/plots/Fig2.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=3, top=NULL), width=13, height=4, units='in', dpi=600)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
