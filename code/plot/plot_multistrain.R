@@ -84,8 +84,8 @@ for (row_dex in seq(101, 101000, 101)) {
 }
 hist(as.numeric(forhist), xlab='Distribution of strain virulences', main='', breaks=100)
 
-# Figure 3 ---------------------------------------------------------------------
-year_horizon <- 5
+# Figure 4 ---------------------------------------------------------------------
+year_horizon <- 10
 titles <- c('(A) Without vaccination\n', '(B) With vaccination\n', '(C) With vaccination &\ndifferential migration')
 l <- list()
 l_dex <- 1
@@ -136,7 +136,7 @@ for (name in c('mod1_interyear1_maxyear100', 'mod2_interyear1_maxyear100',
   print(paste0(titles[l_dex], ": ", mean(forhist.df$forhist), " [", var(forhist.df$forhist), "]"))
   l_dex <- l_dex + 1
 }
-ggsave(filename=paste0("~/virEvol/code_output/plots/Fig3.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=3, top=NULL), width=13, height=4, units='in', dpi=600)
+ggsave(filename=paste0("~/virEvol/code_output/plots/Fig4.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=3, top=NULL), width=13, height=4, units='in', dpi=600)
 
 
 # Figure S3: 10 years instead of 1 year ----------------------------------------

@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Model 3: SEIR with vaccination and migration (low contact rate)
+# Model 3: SEIR with vaccination and migration
 # ------------------------------------------------------------------------------
 # Source functional scripts ----------------------------------------------------
 source('~/virEvol/code/plot/plot_functions.R')
@@ -17,7 +17,7 @@ fI1_init = 1
 # Initial strain 1 infectious population in markets
 mI1_init = 1 
 # Percent of susceptible chickens vaccinated in each time period
-perc_vax = 0.33 
+perc_vax = 0.66
 # Time that perc_vax is vaccinated
 inter_vax_time = 120 
 # Vaccination rate of chickens of farms per susceptible chicken of farm per day
@@ -30,14 +30,14 @@ perc_sold_per_farm = 0.33
 inter_sell_time_per_farm = 120 
 # Migration rate of chickens from farms to markets per chicken per day, if unvaccinated
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm
-# Frac of base migration rate for vaccinated chickens
-diff_vax = 0.1
 # Migration rate of chickens from markets to farms per chicken per day
-m_mf = 1 / 60
+m_mf = 1 / 7
 # Ratio of contact rate in markets vs. farms
 bet_mf_ratio = 5
 # Threshold value for extinction
 threshold_extinction = 3
+
+vir_steps = seq(2, 100, 5)
 
 # Assign model 3 specific equation and test_invade -----------------------------
 eqn <- eqn_mod3
@@ -61,10 +61,11 @@ finalMatrix <- foreach(i=combos, .combine=cbind) %dopar% {
   library(foreach)
   library(doParallel)
   tempMatrix = test_invade(res_vir=i[1], invade_vir=i[2])
-  # write.csv(tempMatrix, paste0("~/virEvol/scratch/nodiff", i[1], "_", i[2], ".csv")) # for debugging purposes
+  write.csv(tempMatrix, paste0("~/virEvol/scratch/nodiff", i[1], "_", i[2], ".csv")) # for debugging purposes
   tempMatrix
 }
 stopCluster(cl)
 pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow=F)
 pip <- pracma::flipud(pip)
-write.csv(pip, paste0('~/virEvol/code_output/pips/main/mod3_v33_mfm33_mmf60_c5_nodiff.csv'))
+write.csv(pip, paste0('~/virEvol/code_output/pips/main/mod3_v66_mfm33_mmf7_c5_nodiff.csv'))
+
