@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Model 1_highc: SEIR with higher contact rate
+# Model 1_c0.5: SEIR with lower contact rate
 # ------------------------------------------------------------------------------
 # Source functional scripts ----------------------------------------------------
 source('~/virEvol/code/plot/plot_functions.R')
@@ -15,11 +15,11 @@ fI1_init = 1
 # Threshold value for extinction
 threshold_extinction = 1.1
 # Virulence steps
-vir_steps = seq(2, 100, 5)
+vir_steps = seq(2, 100, 3)
 
 # Assign model 1 specific equation and test_invade -----------------------------
 eqn <- eqn_mod1
-test_invade <- test_invade_mod1_highc
+test_invade <- test_invade_mod1_lowc
 
 # Create and save PIP ----------------------------------------------------------
 combos <- list()
@@ -38,11 +38,11 @@ finalMatrix <- foreach(i=combos, .combine=cbind) %dopar% {
   library(foreach)
   library(doParallel)
   tempMatrix = test_invade(res_vir=i[1], invade_vir=i[2])
-  # write.csv(tempMatrix, paste0("~/virEvol/scratch/", i[1], "_", i[2], ".csv")) # for debugging purposes
+  write.csv(tempMatrix, paste0("~/virEvol/scratch/", i[1], "_", i[2], ".csv")) # for debugging purposes
   tempMatrix
 }
 stopCluster(cl)
 pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow=F)
 pip <- pracma::flipud(pip)
-write.csv(pip, paste0('~/virEvol/code_output/pips/supplementary/mod1_c10.csv'))
+write.csv(pip, paste0('~/virEvol/code_output/pips/supplementary/mod1_c0.5.csv'))
 

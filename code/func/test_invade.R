@@ -92,11 +92,11 @@ test_invade_mod1 <- function(res_vir, invade_vir) {
   return(c(res))
 }
 
-# Model 1: SEIR with higher contact rate ---------------------------------------
-test_invade_mod1_highc <- function(res_vir, invade_vir) {
+# Model 1: SEIR with lower contact rate ---------------------------------------
+test_invade_mod1_lowc <- function(res_vir, invade_vir) {
   # Strain specific virulence parameters
-  fbet1 <- (10 * c1 * (res_vir)^c2) / pop_size
-  fbet2 <- (10 * c1 * (invade_vir)^c2) / pop_size
+  fbet1 <- (0.75 * (c1 * (res_vir)^c2)) / pop_size
+  fbet2 <- (0.75 * (c1 * (invade_vir)^c2)) / pop_size
   p_1 <- ((res_vir) / 100)
   p_2 <- ((invade_vir) / 100)
   
@@ -363,7 +363,7 @@ test_invade_mod4 <- function(res_vir, invade_vir) {
   
   # Check equilibrium 1
   if (!check_equil(out_eq1.df, uniq_vals_threshold=1000)) {
-    write.csv(list(), paste0('~/virEvol/scratch_equil/err_mod3_equil1_', res_vir, '_', invade_vir, '.csv'))
+    write.csv(list(), paste0('~/virEvol/scratch_equil/err_mod4_equil1_', res_vir, '_', invade_vir, '.csv'))
   }
   
   # Output result for res_vir and invade_vir combination

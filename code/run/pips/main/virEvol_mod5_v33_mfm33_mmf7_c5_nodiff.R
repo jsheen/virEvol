@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Model 4: SEIR with vaccination and migration and slaughter
+# Model 5: SEIR with vaccination and migration and no migration of infectious
 # ------------------------------------------------------------------------------
 # Source functional scripts ----------------------------------------------------
 source('~/virEvol/code/plot/plot_functions.R')
@@ -7,7 +7,7 @@ source('~/virEvol/code/func/gen_parameters.R')
 source('~/virEvol/code/func/model_eqns.R')
 source('~/virEvol/code/func/test_invade.R')
 
-# Set model 3 specific parameters and functions --------------------------------
+# Set model 5 specific parameters and functions --------------------------------
 # Initial susceptible population in farms
 fS_init = (pop_size * 1/2) - 1
 # Initial susceptible population in markets
@@ -15,9 +15,9 @@ mS_init = (pop_size * 1/2) - 1
 # Initial strain 1 infectious population in farms
 fI1_init = 1
 # Initial strain 1 infectious population in markets
-mI1_init = 1 
+mI1_init = 1
 # Percent of susceptible chickens vaccinated in each time period
-perc_vax = 0.66 
+perc_vax = 0.33 
 # Time that perc_vax is vaccinated
 inter_vax_time = 120 
 # Vaccination rate of chickens of farms per susceptible chicken of farm per day
@@ -25,7 +25,7 @@ v = perc_vax / inter_vax_time
 # Rate of loss of immunity due to vaccination per chicken per day
 v_hat = 1 / 120
 # Percent sold in interval
-perc_sold_per_farm = 0.66
+perc_sold_per_farm = 0.33
 # Days between successive sales of chickens of a farm
 inter_sell_time_per_farm = 120 
 # Migration rate of chickens from farms to markets per chicken per day, if unvaccinated
@@ -41,9 +41,9 @@ p_s = 0.5
 
 vir_steps = seq(2, 100, 5)
 
-# Assign model 3 specific equation and test_invade -----------------------------
-eqn <- eqn_mod4
-test_invade <- test_invade_mod4
+# Assign model 5 specific equation and test_invade -----------------------------
+eqn <- eqn_mod5
+test_invade <- test_invade_mod3
 
 # Create and save PIP with no differential migration due to vaccination --------
 m_fm_vax = m_fm
@@ -69,4 +69,4 @@ finalMatrix <- foreach(i=combos, .combine=cbind) %dopar% {
 stopCluster(cl)
 pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow=F)
 pip <- pracma::flipud(pip)
-write.csv(pip, paste0('~/virEvol/code_output/pips/main/mod4_v66_mfm66_mmf7_c5_nodiff.csv'))
+write.csv(pip, paste0('~/virEvol/code_output/pips/main/mod5_v33_mfm33_mmf7_c5_nodiff.csv'))

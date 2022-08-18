@@ -7,7 +7,7 @@ source('~/virEvol/code/func/gen_parameters.R')
 source('~/virEvol/code/func/model_eqns.R')
 source('~/virEvol/code/func/test_invade.R')
 
-# Set model 3 specific parameters and functions --------------------------------
+# Set model 4 specific parameters and functions --------------------------------
 # Initial susceptible population in farms
 fS_init = (pop_size * 1/2) - 1
 # Initial susceptible population in markets
@@ -15,7 +15,7 @@ mS_init = (pop_size * 1/2) - 1
 # Initial strain 1 infectious population in farms
 fI1_init = 1
 # Initial strain 1 infectious population in markets
-mI1_init = 1 
+mI1_init = 1
 # Percent of susceptible chickens vaccinated in each time period
 perc_vax = 0.33 
 # Time that perc_vax is vaccinated
@@ -37,11 +37,11 @@ bet_mf_ratio = 5
 # Threshold value for extinction
 threshold_extinction = 2
 # Percentage of market chickens that are to be immediately slaughtered
-p_s = 0.75
+p_s = 0.5
 
 vir_steps = seq(2, 100, 5)
 
-# Assign model 3 specific equation and test_invade -----------------------------
+# Assign model 4 specific equation and test_invade -----------------------------
 eqn <- eqn_mod4
 test_invade <- test_invade_mod4
 
