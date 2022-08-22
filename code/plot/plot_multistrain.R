@@ -86,7 +86,7 @@ hist(as.numeric(forhist), xlab='Distribution of strain virulences', main='', bre
 
 # Figure 4 ---------------------------------------------------------------------
 year_horizon <- 10
-titles <- c('(A) Without vaccination\n', '(B) With vaccination\n', '(C) With vaccination &\ndifferential migration')
+titles <- c('(A) Without vaccination\n', '(B) With vaccination\n', '(C) With vaccination\n& markets')
 l <- list()
 l_dex <- 1
 for (name in c('mod1_interyear1_maxyear100', 'mod2_interyear1_maxyear100',
@@ -119,29 +119,28 @@ for (name in c('mod1_interyear1_maxyear100', 'mod2_interyear1_maxyear100',
       geom_histogram(aes(y = ..density..),
                      colour = 'white', fill = "cornflowerblue", bins=30) + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-            panel.background = element_blank(), axis.line = element_line(colour = "black")) +
-      xlab('Final virulences') + ylab('Density') + scale_x_continuous(limits = c(0, 100), oob = scales::oob_keep) +
+            panel.background = element_blank(), axis.line = element_line(colour = "black")) + theme(plot.title = element_text(hjust = 0.5)) +
+      xlab('Surviving virulences') + ylab('Density') + scale_x_continuous(limits = c(0, 100), oob = scales::oob_keep) +
       ggtitle(titles[l_dex]) + theme(text = element_text(size = 24)) + ylim(0, 0.1) +
-      theme(plot.title = element_text(size=18))
+      theme(plot.title = element_text(size=22))
   } else {
     l[[l_dex]] <- ggplot(forhist.df, aes(x = forhist)) + 
       geom_histogram(aes(y = ..density..),
                      colour = 'white', fill = "cornflowerblue", bins=30) + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-            panel.background = element_blank(), axis.line = element_line(colour = "black")) +
-      xlab('Final virulences') + ylab('') + scale_x_continuous(limits = c(0, 100), oob = scales::oob_keep) +
-      ggtitle(titles[l_dex]) + theme(text = element_text(size = 24)) + ylim(0, 0.1) +
-      theme(plot.title = element_text(size=18))
+            panel.background = element_blank(), axis.line = element_line(colour = "black")) + theme(plot.title = element_text(hjust = 0.5)) +
+      xlab('Surviving virulences') + ylab('') + scale_x_continuous(limits = c(0, 100), oob = scales::oob_keep) +
+      ggtitle(titles[l_dex]) + theme(text = element_text(size = 22)) + ylim(0, 0.1) +
+      theme(plot.title = element_text(size=22))
   }
   print(paste0(titles[l_dex], ": ", mean(forhist.df$forhist), " [", var(forhist.df$forhist), "]"))
   l_dex <- l_dex + 1
 }
-ggsave(filename=paste0("~/virEvol/code_output/plots/Fig4.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=3, top=NULL), width=13, height=4, units='in', dpi=600)
+ggsave(filename=paste0("~/virEvol/code_output/plots/main/Fig4.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=3, top=NULL), width=13, height=4, units='in', dpi=600)
 
-
-# Figure S3: 10 years instead of 1 year ----------------------------------------
+# Figure S5: 10 years instead of 1 year ----------------------------------------
 year_horizon <- 1
-titles <- c('(A) Without vaccination\n', '(B) With vaccination\n', '(C) With vaccination &\ndifferential migration')
+titles <- c('(A) Without vaccination\n', '(B) With vaccination\n', '(C) With vaccination\n& markets')
 l <- list()
 l_dex <- 1
 for (name in c('mod1_interyear10_maxyear100', 'mod2_interyear10_maxyear100',
@@ -174,22 +173,22 @@ for (name in c('mod1_interyear10_maxyear100', 'mod2_interyear10_maxyear100',
       geom_histogram(aes(y = ..density..),
                      colour = 'white', fill = "cornflowerblue", bins=30) + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-            panel.background = element_blank(), axis.line = element_line(colour = "black")) +
-      xlab('Final virulences') + ylab('Density') + scale_x_continuous(limits = c(0, 100), oob = scales::oob_keep) +
+            panel.background = element_blank(), axis.line = element_line(colour = "black")) + theme(plot.title = element_text(hjust = 0.5)) +
+      xlab('Surviving virulences') + ylab('Density') + scale_x_continuous(limits = c(0, 100), oob = scales::oob_keep) +
       ggtitle(titles[l_dex]) + theme(text = element_text(size = 24)) + ylim(0, 0.1) +
-      theme(plot.title = element_text(size=18))
+      theme(plot.title = element_text(size=22))
   } else {
     l[[l_dex]] <- ggplot(forhist.df, aes(x = forhist)) + 
       geom_histogram(aes(y = ..density..),
                      colour = 'white', fill = "cornflowerblue", bins=30) + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-            panel.background = element_blank(), axis.line = element_line(colour = "black")) +
-      xlab('Final virulences') + ylab('') + scale_x_continuous(limits = c(0, 100), oob = scales::oob_keep) +
+            panel.background = element_blank(), axis.line = element_line(colour = "black")) + theme(plot.title = element_text(hjust = 0.5)) +
+      xlab('Surviving virulences') + ylab('') + scale_x_continuous(limits = c(0, 100), oob = scales::oob_keep) +
       ggtitle(titles[l_dex]) + theme(text = element_text(size = 24)) + ylim(0, 0.1) +
-      theme(plot.title = element_text(size=18))
+      theme(plot.title = element_text(size=22))
   }
   print(paste0(titles[l_dex], ": ", mean(forhist.df$forhist), " [", var(forhist.df$forhist), "]"))
   l_dex <- l_dex + 1
 }
-ggsave(filename=paste0("~/virEvol/code_output/plots/FigS3.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=3, top=NULL), width=13, height=4, units='in', dpi=600)
+ggsave(filename=paste0("~/virEvol/code_output/plots/supplementary/FigS5.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=3, top=NULL), width=13, height=4, units='in', dpi=600)
 

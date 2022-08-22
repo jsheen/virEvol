@@ -57,34 +57,28 @@ find_singular_strat <- function(name, vir_steps, supplementary=FALSE) {
     print(paste0(name, ": ", vir_singular_strat))
   }
 }
-# Figure 1 singular strategies
-find_singular_strat('mod1', vir_steps=vir_steps)
-find_singular_strat('mod2', vir_steps=vir_steps)
+# Figure 1
+find_singular_strat('mod1', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod2', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 5))
 
-# Figure S2 singular strategies
+# Figure S2
 find_singular_strat('mod4_v66_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 5))
 find_singular_strat('mod4_v33_mfm66_mmf7_c5_nodiff', vir_steps=seq(2, 100, 5))
 find_singular_strat('mod4_v66_mfm66_mmf7_c5_nodiff', vir_steps=seq(2, 100, 5))
 
-# Figure S3 singular strategies
+# Figure S3
 find_singular_strat('mod3_v33_mfm33_mmf7_c10_diff', vir_steps=seq(2, 100, 1), supplementary=TRUE)
 find_singular_strat('mod5_v33_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 5))
 find_singular_strat('mod3_v33_mfm33_mmf7_c10_nodiff', vir_steps=seq(2, 100, 1))
 
-
-find_singular_strat('mod3_v33_mfm33_mmf7_c10_nodiff', vir_steps=vir_steps)
-find_singular_strat('mod3_v33_mfm33_mmf60_c5_nodiff', vir_steps=vir_steps, supplementary=TRUE)
-find_singular_strat('mod3_v33_mfm33_mmf60_c10_nodiff', vir_steps=vir_steps, supplementary=TRUE)
+# Figure 2 and Figure S4
+find_singular_strat('mod3_v33_mfm33_mmf7_c10_nodiff', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod3_v33_mfm33_mmf30_c10_nodiff', vir_steps=seq(2, 100, 5), supplementary=TRUE)
-find_singular_strat('mod3_v33_mfm33_mmf45_c10_nodiff', vir_steps=seq(2, 100, 5), supplementary=TRUE)
-find_singular_strat('mod3_v33_mfm33_mmf60_c10_diff', vir_steps=vir_steps, supplementary=TRUE)
-find_singular_strat('mod3_v33_mfm33_mmf7_c10_diff', vir_steps=vir_steps, supplementary=TRUE)
-find_singular_strat('mod3_v33_mfm33_mmf60_c1_nodiff', vir_steps=vir_steps, supplementary=TRUE)
-find_singular_strat('mod3_v33_mfm33_mmf60_c1_diff', vir_steps=vir_steps, supplementary=TRUE)
-find_singular_strat('mod3_v33_mfm33_mmf60_c2_nodiff', vir_steps=vir_steps, supplementary=TRUE)
-find_singular_strat('mod3_v33_mfm33_mmf60_c2_diff', vir_steps=vir_steps, supplementary=TRUE)
-
+find_singular_strat('mod3_v33_mfm33_mmf60_c10_nodiff', vir_steps=seq(2, 100, 1), supplementary=TRUE)
+find_singular_strat('mod3_v33_mfm33_mmf60_c1_nodiff', vir_steps=seq(2, 100, 1), supplementary=TRUE)
+find_singular_strat('mod3_v33_mfm33_mmf60_c2_nodiff', vir_steps=seq(2, 100, 1), supplementary=TRUE)
+find_singular_strat('mod3_v33_mfm33_mmf60_c5_nodiff', vir_steps=seq(2, 100, 1), supplementary=TRUE)
 
 # Figure 1: Main comparison ----------------------------------------------------
 l <- list()
@@ -194,9 +188,84 @@ for (name in c('mod4_v33_mfm33_mmf7_c5_nodiff', 'mod5_v33_mfm33_mmf7_c5_nodiff',
 }
 ggsave(filename=paste0("~/virEvol/code_output/plots/supplementary/FigS3.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=4, top=NULL, common.legend = TRUE, legend="bottom"), width=18, height=4, units='in', dpi=600)
 
+# Figure 2: turnover rate from markets and contact rate ------------------------
+vary_removal <- data.frame(matrix(c(7, 47,
+                                    30, 42,
+                                    60, 37), byrow=T, nrow=3, ncol=2))
+colnames(vary_removal) <- c('Duration', 'ESS')
+vary_contact <- data.frame(matrix(c(1, 44,
+                                    2, 44,
+                                    5, 38,
+                                    10, 37), byrow=T, nrow=4, ncol=2))
+colnames(vary_contact) <- c('Ratio', 'ESS')
+l <- list()
+l_dex <- 1
+titles <- c(paste("(A) ESS vs. duration in\nmarkets"," (ρ = 10)"), paste("(B) ESS vs. ", "ρ", "(duration in\nmarkets = 60 days)"))
+for (plot.df in list(vary_removal, vary_contact)) {
+  if (l_dex == 1) {
+    temp_plot <- ggplot(plot.df, aes(y = ESS, x = Duration)) + geom_line(size=1) + 
+      theme(legend.position="none") + geom_hline(yintercept=47, linetype='dashed', color='red', size=2) + geom_point(size=5) +
+      xlab('Duration in markets (days)') + ylab(expression(paste("α"^"*"))) + ggtitle(titles[l_dex]) +
+      theme(text = element_text(size = 18)) + theme(plot.title = element_text(hjust = 0.5)) +
+      theme(plot.title = element_text(size=18))
+  } else if (l_dex == 2) {
+    temp_plot <- ggplot(plot.df, aes(y = ESS, x = Ratio)) + geom_line(size=1) +
+      theme(legend.position="none") + geom_hline(yintercept=47, linetype='dashed', color='red', size=2) + geom_point(size=5) +
+      xlab(expression(paste("ρ"))) + ylab(expression(paste("α"^"*"))) + ggtitle(titles[l_dex]) +
+      theme(text = element_text(size = 18)) + theme(plot.title = element_text(hjust = 0.5)) +
+      theme(plot.title = element_text(size=18))
+  }
+  l[[l_dex]] <- temp_plot
+  l_dex <- l_dex + 1
+}
+ggsave(filename=paste0("~/virEvol/code_output/plots/main/Fig2.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=2, top=NULL, common.legend = TRUE, legend="bottom"), width=8, height=4, units='in', dpi=600)
 
+# Figure S4: Faster rate of migration from market patch results and lower
+#            transmission rate in markets --------------------------------------
+l <- list()
+l_dex <- 1
+titles <- c("(A) Duration in Markets\n(days) = 7 (ρ = 10)", 
+            "(B) Duration in Markets\n(days) = 30 (ρ = 10)",
+            "(C) Duration in Markets\n(days) = 60 (ρ = 10)",
+            "(D) ρ = 1 (duration in\nmarkets = 60 days)",
+            "(E) ρ = 2 (duration in\nmarkets = 60 days)",
+            "(F) ρ = 5 (duration in\nmarkets = 60 days)")
+for (name in c('mod3_v33_mfm33_mmf7_c10_nodiff', 
+               'mod3_v33_mfm33_mmf30_c10_nodiff',
+               'mod3_v33_mfm33_mmf60_c10_nodiff',
+               'mod3_v33_mfm33_mmf60_c1_nodiff', 
+               'mod3_v33_mfm33_mmf60_c2_nodiff',
+               'mod3_v33_mfm33_mmf60_c5_nodiff')) {
+  if (l_dex == 1) {
+    pip <- read.csv(paste0('~/virEvol/code_output/pips/main/', name, '.csv'))
+  } else {
+    pip <- read.csv(paste0('~/virEvol/code_output/pips/supplementary/', name, '.csv'))
+  }
+  pip <- pip[,c(2:ncol(pip))]
+  pip <- data.matrix(pip)
+  if (l_dex == 2) {
+    vir_steps <- seq(2, 100, 5)
+  } else {
+    vir_steps <- seq(2, 100, 1)
+  }
+  colnames(pip) <- vir_steps
+  rownames(pip) <- rev(vir_steps)
+  pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
+  if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
+  melted <- melt(pip_toPlot)
+  colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
+  temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
+    scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
+    xlab('Resident virulence') + ylab('Invader virulence') + ggtitle(titles[l_dex]) +
+    theme(text = element_text(size = 24)) + theme(plot.title = element_text(hjust = 0.5)) +
+    theme(plot.title = element_text(size=18)) +theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                                     panel.background = element_blank(), axis.line = element_line(colour = "black"))
+  l[[l_dex]] <- temp_plot
+  l_dex <- l_dex + 1
+}
+ggsave(filename=paste0("~/virEvol/code_output/plots/supplementary/FigS4.jpg"), marrangeGrob(grobs = l, ncol=3, nrow=2, top=NULL, layout_matrix=matrix(1:6, 2, 3, TRUE), common.legend = TRUE, legend="bottom"), width=12, height=8, units='in', dpi=600)
 
-# Plot Figure 2 (virulence = 50)  ----------------------------------------------
+# Plot Figure 3 (virulence = 50)  ----------------------------------------------
 l <- list()
 vir_50_mod2 <- data.frame(matrix(c(76.32, 23.68,
                                           'Unvax, Farm', 'Vax, Farm'), ncol=2, nrow=2))
@@ -205,8 +274,8 @@ vir_50_mod2$infectious <- as.numeric(vir_50_mod2$infectious)
 l[[1]] <- ggplot(vir_50_mod2, aes(area = infectious, fill = infectious, label = patch)) + geom_treemap() +
   geom_treemap_text(fontface = "italic", colour = "white", place = "centre",
                     grow = TRUE) + scale_fill_continuous(name = "% Infectious") + theme(legend.position="none") +
-  ggtitle('(A) High Contact\nNo Migration Market to Farm')
-vir_50_mod3_nodiff <- data.frame(matrix(c(40.26, 10.24, 45.03, 4.46,
+  ggtitle('(A) No Migration From Markets\nNo Market Transmission') + theme(plot.title = element_text(size=19))
+vir_50_mod3_nodiff <- data.frame(matrix(c(75.63, 23.46, 0.88, 0.03,
                                           'Unvax, Farm', 'Vax, Farm',
                                           'Unvax, Market', 'Vax, Market'), ncol=2, nrow=4))
 colnames(vir_50_mod3_nodiff) <- c('infectious', 'patch')
@@ -214,223 +283,25 @@ vir_50_mod3_nodiff$infectious <- as.numeric(vir_50_mod3_nodiff$infectious)
 l[[2]] <- ggplot(vir_50_mod3_nodiff, aes(area = infectious, fill = infectious, label = patch)) + geom_treemap() +
   geom_treemap_text(fontface = "italic", colour = "white", place = "centre",
                     grow = TRUE) + scale_fill_continuous(name = "% Infectious") + theme(legend.position="none") +
-  ggtitle('(B) High Contact,\nLow Migration Rate Market to Farm')
-vir_50_mod3_nodiff_fast <- data.frame(matrix(c(75.79, 22.99, 0.92, 0.31,
+  ggtitle('(B) Fast Migration From Markets\nHigh Market Transmission') + theme(plot.title = element_text(size=19))
+vir_50_mod3_nodiff_slow <- data.frame(matrix(c(46.21, 12.84, 40.5, 0.46,
                                           'Unvax, Farm', 'Vax, Farm',
                                           'Unvax, Market', 'Vax, Market'), ncol=2, nrow=4))
-colnames(vir_50_mod3_nodiff_fast) <- c('infectious', 'patch')
-vir_50_mod3_nodiff_fast$infectious <- as.numeric(vir_50_mod3_nodiff_fast$infectious)
-l[[3]] <- ggplot(vir_50_mod3_nodiff_fast, aes(area = infectious, fill = infectious, label = patch)) + geom_treemap() +
+colnames(vir_50_mod3_nodiff_slow) <- c('infectious', 'patch')
+vir_50_mod3_nodiff_slow$infectious <- as.numeric(vir_50_mod3_nodiff_slow$infectious)
+l[[3]] <- ggplot(vir_50_mod3_nodiff_slow, aes(area = infectious, fill = infectious, label = patch)) + geom_treemap() +
   geom_treemap_text(fontface = "italic", colour = "white", place = "centre",
                     grow = TRUE) + scale_fill_continuous(name = "% Infectious") + theme(legend.position="none") +
-  ggtitle('(C) High Contact,\nHigh Migration Rate Market to Farm')
-vir_50_mod3_nodiff_lowc <- data.frame(matrix(c(76.9, 20.02, 2.47, 0.61,
+  ggtitle('(C) Slow Migration From Markets\nHigh Market Transmission') + theme(plot.title = element_text(size=19))
+vir_50_mod3_nodiff_slow_lowc <- data.frame(matrix(c(76.16, 21.65, 2.12, 0.06,
                                                'Unvax, Farm', 'Vax, Farm',
                                                'Unvax, Market', 'Vax, Market'), ncol=2, nrow=4))
-colnames(vir_50_mod3_nodiff_lowc) <- c('infectious', 'patch')
-vir_50_mod3_nodiff_lowc$infectious <- as.numeric(vir_50_mod3_nodiff_lowc$infectious)
-l[[4]] <- ggplot(vir_50_mod3_nodiff_lowc, aes(area = infectious, fill = infectious, label = patch)) + geom_treemap() +
+colnames(vir_50_mod3_nodiff_slow_lowc) <- c('infectious', 'patch')
+vir_50_mod3_nodiff_slow_lowc$infectious <- as.numeric(vir_50_mod3_nodiff_slow_lowc$infectious)
+l[[4]] <- ggplot(vir_50_mod3_nodiff_slow_lowc, aes(area = infectious, fill = infectious, label = patch)) + geom_treemap() +
   geom_treemap_text(fontface = "italic", colour = "white", place = "centre",
                     grow = TRUE) + scale_fill_continuous(name = "% Infectious") + theme(legend.position="none") +
-  ggtitle('(D) Low Contact,\nLow Migration Rate Market to Farm')
-ggsave(filename=paste0("~/virEvol/code_output/plots/main/Fig2.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=4, top=NULL, legend="bottom"), width=12, height=4, units='in', dpi=600)
-
-
-
-# Figure S1: Lower contact rate in markets -------------------------------------
-l <- list()
-l_dex <- 1
-titles <- c("(A) Contact rate ratio in\nMarket vs. Farms = 1", 
-            "(B) Contact rate ratio in\nMarket vs. Farms = 2",
-            "(C) Contact rate ratio in\nMarket vs. Farms = 10")
-for (name in c('mod3_v33_mfm33_mmf60_c1_nodiff', 
-               'mod3_v33_mfm33_mmf60_c2_nodiff',
-               'mod3_v33_mfm33_mmf60_c10_nodiff')) {
-  pip <- read.csv(paste0('~/virEvol/code_output/pips/supplementary/', name, '.csv'))
-  pip <- pip[,c(2:ncol(pip))]
-  pip <- data.matrix(pip)
-  colnames(pip) <- vir_steps
-  rownames(pip) <- rev(vir_steps)
-  pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
-  if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
-  melted <- melt(pip_toPlot)
-  colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
-  if (l_dex == 1) {
-    temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-      scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
-      xlab('Resident virulence') + ylab('Invader virulence') + ggtitle(titles[l_dex]) +
-      theme(text = element_text(size = 24)) + 
-      theme(plot.title = element_text(size=18)) +theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                       panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  } else {
-    temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-      scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
-      xlab('Resident virulence') + ylab('') + ggtitle(titles[l_dex]) +
-      theme(text = element_text(size = 24)) + 
-      theme(plot.title = element_text(size=18)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                        panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  }
-  l[[l_dex]] <- temp_plot
-  l_dex <- l_dex + 1
-}
-ggsave(filename=paste0("~/virEvol/code_output/plots/supplementary/FigS1.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=3, top=NULL, common.legend = TRUE, legend="bottom"), width=12, height=4, units='in', dpi=600)
-
-# Figure S2: Faster rate of migration from market patch results ----------------
-l <- list()
-l_dex <- 1
-titles <- c("(A) Migration from market\n to farm = 7", 
-            "(B) Migration from market\n to farm = 30")
-for (name in c('mod3_v33_mfm33_mmf7_c10_nodiff', 
-               'mod3_v33_mfm33_mmf30_c10_nodiff')) {
-  pip <- read.csv(paste0('~/virEvol/code_output/pips/supplementary/', name, '.csv'))
-  pip <- pip[,c(2:ncol(pip))]
-  pip <- data.matrix(pip)
-  if (l_dex == 1) {
-    vir_steps = vir_steps = vir_steps = seq(2, 100, 1)
-  } else {
-    vir_steps = vir_steps = vir_steps = seq(2, 100, 5)
-  }
-  colnames(pip) <- vir_steps
-  rownames(pip) <- rev(vir_steps)
-  pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
-  if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
-  melted <- melt(pip_toPlot)
-  colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
-  if (l_dex == 1) {
-    temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-      scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
-      xlab('Resident virulence') + ylab('Invader virulence') + ggtitle(titles[l_dex]) +
-      theme(text = element_text(size = 24)) + 
-      theme(plot.title = element_text(size=18)) +theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                       panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  } else {
-    temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-      scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
-      xlab('Resident virulence') + ylab('') + ggtitle(titles[l_dex]) +
-      theme(text = element_text(size = 24)) + 
-      theme(plot.title = element_text(size=18)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                        panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  }
-  l[[l_dex]] <- temp_plot
-  l_dex <- l_dex + 1
-}
-ggsave(filename=paste0("~/virEvol/code_output/plots/supplementary/FigS2.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=2, top=NULL, common.legend = TRUE, legend="bottom"), width=8, height=4, units='in', dpi=600)
-
-# Figure S3 ---------------------------------------------------------------------
-l <- list()
-l_dex <- 1
-titles <- c("(A) Vax = 33%;\nMigrate = 33%", "(B) Vax = 33%;\nMigrate = 66%", 
-            "(C) Vax = 66%;\nMigrate = 33%", "(D) Vax = 66%;\nMigrate = 66%")
-for (name in c('mod3_v33_mfm33_mmf7_c10_nodiff', 'mod3_v33_mfm66_mmf7_c5_nodiff',
-               'mod3_v66_mfm33_mmf7_c5_nodiff', 'mod3_v66_mfm66_mmf7_c5_nodiff')) {
-  pip <- read.csv(paste0('~/virEvol/code_output/pips/supplementary/', name, '.csv'))
-  pip <- pip[,c(2:ncol(pip))]
-  pip <- data.matrix(pip)
-  if (l_dex == 1) {
-    vir_steps <- seq(2, 100, 1)
-  } else {
-    vir_steps <- seq(2, 100, 5)
-  }
-  colnames(pip) <- vir_steps
-  rownames(pip) <- rev(vir_steps)
-  pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
-  if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
-  melted <- melt(pip_toPlot)
-  colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
-  if (l_dex == 1) {
-    temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-      scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
-      xlab('Resident virulence') + ylab('Invader virulence') + ggtitle(titles[l_dex]) +
-      theme(text = element_text(size = 24)) + 
-      theme(plot.title = element_text(size=18)) +theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                       panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  } else {
-    temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-      scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
-      xlab('Resident virulence') + ylab('') + ggtitle(titles[l_dex]) +
-      theme(text = element_text(size = 24)) +
-      theme(plot.title = element_text(size=18)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                        panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  }
-  l[[l_dex]] <- temp_plot
-  l_dex <- l_dex + 1
-}
-ggsave(filename=paste0("~/virEvol/code_output/plots/supplementary/FigS3.jpg"), marrangeGrob(grobs = l, nrow=2, ncol=2, top=NULL, common.legend = TRUE, legend="bottom"), width=8, height=8, units='in', dpi=600)
-
-# Figure S5 --------------------------------------------------------------------
-vir_steps <- seq(2, 100, 5)
-l <- list()
-l_dex <- 1
-titles <- c("(A) Vax = 33%;\nMigrate = 33%", "(B) Vax = 33%;\nMigrate = 66%", 
-            "(C) Vax = 66%;\nMigrate = 33%", "(D) Vax = 66%;\nMigrate = 66%")
-for (name in c('mod5_v33_mfm33_mmf7_c5_nodiff', 'mod5_v33_mfm66_mmf7_c5_nodiff',
-               'mod5_v66_mfm33_mmf7_c5_nodiff', 'mod5_v66_mfm66_mmf7_c5_nodiff')) {
-  pip <- read.csv(paste0('~/virEvol/code_output/pips/main/', name, '.csv'))
-  pip <- pip[,c(2:ncol(pip))]
-  pip <- data.matrix(pip)
-  colnames(pip) <- vir_steps
-  rownames(pip) <- rev(vir_steps)
-  pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
-  pip_toPlot <- ifelse((pip_toPlot == 2), 0, pip_toPlot) # TO REPLACE
-  if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.', name)) }
-  melted <- melt(pip_toPlot)
-  colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
-  if (l_dex == 1) {
-    temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-      scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
-      xlab('Resident virulence') + ylab('Invader virulence') + ggtitle(titles[l_dex]) +
-      theme(text = element_text(size = 24)) + 
-      theme(plot.title = element_text(size=18)) +theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                       panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  } else {
-    temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-      scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
-      xlab('Resident virulence') + ylab('') + ggtitle(titles[l_dex]) +
-      theme(text = element_text(size = 24)) +
-      theme(plot.title = element_text(size=18)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                        panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  }
-  l[[l_dex]] <- temp_plot
-  l_dex <- l_dex + 1
-}
-ggsave(filename=paste0("~/virEvol/code_output/plots/supplementary/FigS5.jpg"), marrangeGrob(grobs = l, nrow=2, ncol=2, top=NULL, common.legend = TRUE, legend="bottom"), width=8, height=8, units='in', dpi=600)
-
-# Figure S6 --------------------------------------------------------------------
-vir_steps <- seq(2, 100, 3)
-l <- list()
-l_dex <- 1
-titles <- c("Lowered Transmission")
-for (name in c('mod1_c0.5')) {
-  pip <- read.csv(paste0('~/virEvol/code_output/pips/supplementary/', name, '.csv'))
-  pip <- pip[,c(2:ncol(pip))]
-  pip <- data.matrix(pip)
-  colnames(pip) <- vir_steps
-  rownames(pip) <- rev(vir_steps)
-  pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
-  pip_toPlot <- ifelse((pip_toPlot == 2), 0, pip_toPlot) # TO REPLACE
-  if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.', name)) }
-  melted <- melt(pip_toPlot)
-  colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
-  if (l_dex == 1) {
-    temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-      scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
-      xlab('Resident virulence') + ylab('Invader virulence') + ggtitle(titles[l_dex]) +
-      theme(text = element_text(size = 24)) + 
-      theme(plot.title = element_text(size=18)) +theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                       panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  } else {
-    temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-      scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
-      xlab('Resident virulence') + ylab('') + ggtitle(titles[l_dex]) +
-      theme(text = element_text(size = 24)) +
-      theme(plot.title = element_text(size=18)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                        panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  }
-  l[[l_dex]] <- temp_plot
-  l_dex <- l_dex + 1
-}
-ggsave(filename=paste0("~/virEvol/code_output/plots/supplementary/FigS6.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=1, top=NULL, common.legend = TRUE, legend="bottom"), width=8, height=8, units='in', dpi=600)
-
-# Should put a supplementary plot with differential migration of vaccinated individuals
+  ggtitle('(D) Slow Migration From Markets\nLow Market Transmission') + theme(plot.title = element_text(size=19))
+ggsave(filename=paste0("~/virEvol/code_output/plots/main/Fig3.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=4, top=NULL, legend="bottom"), width=16, height=4.5, units='in', dpi=600)
 
 
