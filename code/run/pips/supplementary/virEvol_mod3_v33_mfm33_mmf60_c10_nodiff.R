@@ -25,13 +25,13 @@ v = perc_vax / inter_vax_time
 # Rate of loss of immunity due to vaccination per chicken per day
 v_hat = 1 / 120
 # Percent sold in interval
-perc_sold_per_farm = 0.33
+perc_sold_per_farm = 0.99
 # Days between successive sales of chickens of a farm
-inter_sell_time_per_farm = 120 
+inter_sell_time_per_farm = 120
 # Migration rate of chickens from farms to markets per chicken per day, if unvaccinated
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm
 # Migration rate of chickens from markets to farms per chicken per day
-m_mf = 1 / 60
+m_mf = 1 / 14
 # Ratio of contact rate in markets vs. farms
 bet_mf_ratio = 10
 # Threshold value for extinction
