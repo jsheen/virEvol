@@ -22,18 +22,22 @@ b = 1 / 120
 # b = 0.07 # Ian's parameter
 
 # Natural mortality rate per chicken per day
-nat_mort = 1 / 730
+nat_mort = 1 / 365
 # nat_mort = 0.05 # Ian's parameter
 
 # Mortality rate due to disease per chicken per day
 mort = 1 / 4
 
 # Parameters to define transmission rate from virulence level
-c1 = 0.1
-c2 = 0.3
+c1 = 1
+c2 = 0.5
+# Plotting the tradeoff curve
+# xs = seq(0, 100, 0.1)
+# ys = (c1 * xs) ^ c2
+# plot(xs, ys, type='l')
 
 # Virulence steps virus is allowed to take
-vir_steps = seq(2, 100, 1)
+vir_steps = seq(2, 100, 5)
 
 # Plot tradeoff curve
 # virulences <- seq(0, 100, 0.01)
