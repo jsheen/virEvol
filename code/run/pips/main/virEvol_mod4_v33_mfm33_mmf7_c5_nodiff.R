@@ -37,9 +37,10 @@ bet_mf_ratio = 5
 # Threshold value for extinction
 threshold_extinction = 2
 # Percentage of market chickens that are to be immediately slaughtered
-p_s = 0.5
+p_s = 0.8
 
-vir_steps = seq(2, 100, 5)
+c1 = 0.1
+c2 = 0.3
 
 # Assign model 4 specific equation and test_invade -----------------------------
 eqn <- eqn_mod4

@@ -31,15 +31,13 @@ inter_sell_time_per_farm = 120
 # Migration rate of chickens from farms to markets per chicken per day, if unvaccinated
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm
 # Migration rate of chickens from markets to farms per chicken per day
-m_mf = 1 / 7
+m_mf = 1 / 30
 # Ratio of contact rate in markets vs. farms
 bet_mf_ratio = 5
 # Threshold value for extinction
-threshold_extinction = 2
+threshold_extinction = 2.2
 # Percentage of market chickens that are to be immediately slaughtered
-p_s = 0.5
-
-vir_steps = seq(2, 100, 5)
+p_s = 0.8
 
 # Assign model 4 specific equation and test_invade -----------------------------
 eqn <- eqn_mod4
