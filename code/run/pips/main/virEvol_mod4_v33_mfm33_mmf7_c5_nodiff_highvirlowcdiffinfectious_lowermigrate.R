@@ -25,7 +25,7 @@ v = perc_vax / inter_vax_time
 # Rate of loss of immunity due to vaccination per chicken per day
 v_hat = 1 / 120
 # Percent sold in interval
-perc_sold_per_farm = 0.33
+perc_sold_per_farm = 0.0825
 # Days between successive sales of chickens of a farm
 inter_sell_time_per_farm = 120 
 # Migration rate of chickens from farms to markets per chicken per day, if unvaccinated
@@ -67,4 +67,4 @@ finalMatrix <- foreach(i=combos, .combine=cbind) %dopar% {
 stopCluster(cl)
 pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow=F)
 pip <- pracma::flipud(pip)
-write.csv(pip, paste0('~/virEvol/code_output/pips/main/mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect.csv'))
+write.csv(pip, paste0('~/virEvol/code_output/pips/main/mod4_v33_mfm33_mmf7_c5_nodiff_highvirlowcdiffinfectious_lowermigrate.csv'))

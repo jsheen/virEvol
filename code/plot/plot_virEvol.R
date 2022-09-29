@@ -31,9 +31,9 @@ plot_pip <- function(name, vir_steps, title) {
   l[[1]] <- temp_plot
   ggsave(filename=paste0("~/virEvol/code_output/plots/virEvol_", name, ".png"), marrangeGrob(grobs = l, nrow=1, ncol=1, top=NULL), width=3, height=3, units='in', dpi=600)
 }
-plot_pip("mod4_v33_mfm33_mmf7_c5_nodiff_test", vir_steps=seq(2, 100, 5), "lowvir")
-plot_pip("mod4_v33_mfm33_mmf7_c5_nodiff_testhighvir", vir_steps=seq(2, 100, 5), "highvir")
-plot_pip("mod4_v33_mfm33_mmf7_c5_nodiff_highvirlowc", vir_steps=seq(2, 100, 5), "highvirlowc")
+plot_pip('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 5), 'highvirselect')
+plot_pip('mod4_v33_mfm33_mmf7_c5_nodiff_highvirlowcdiffinfectious', vir_steps=seq(2, 100, 5), 'highvirlowcdiffinfectious')
+plot_pip('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselectveryhighbetmfratio', vir_steps=seq(2, 100, 5), 'highvirselectveryhighbetmfratio')
 
 # Function to find singular strategy -------------------------------------------
 find_singular_strat <- function(name, vir_steps, supplementary=FALSE) {
@@ -70,7 +70,11 @@ find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 1))
 # Figure S1
 find_singular_strat('mod1_highvirselect', vir_steps=seq(2, 100, 1), supplementary=FALSE)
 find_singular_strat('mod2_highvirselect', vir_steps=seq(2, 100, 1), supplementary=FALSE)
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 1), supplementary=FALSE)
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 5), supplementary=FALSE)
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirlowcdiffinfectious', vir_steps=seq(2, 100, 5), supplementary=FALSE)
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselectveryhighbetmfratio', vir_steps=seq(2, 100, 5), supplementary=FALSE)
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirlowcdiffinfectious_lowmigrate', vir_steps=seq(2, 100, 5), supplementary=FALSE)
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirlowcdiffinfectious_lowermigrate', vir_steps=seq(2, 100, 5), supplementary=FALSE)
 
 # Figure S2
 find_singular_strat('mod4_v66_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 5))

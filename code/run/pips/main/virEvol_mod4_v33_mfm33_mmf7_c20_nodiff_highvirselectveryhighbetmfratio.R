@@ -31,9 +31,9 @@ inter_sell_time_per_farm = 120
 # Migration rate of chickens from farms to markets per chicken per day, if unvaccinated
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm
 # Migration rate of chickens from markets to farms per chicken per day
-m_mf = 1 / 7
+m_mf = 1 / 30
 # Ratio of contact rate in markets vs. farms
-bet_mf_ratio = 5
+bet_mf_ratio = 20
 # Threshold value for extinction
 threshold_extinction = 2.2
 # Percentage of market chickens that are to be immediately slaughtered
@@ -67,4 +67,4 @@ finalMatrix <- foreach(i=combos, .combine=cbind) %dopar% {
 stopCluster(cl)
 pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow=F)
 pip <- pracma::flipud(pip)
-write.csv(pip, paste0('~/virEvol/code_output/pips/main/mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect.csv'))
+write.csv(pip, paste0('~/virEvol/code_output/pips/main/mod4_v33_mfm33_mmf7_c5_nodiff_highvirselectveryhighbetmfratio.csv'))
