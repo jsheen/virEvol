@@ -13,12 +13,14 @@ vir_steps <- seq(2, 100, 1)
 
 # Function to plot each of the results -----------------------------------------
 plot_pip <- function(name, vir_steps, title) {
-  pip <- read.csv(paste0('~/virEvol/code_output/pips/', name, '.csv'))
+  pip <- read.csv(paste0('~/virEvol/code_output/pips/main/', name, '.csv'))
   pip <- pip[,c(2:ncol(pip))]
   pip <- data.matrix(pip)
   colnames(pip) <- vir_steps
   rownames(pip) <- rev(vir_steps)
   pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
+  pip_toPlot <- ifelse((pip == 4), 0, pip_toPlot) # Both extinct
+  pip_toPlot <- ifelse((pip == 2), 0, pip_toPlot) # Res extinct
   if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
   melted <- melt(pip_toPlot)
   colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
@@ -29,6 +31,9 @@ plot_pip <- function(name, vir_steps, title) {
   l[[1]] <- temp_plot
   ggsave(filename=paste0("~/virEvol/code_output/plots/virEvol_", name, ".png"), marrangeGrob(grobs = l, nrow=1, ncol=1, top=NULL), width=3, height=3, units='in', dpi=600)
 }
+plot_pip("mod4_v33_mfm33_mmf7_c5_nodiff_test", vir_steps=seq(2, 100, 5), "lowvir")
+plot_pip("mod4_v33_mfm33_mmf7_c5_nodiff_testhighvir", vir_steps=seq(2, 100, 5), "highvir")
+plot_pip("mod4_v33_mfm33_mmf7_c5_nodiff_highvirlowc", vir_steps=seq(2, 100, 5), "highvirlowc")
 
 # Function to find singular strategy -------------------------------------------
 find_singular_strat <- function(name, vir_steps, supplementary=FALSE) {
@@ -60,7 +65,7 @@ find_singular_strat <- function(name, vir_steps, supplementary=FALSE) {
 # Figure 1
 find_singular_strat('mod1', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod2', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 1))
 
 # Figure S1
 find_singular_strat('mod1_highvirselect', vir_steps=seq(2, 100, 1), supplementary=FALSE)
@@ -95,7 +100,7 @@ for (name in c('mod1', 'mod2', 'mod4_v33_mfm33_mmf7_c5_nodiff')) {
   pip <- pip[,c(2:ncol(pip))]
   pip <- data.matrix(pip)
   if (l_dex == 3) {
-    vir_steps <- seq(2, 100, 5)
+    vir_steps <- seq(2, 100, 1)
   } else {
     vir_steps <- seq(2, 100, 1)
   }
@@ -137,9 +142,9 @@ for (name in c('mod1_highvirselect', 'mod2_highvirselect', 'mod4_v33_mfm33_mmf7_
   pip <- pip[,c(2:ncol(pip))]
   pip <- data.matrix(pip)
   if (l_dex == 1) {
-    vir_steps <- seq(2, 100, 3)
+    vir_steps <- seq(2, 100, 1)
   } else {
-    vir_steps <- seq(2, 100, 3)
+    vir_steps <- seq(2, 100, 1)
   }
   colnames(pip) <- vir_steps
   rownames(pip) <- rev(vir_steps)

@@ -33,14 +33,11 @@ m_fm = perc_sold_per_farm / inter_sell_time_per_farm
 # Migration rate of chickens from markets to farms per chicken per day
 m_mf = 1 / 7
 # Ratio of contact rate in markets vs. farms
-bet_mf_ratio = 5
+bet_mf_ratio = 1
 # Threshold value for extinction
-threshold_extinction = 2
+threshold_extinction = 2.2
 # Percentage of market chickens that are to be immediately slaughtered
 p_s = 0.8
-
-c1 = 0.1
-c2 = 0.3
 
 # Assign model 4 specific equation and test_invade -----------------------------
 eqn <- eqn_mod4
@@ -70,4 +67,4 @@ finalMatrix <- foreach(i=combos, .combine=cbind) %dopar% {
 stopCluster(cl)
 pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow=F)
 pip <- pracma::flipud(pip)
-write.csv(pip, paste0('~/virEvol/code_output/pips/main/mod4_v33_mfm33_mmf7_c5_nodiff.csv'))
+write.csv(pip, paste0('~/virEvol/code_output/pips/main/mod4_v33_mfm33_mmf7_c5_nodiff_highvirlowcdiffinfectious.csv'))
