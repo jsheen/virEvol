@@ -27,16 +27,9 @@ nat_mort = 1 / 365
 mort = 1 / 4
 
 # Parameters to define transmission rate from virulence level
-# # For low transmission tradeoff
+# For low transmission tradeoff
 c1 = 0.1
 c2 = 0.3
-
-# Plot tradeoff curve
-# virulences <- seq(0, 100, 0.01)
-# transmissions <- (c1 * virulences)^c2
-# mortalities <- virulences / 100
-# plot(mortalities, transmissions, type='l', main='Transmission-Mortality Tradeoff Curve',
-#      xlab=expression(mu), ylab=expression(beta), lwd=5, col='red', cex.lab=1.2)
 
 # Virulence steps virus is allowed to take
 vir_steps = seq(2, 100, 5)

@@ -9,7 +9,7 @@ library(ggpubr)
 library(treemapify)
 
 # Load global variables --------------------------------------------------------
-vir_steps <- seq(2, 100, 1)
+vir_steps <- seq(2, 100, 5)
 
 # Function to plot each of the results -----------------------------------------
 plot_pip <- function(name, vir_steps, title) {
@@ -31,17 +31,10 @@ plot_pip <- function(name, vir_steps, title) {
   l[[1]] <- temp_plot
   ggsave(filename=paste0("~/virEvol/code_output/plots/virEvol_", name, ".png"), marrangeGrob(grobs = l, nrow=1, ncol=1, top=NULL), width=3, height=3, units='in', dpi=600)
 }
-plot_pip('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 5), 'highvirselect')
-plot_pip('mod4_v33_mfm33_mmf7_c5_nodiff_highvirlowcdiffinfectious', vir_steps=seq(2, 100, 5), 'highvirlowcdiffinfectious')
-plot_pip('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselectveryhighbetmfratio', vir_steps=seq(2, 100, 5), 'highvirselectveryhighbetmfratio')
 
 # Function to find singular strategy -------------------------------------------
-find_singular_strat <- function(name, vir_steps, supplementary=FALSE) {
-  if (supplementary) {
-    pip <- read.csv(paste0('~/virEvol/code_output/pips/supplementary/', name, '.csv'))
-  } else {
-    pip <- read.csv(paste0('~/virEvol/code_output/pips/main/', name, '.csv'))
-  }
+find_singular_strat <- function(name, vir_steps) {
+  pip <- read.csv(paste0('~/virEvol/code_output/pips/', name, '.csv'))
   pip <- pip[,c(2:ncol(pip))]
   pip <- data.matrix(pip)
   colnames(pip) <- vir_steps
@@ -62,121 +55,98 @@ find_singular_strat <- function(name, vir_steps, supplementary=FALSE) {
     print(paste0(name, ": ", vir_singular_strat))
   }
 }
-# Figure 1
+# Figure 3
 find_singular_strat('mod1', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod2', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod1_highvirselect', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod2_highvirselect', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 5))
 
-# Figure S1
-find_singular_strat('mod1_highvirselect', vir_steps=seq(2, 100, 1), supplementary=FALSE)
-find_singular_strat('mod2_highvirselect', vir_steps=seq(2, 100, 1), supplementary=FALSE)
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 5), supplementary=FALSE)
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirlowcdiffinfectious', vir_steps=seq(2, 100, 5), supplementary=FALSE)
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselectveryhighbetmfratio', vir_steps=seq(2, 100, 5), supplementary=FALSE)
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirlowcdiffinfectious_lowmigrate', vir_steps=seq(2, 100, 5), supplementary=FALSE)
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirlowcdiffinfectious_lowermigrate', vir_steps=seq(2, 100, 5), supplementary=FALSE)
+# Sensitivity test 1
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 1)) # Ref
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens1', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens2', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens3', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens4', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens5', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens6', vir_steps=seq(2, 100, 5))
 
-# Figure S2
-find_singular_strat('mod4_v66_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm66_mmf7_c5_nodiff', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v66_mfm66_mmf7_c5_nodiff', vir_steps=seq(2, 100, 5))
+# Sensitivity test 2
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 5)) # Ref
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens1', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens2', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens3', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens4', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens5', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens6', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens7', vir_steps=seq(2, 100, 5))
 
-# Figure S3
-find_singular_strat('mod3_v33_mfm33_mmf7_c10_diff', vir_steps=seq(2, 100, 1), supplementary=TRUE)
-find_singular_strat('mod5_v33_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod3_v33_mfm33_mmf7_c10_nodiff', vir_steps=seq(2, 100, 1))
+# Figure 1: Conceptual diagram -------------------------------------------------
+# Done in Google slides
 
-# Figure 2 and Figure S4
-find_singular_strat('mod3_v33_mfm33_mmf7_c10_nodiff', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod3_v33_mfm33_mmf30_c10_nodiff', vir_steps=seq(2, 100, 5), supplementary=TRUE)
-find_singular_strat('mod3_v33_mfm33_mmf60_c10_nodiff', vir_steps=seq(2, 100, 1), supplementary=TRUE)
-find_singular_strat('mod3_v33_mfm33_mmf60_c1_nodiff', vir_steps=seq(2, 100, 1), supplementary=TRUE)
-find_singular_strat('mod3_v33_mfm33_mmf60_c2_nodiff', vir_steps=seq(2, 100, 1), supplementary=TRUE)
-find_singular_strat('mod3_v33_mfm33_mmf60_c5_nodiff', vir_steps=seq(2, 100, 1), supplementary=TRUE)
+# Figure 2: Model digratm ------------------------------------------------------
+# Done in Latex
 
-# Figure 1: Main comparison ----------------------------------------------------
+# Figure 3: Main comparison ----------------------------------------------------
 l <- list()
 l_dex <- 1
-titles <- c("(A) Without vaccination\n  (SEIR)", "(B) With vaccination\n  (SEIRV)", 
-            "(C) With vaccination\n      & markets (SEIRV-m)")
-for (name in c('mod1', 'mod2', 'mod4_v33_mfm33_mmf7_c5_nodiff')) {
-  pip <- read.csv(paste0('~/virEvol/code_output/pips/main/', name, '.csv'))
+titles <- c("(A) Without vaccination\n  (SEIR)", "(D) Without vaccination\n  (SEIR)",  
+            "(B) With vaccination\n  (SEIRV)", "(E) With vaccination\n  (SEIRV)", 
+            "(C) With vaccination\n      & markets (SEIRV-m)", "(F) With vaccination\n      & markets (SEIRV-m)")
+for (name in c('mod1','mod1_highvirselect',
+               'mod2', 'mod2_highvirselect',
+               'mod4_v33_mfm33_mmf7_c5_nodiff','mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect')) {
+  pip <- read.csv(paste0('~/virEvol/code_output/pips/', name, '.csv'))
   pip <- pip[,c(2:ncol(pip))]
   pip <- data.matrix(pip)
-  if (l_dex == 3) {
-    vir_steps <- seq(2, 100, 1)
+  if (l_dex %in% c(6)) {
+    vir_steps <- seq(2, 100, 5)
   } else {
     vir_steps <- seq(2, 100, 1)
   }
   colnames(pip) <- vir_steps
   rownames(pip) <- rev(vir_steps)
   pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
-  pip_toPlot <- ifelse((pip_toPlot == 2), NA, pip_toPlot) # Should be grayed
-  if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
+  pip_toPlot <- ifelse((pip_toPlot == 2), NA, pip_toPlot) # Extinction of resident before introduction of invader
+  pip_toPlot <- ifelse((pip_toPlot == 4), NA, pip_toPlot) # Extinction of both strains by the end of ten years
+  if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip: ', name)) }
   melted <- melt(pip_toPlot)
   colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
-  if (l_dex == 1) {
-    temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-      scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
-      xlab('Resident virulence') + ylab('Invader virulence') + ggtitle(titles[l_dex]) +
-      theme(text = element_text(size = 24)) + theme(plot.title = element_text(hjust = 0.5)) +
-      theme(plot.title = element_text(size=18)) +theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                       panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  } else {
-    temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-      scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
-      xlab('Resident virulence') + ylab('') + ggtitle(titles[l_dex]) +
-      theme(text = element_text(size = 24)) + theme(plot.title = element_text(hjust = 0.5)) +
-      theme(plot.title = element_text(size=18)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                        panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  }
+  temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
+    scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
+    xlab('') + ylab('') + ggtitle(titles[l_dex]) +
+    theme(text = element_text(size = 24)) + theme(plot.title = element_text(hjust = 0.5)) +
+    theme(plot.title = element_text(size=18)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                                      panel.background = element_blank(), axis.line = element_line(colour = "black"))
   l[[l_dex]] <- temp_plot
   l_dex <- l_dex + 1
 }
-ggsave(filename=paste0("~/virEvol/code_output/plots/main/Fig1.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=3, top=NULL, common.legend = TRUE, legend="bottom"), width=12, height=4, units='in', dpi=600)
+ggsave(filename=paste0("~/virEvol/code_output/plots/main/Fig3.jpg"), marrangeGrob(grobs = l, nrow=2, ncol=3, top=NULL, common.legend = TRUE, legend="bottom"), width=12, height=8, units='in', dpi=600)
 
-# Figure S1: Main comparison with different tradeoff curve ---------------------
-l <- list()
-l_dex <- 1
-titles <- c("(A) Without vaccination\n  (SEIR)", "(B) With vaccination\n  (SEIRV)", 
-            "(C) With vaccination\n      & markets (SEIRV-m)")
-for (name in c('mod1_highvirselect', 'mod2_highvirselect', 'mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect')) {
-  print(name)
-  pip <- read.csv(paste0('~/virEvol/code_output/pips/main/', name, '.csv'))
-  pip <- pip[,c(2:ncol(pip))]
-  pip <- data.matrix(pip)
-  if (l_dex == 1) {
-    vir_steps <- seq(2, 100, 1)
-  } else {
-    vir_steps <- seq(2, 100, 1)
-  }
-  colnames(pip) <- vir_steps
-  rownames(pip) <- rev(vir_steps)
-  pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
-  pip_toPlot <- ifelse((pip_toPlot == 2), NA, pip_toPlot) # Should be grayed
-  pip_toPlot <- ifelse((pip_toPlot == 4), NA, pip_toPlot) # Should be grayed
-  if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
-  melted <- melt(pip_toPlot)
-  colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
-  if (l_dex == 1) {
-    temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-      scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
-      xlab('Resident virulence') + ylab('Invader virulence') + ggtitle(titles[l_dex]) +
-      theme(text = element_text(size = 24)) + theme(plot.title = element_text(hjust = 0.5)) +
-      theme(plot.title = element_text(size=18)) +theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                       panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  } else {
-    temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
-      scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
-      xlab('Resident virulence') + ylab('') + ggtitle(titles[l_dex]) +
-      theme(text = element_text(size = 24)) + theme(plot.title = element_text(hjust = 0.5)) +
-      theme(plot.title = element_text(size=18)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                        panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  }
-  l[[l_dex]] <- temp_plot
-  l_dex <- l_dex + 1
-}
-ggsave(filename=paste0("~/virEvol/code_output/plots/supplementary/FigS1.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=3, top=NULL, common.legend = TRUE, legend="bottom"), width=12, height=4, units='in', dpi=600)
+# Figure S1: Tradeoff curves ---------------------------------------------------
+c1 = 1
+c2 = 0.4
+virulences <- seq(0, 100, 0.01)
+transmissions <- (c1 * virulences)^c2
+mortalities <- virulences / 100
+plot(mortalities, transmissions, type='l', main='Transmission-Mortality Tradeoff Curve',
+     xlab=expression(mu), ylab=expression(beta), lwd=5, col='red', cex.lab=1.2)
+c1 = 0.1
+c2 = 0.3
+virulences <- seq(0, 100, 0.01)
+transmissions <- (c1 * virulences)^c2
+mortalities <- virulences / 100
+lines(mortalities, transmissions, lwd=5, col='blue')
+legend("topleft", 
+       legend = c("Tradeoff curve 1", "Tradeoff curve 2"), 
+       col = c('blue', 'red'),
+       bty = "n", 
+       pch = c(16, 16), 
+       pt.cex = 1.2,
+       cex = 1, 
+       text.col = "black", 
+       horiz = F)
 
 # Figure S2: Vary vaccination and migration (sensitivity tests 4 and 5) --------
 vir_steps <- seq(2, 100, 5)
