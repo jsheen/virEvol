@@ -8,6 +8,8 @@ source('~/virEvol/code/func/model_eqns.R')
 source('~/virEvol/code/func/test_invade.R')
 
 # Set model 4 specific parameters and functions --------------------------------
+c1 = 1
+c2 = 0.4
 # Initial susceptible population in farms
 fS_init = (pop_size * 1/2) - 1
 # Initial susceptible population in markets
@@ -61,7 +63,7 @@ finalMatrix <- foreach(i=combos, .combine=cbind) %dopar% {
   library(foreach)
   library(doParallel)
   tempMatrix = test_invade(res_vir=i[1], invade_vir=i[2])
-  write.csv(tempMatrix, paste0("~/virEvol/scratch/", i[1], "_", i[2], ".csv")) # for debugging purposes
+  # write.csv(tempMatrix, paste0("~/virEvol/scratch/", i[1], "_", i[2], ".csv")) # for debugging purposes
   tempMatrix
 }
 stopCluster(cl)

@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Model 4: SEIR with vaccination and migration and slaughter
+# Model 5: SEIR with vaccination and migration and no migration of infectious
 # ------------------------------------------------------------------------------
 # Source functional scripts ----------------------------------------------------
 source('~/virEvol/code/plot/plot_functions.R')
@@ -7,7 +7,7 @@ source('~/virEvol/code/func/gen_parameters.R')
 source('~/virEvol/code/func/model_eqns.R')
 source('~/virEvol/code/func/test_invade.R')
 
-# Set model 4 specific parameters and functions --------------------------------
+# Set model 5 specific parameters and functions --------------------------------
 c1 = 0.1
 c2 = 0.3
 # Initial susceptible population in farms
@@ -41,9 +41,9 @@ threshold_extinction = 2.2
 # Percentage of market chickens that are to be immediately slaughtered
 p_s = 0.8
 
-# Assign model 4 specific equation and test_invade -----------------------------
-eqn <- eqn_mod4
-test_invade <- test_invade_mod4
+# Assign model 5 specific equation and test_invade -----------------------------
+eqn <- eqn_mod5
+test_invade <- test_invade_mod3
 
 # Create and save PIP with no differential migration due to vaccination --------
 m_fm_vax = m_fm
@@ -69,4 +69,4 @@ finalMatrix <- foreach(i=combos, .combine=cbind) %dopar% {
 stopCluster(cl)
 pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow=F)
 pip <- pracma::flipud(pip)
-write.csv(pip, paste0('~/virEvol/code_output/pips/main/mod4_v33_mfm33_mmf7_c5_nodiff.csv'))
+write.csv(pip, paste0('~/virEvol/code_output/pips/main/mod4_v33_mfm33_mmf7_c5_nodiff_sens6.csv'))

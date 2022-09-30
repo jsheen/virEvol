@@ -37,7 +37,7 @@ bet_mf_ratio = 5
 # Threshold value for extinction
 threshold_extinction = 2
 # Percentage of market chickens that are to be immediately slaughtered
-p_s = 0.5
+p_s = 0.8
 
 vir_steps = seq(2, 100, 5)
 

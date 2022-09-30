@@ -28,11 +28,8 @@ mort = 1 / 4
 
 # Parameters to define transmission rate from virulence level
 # # For low transmission tradeoff
-# c1 = 0.1
-# c2 = 0.3
-# For high transmission tradeoff
-c1 = 1
-c2 = 0.4
+c1 = 0.1
+c2 = 0.3
 
 # Plot tradeoff curve
 # virulences <- seq(0, 100, 0.01)

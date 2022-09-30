@@ -8,8 +8,8 @@ source('~/virEvol/code/func/model_eqns.R')
 source('~/virEvol/code/func/test_invade.R')
 
 # Set model 4 specific parameters and functions --------------------------------
-c1 = 0.1
-c2 = 0.3
+c1 = 1
+c2 = 0.4
 # Initial susceptible population in farms
 fS_init = (pop_size * 1/2) - 1
 # Initial susceptible population in markets
@@ -35,7 +35,7 @@ m_fm = perc_sold_per_farm / inter_sell_time_per_farm
 # Migration rate of chickens from markets to farms per chicken per day
 m_mf = 1 / 7
 # Ratio of contact rate in markets vs. farms
-bet_mf_ratio = 5
+bet_mf_ratio = 1
 # Threshold value for extinction
 threshold_extinction = 2.2
 # Percentage of market chickens that are to be immediately slaughtered
@@ -63,10 +63,10 @@ finalMatrix <- foreach(i=combos, .combine=cbind) %dopar% {
   library(foreach)
   library(doParallel)
   tempMatrix = test_invade(res_vir=i[1], invade_vir=i[2])
-  write.csv(tempMatrix, paste0("~/virEvol/scratch/", i[1], "_", i[2], ".csv")) # for debugging purposes
+  # write.csv(tempMatrix, paste0("~/virEvol/scratch/", i[1], "_", i[2], ".csv")) # for debugging purposes
   tempMatrix
 }
 stopCluster(cl)
 pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow=F)
 pip <- pracma::flipud(pip)
-write.csv(pip, paste0('~/virEvol/code_output/pips/main/mod4_v33_mfm33_mmf7_c5_nodiff.csv'))
+write.csv(pip, paste0('~/virEvol/code_output/pips/main/mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens3.csv'))
