@@ -13,7 +13,7 @@ vir_steps <- seq(2, 100, 5)
 
 # Function to plot each of the results -----------------------------------------
 plot_pip <- function(name, vir_steps, title) {
-  pip <- read.csv(paste0('~/virEvol/code_output/pips/main/', name, '.csv'))
+  pip <- read.csv(paste0('~/virEvol/code_output/pips/', name, '.csv'))
   pip <- pip[,c(2:ncol(pip))]
   pip <- data.matrix(pip)
   colnames(pip) <- vir_steps
@@ -31,6 +31,8 @@ plot_pip <- function(name, vir_steps, title) {
   l[[1]] <- temp_plot
   ggsave(filename=paste0("~/virEvol/code_output/plots/virEvol_", name, ".png"), marrangeGrob(grobs = l, nrow=1, ncol=1, top=NULL), width=3, height=3, units='in', dpi=600)
 }
+plot_pip('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 1), 'highvirselect')
+plot_pip('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_test', vir_steps=seq(2, 100, 5), 'highvirselecttest')
 
 # Function to find singular strategy -------------------------------------------
 find_singular_strat <- function(name, vir_steps) {
