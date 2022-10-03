@@ -6,21 +6,6 @@
 #         4 = If invader is extinct (both resident and invader are below extinction threshold)
 #         5 = Error in code
 
-# Helper function --------------------------------------------------------------
-check_equil <- function(out.df, uniq_vals_threshold) {
-  in_equil <- TRUE
-  start_check <- which(out.df$time == (out.df$time[nrow(out.df)] - 100))
-  for (col_dex in 2:ncol(out.df)) {
-    if (length(unique(round(out.df[start_check:nrow(out.df),col_dex]))) > uniq_vals_threshold) {
-      print(col_dex)
-      print(length(unique(round(out.df[start_check:nrow(out.df),col_dex]))))
-      print(unique(round(out.df[start_check:nrow(out.df),col_dex])))
-      in_equil <- FALSE
-    }
-  }
-  return(in_equil)
-}
-
 # Model 1: SEIR ----------------------------------------------------------------
 test_invade_mod1 <- function(res_vir, invade_vir) {
   # Strain specific virulence parameters
@@ -40,11 +25,6 @@ test_invade_mod1 <- function(res_vir, invade_vir) {
   
   # For debugging purposes
   # plot.out.df.mod1(out_eq1.df)
-  
-  # Check equilibrium 1
-  if (!check_equil(out_eq1.df, uniq_vals_threshold=100)) {
-    write.csv(list(), paste0('~/virEvol/scratch_equil/err_mod1_equil1_', res_vir, '_', invade_vir, '.csv'))
-  }
   
   # Output result for res_vir and invade_vir combination
   res <- 5
@@ -112,11 +92,6 @@ test_invade_mod2 <- function(res_vir, invade_vir) {
   
   # For debugging purposes
   # plot.out.df.mod2(out_eq1.df)
-  
-  # Check equilibrium 1
-  if (!check_equil(out_eq1.df, uniq_vals_threshold=100)) {
-    write.csv(list(), paste0('~/virEvol/scratch_equil/err_mod2_equil1_', res_vir, '_', invade_vir, '.csv'))
-  }
   
   # Output result for res_vir and invade_vir combination
   res <- 5
@@ -193,11 +168,6 @@ test_invade_mod3 <- function(res_vir, invade_vir) {
   
   # For debugging purposes
   # plot.out.df.mod3(out_eq1.df)
-  
-  # Check equilibrium 1
-  if (!check_equil(out_eq1.df, uniq_vals_threshold=100)) {
-    write.csv(list(), paste0('~/virEvol/scratch_equil/err_mod3_equil1_', res_vir, '_', invade_vir, '.csv'))
-  }
   
   # Output result for res_vir and invade_vir combination
   res <- 5
@@ -288,11 +258,6 @@ test_invade_mod4 <- function(res_vir, invade_vir) {
   
   # For debugging purposes
   # plot.out.df.mod3(out_eq1.df)
-  
-  # Check equilibrium 1
-  if (!check_equil(out_eq1.df, uniq_vals_threshold=100)) {
-    write.csv(list(), paste0('~/virEvol/scratch_equil/err_mod4_equil1_', res_vir, '_', invade_vir, '.csv'))
-  }
   
   # Output result for res_vir and invade_vir combination
   res <- 5

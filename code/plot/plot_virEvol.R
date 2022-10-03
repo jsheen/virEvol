@@ -61,26 +61,27 @@ find_singular_strat('mod2', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod1_highvirselect', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod2_highvirselect', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_test', vir_steps=seq(2, 100, 5))
 
-# Sensitivity test 1
+# Sensitivity test (low virulence)
 find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 1)) # Ref
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens1', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens2', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens3', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens4', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens5', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens6', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens1', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens2', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens3', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens4', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens5', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens6', vir_steps=seq(2, 100, 1))
 
-# Sensitivity test 2
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 5)) # Ref
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens1', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens2', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens3', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens4', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens5', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens6', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens7', vir_steps=seq(2, 100, 5))
+# Sensitivity test (high virulence)
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 1)) # Ref
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens1', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens2', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens3', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens4', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens5', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens6', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens7', vir_steps=seq(2, 100, 1))
 
 # Figure 1: Conceptual diagram -------------------------------------------------
 # Done in Google slides
@@ -100,11 +101,7 @@ for (name in c('mod1','mod1_highvirselect',
   pip <- read.csv(paste0('~/virEvol/code_output/pips/', name, '.csv'))
   pip <- pip[,c(2:ncol(pip))]
   pip <- data.matrix(pip)
-  if (l_dex %in% c(6)) {
-    vir_steps <- seq(2, 100, 5)
-  } else {
-    vir_steps <- seq(2, 100, 1)
-  }
+  vir_steps <- seq(2, 100, 1)
   colnames(pip) <- vir_steps
   rownames(pip) <- rev(vir_steps)
   pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
