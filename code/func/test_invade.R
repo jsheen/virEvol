@@ -199,7 +199,6 @@ test_invade_mod3 <- function(res_vir, invade_vir) {
     
     # Run model until second equilibrium
     time_eq2 <- seq(0, t_max_eq2, by = 1)
-    time_eq2 <- seq(0, 1e4, by = 1)
     out_eq2 <- ode(y=eq2_init, times=time_eq2, func=eqn, parms=parameters)
     out_eq2.df <- as.data.frame(out_eq2)
     
@@ -289,7 +288,6 @@ test_invade_mod4 <- function(res_vir, invade_vir) {
     
     # Run model until second equilibrium
     time_eq2 <- seq(0, t_max_eq2, by = 1)
-    time_eq2 <- seq(0, 1e4, by = 1)
     out_eq2 <- ode(y=eq2_init, times=time_eq2, func=eqn, parms=parameters)
     out_eq2.df <- as.data.frame(out_eq2)
     
