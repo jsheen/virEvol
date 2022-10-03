@@ -9,7 +9,7 @@ library(ggpubr)
 library(treemapify)
 
 # Load global variables --------------------------------------------------------
-vir_steps <- seq(2, 100, 5)
+vir_steps <- seq(2, 100, 1)
 
 # Function to plot each of the results -----------------------------------------
 plot_pip <- function(name, vir_steps, title) {
@@ -63,6 +63,7 @@ find_singular_strat('mod1_highvirselect', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod2_highvirselect', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_test', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_test2', vir_steps=seq(2, 100, 1))
 
 # Sensitivity test (low virulence)
 find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 1)) # Ref
