@@ -10,6 +10,8 @@ interyear_input <- 1
 maxyear_input <- 100
 
 # Set model 1 specific parameters and functions --------------------------------
+c1=0.1
+c2=0.3
 # Initial susceptible population
 fS_init = pop_size - 1
 # Initial strain 1 infectious population in farms
@@ -85,10 +87,10 @@ multistrainSim_mod1 <- function(interyear=interyear_input, maxyear=maxyear_input
     
     # Introduce new strain
     I_dex_tointroduce <- which(out.df[nrow(out.df), 13:22] == min(out.df[nrow(out.df), 13:22]))[1] + 12
-
-    # Introduce the new strain 
-
-    new_vir <- runif(1, min=2, max=100)
+    tobase_newvir <- mean(virstrats[nrow(virstrats),])
+    min_newvir <- ifelse((tobase_newvir - 10) < 2, 2, (tobase_newvir - 10))
+    max_newvir <- ifelse((tobase_newvir + 10) > 100, 100, (tobase_newvir + 10))
+    new_vir <- runif(1, min=min_newvir, max=max_newvir)
     fbet_new <- (c1 * (new_vir)^c2) / pop_size
     p_new <- (new_vir) / 100
     parameters[I_dex_tointroduce -10 -2] <- fbet_new

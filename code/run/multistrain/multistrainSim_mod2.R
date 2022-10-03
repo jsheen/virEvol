@@ -10,6 +10,8 @@ interyear_input <- 10
 maxyear_input <- 100
 
 # Set model 2 specific parameters and functions --------------------------------
+c1=0.1
+c2=0.3
 # Initial susceptible population
 fS_init = pop_size - 1
 # Initial strain 1 infectious population in farms
@@ -23,7 +25,7 @@ v = perc_vax / inter_vax_time
 # Rate of loss of immunity due to vaccination per chicken per day
 v_hat = (1 / 120)
 # Threshold value for extinction
-threshold_extinction = 1
+threshold_extinction = 1.1
 # Assign model 2
 eqn <- multi_eqn_mod2
 
@@ -102,7 +104,10 @@ multistrainSim_mod2 <- function(interyear=interyear_input, maxyear=maxyear_input
     
     # Introduce new strain
     I_dex_tointroduce <- which((out.df[nrow(out.df), 35:44] + out.df[nrow(out.df), 13:22]) == min(out.df[nrow(out.df), 35:44] + out.df[nrow(out.df), 13:22]))[1] + 12
-    new_vir <- runif(1, min=2, max=100)
+    tobase_newvir <- mean(virstrats[nrow(virstrats),])
+    min_newvir <- ifelse((tobase_newvir - 10) < 2, 2, (tobase_newvir - 10))
+    max_newvir <- ifelse((tobase_newvir + 10) > 100, 100, (tobase_newvir + 10))
+    new_vir <- runif(1, min=min_newvir, max=max_newvir)
     fbet_new <- (c1 * (new_vir)^c2) / pop_size
     p_new <- (new_vir) / 100
     parameters[I_dex_tointroduce -10 -2] <- fbet_new

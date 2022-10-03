@@ -19,8 +19,8 @@ plot_pip <- function(name, vir_steps, title) {
   colnames(pip) <- vir_steps
   rownames(pip) <- rev(vir_steps)
   pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
-  pip_toPlot <- ifelse((pip == 4), 0, pip_toPlot) # Both extinct
-  pip_toPlot <- ifelse((pip == 2), 0, pip_toPlot) # Res extinct
+  pip_toPlot <- ifelse((pip_toPlot == 4), 0, pip_toPlot) # Both extinct
+  pip_toPlot <- ifelse((pip_toPlot == 2), 0, pip_toPlot) # Res extinct
   if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
   melted <- melt(pip_toPlot)
   colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
@@ -32,7 +32,6 @@ plot_pip <- function(name, vir_steps, title) {
   ggsave(filename=paste0("~/virEvol/code_output/plots/virEvol_", name, ".png"), marrangeGrob(grobs = l, nrow=1, ncol=1, top=NULL), width=3, height=3, units='in', dpi=600)
 }
 plot_pip('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 1), 'highvirselect')
-plot_pip('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_test', vir_steps=seq(2, 100, 5), 'highvirselecttest')
 
 # Function to find singular strategy -------------------------------------------
 find_singular_strat <- function(name, vir_steps) {
@@ -42,6 +41,8 @@ find_singular_strat <- function(name, vir_steps) {
   colnames(pip) <- vir_steps
   rownames(pip) <- rev(vir_steps)
   pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
+  pip_toPlot <- ifelse((pip_toPlot == 2), NA, pip_toPlot) # Extinction of resident before invader introduced
+  pip_toPlot <- ifelse((pip_toPlot == 4), NA, pip_toPlot) # Extinction of both resident and invader
   if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip.')) }
   singular_strats <- c()
   for (col_dex in 1:ncol(pip)) {
@@ -64,8 +65,6 @@ find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod1_highvirselect', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod2_highvirselect', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_test', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_test2', vir_steps=seq(2, 100, 1))
 
 # Sensitivity test (low virulence)
 find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 1)) # Ref
@@ -75,6 +74,7 @@ find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens3', vir_steps=seq(2, 100,
 find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens4', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens5', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens6', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens7', vir_steps=seq(2, 100, 1))
 
 # Sensitivity test (high virulence)
 find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 1)) # Ref

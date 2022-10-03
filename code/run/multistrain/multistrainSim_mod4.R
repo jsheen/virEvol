@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Model 3: SEIR with vaccination and migration
+# Model 4: SEIR with vaccination and migration and slaughter
 # ------------------------------------------------------------------------------
 # Source functional scripts and set seed and nsim ------------------------------
 source('~/virEvol/code/func/gen_parameters.R')
@@ -9,7 +9,9 @@ nsim <- 1000
 interyear_input <- 1
 maxyear_input <- 100
 
-# Set model 3 specific parameters and functions --------------------------------
+# Set model 4 specific parameters and functions --------------------------------
+c1=0.1
+c2=0.3
 # Initial susceptible population in farms
 fS_init = (pop_size * 1/2) - 1
 # Initial susceptible population in markets
@@ -32,18 +34,16 @@ perc_sold_per_farm = 0.33
 inter_sell_time_per_farm = 120 
 # Migration rate of chickens from farms to markets per chicken per day, if unvaccinated
 m_fm = perc_sold_per_farm / inter_sell_time_per_farm
-# Frac of base migration rate for vaccinated chickens
-diff_vax = 0.1
-# Migration rate of chickens from farms to markets per chicken, if vaccinated
-m_fm_vax = (perc_sold_per_farm * diff_vax) / inter_sell_time_per_farm
 # Migration rate of chickens from markets to farms per chicken per day
 m_mf = 1 / 7
 # Ratio of contact rate in markets vs. farms
-bet_mf_ratio = 10
+bet_mf_ratio = 5
 # Threshold value for extinction
-threshold_extinction = 3
-# Assign model 3
-eqn <- multi_eqn_mod3
+threshold_extinction = 2.2
+# Slaughte proportion
+p_s = 0.8
+# Assign model 4
+eqn <- multi_eqn_mod4
 
 # Create function that will output the virulence strategies every interyear ----
 multistrainSim_mod3 <- function(interyear=interyear_input, maxyear=maxyear_input) {
@@ -65,7 +65,7 @@ multistrainSim_mod3 <- function(interyear=interyear_input, maxyear=maxyear_input
                   sig=sig, gamm=gamm,
                   mort=mort, b=b, nat_mort=nat_mort,
                   v=v, v_hat=v_hat,
-                  m_fm=m_fm, m_fm_vax=m_fm_vax, m_mf=m_mf)
+                  m_fm=m_fm, m_mf=m_mf, p_s=p_s)
   
   # Prepare result dataframe
   virstrats <- data.frame(matrix(NA, ncol=10, nrow=(maxyear / interyear) + 1))
@@ -144,7 +144,10 @@ multistrainSim_mod3 <- function(interyear=interyear_input, maxyear=maxyear_input
     # Introduce new strain
     I_dex_tointroduce <- which((out.df[nrow(out.df), 13:22] + out.df[nrow(out.df), 35:44] + out.df[nrow(out.df), 56:65] + out.df[nrow(out.df), 78:87]) == 
                                  min(out.df[nrow(out.df), 13:22] + out.df[nrow(out.df), 35:44] + out.df[nrow(out.df), 56:65] + out.df[nrow(out.df), 78:87]))[1] + 12
-    new_vir <- runif(1, min=2, max=100)
+    tobase_newvir <- mean(virstrats[nrow(virstrats),])
+    min_newvir <- ifelse((tobase_newvir - 10) < 2, 2, (tobase_newvir - 10))
+    max_newvir <- ifelse((tobase_newvir + 10) > 100, 100, (tobase_newvir + 10))
+    new_vir <- runif(1, min=min_newvir, max=max_newvir)
     fbet_new <- (c1 * (new_vir)^c2) / pop_size
     mbet_new <- fbet_new * bet_mf_ratio
     p_new <- (new_vir) / 100
@@ -227,5 +230,5 @@ finalMatrix <- foreach(i=1:nsim, .combine=rbind) %dopar% {
   tempMatrix
 }
 stopCluster(cl)
-write.csv(finalMatrix, paste0('~/virEvol/code_output/multistrain_res/mod3_interyear', interyear_input, '_maxyear', maxyear_input, '.csv'))
+write.csv(finalMatrix, paste0('~/virEvol/code_output/multistrain_res/mod4_interyear', interyear_input, '_maxyear', maxyear_input, '.csv'))
 

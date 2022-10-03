@@ -1,3 +1,4 @@
+rm(list = ls())
 # ------------------------------------------------------------------------------
 # Model 5: SEIR with vaccination and migration and no migration of infectious
 # ------------------------------------------------------------------------------
@@ -43,7 +44,7 @@ p_s = 0.8
 
 # Assign model 5 specific equation and test_invade -----------------------------
 eqn <- eqn_mod5
-test_invade <- test_invade_mod3
+test_invade <- test_invade_mod4
 
 # Create and save PIP with no differential migration due to vaccination --------
 m_fm_vax = m_fm
@@ -70,3 +71,4 @@ stopCluster(cl)
 pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow=F)
 pip <- pracma::flipud(pip)
 write.csv(pip, paste0('~/virEvol/code_output/pips/mod4_v33_mfm33_mmf7_c5_nodiff_sens6.csv'))
+rm(list = ls())

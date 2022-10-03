@@ -26,13 +26,5 @@ nat_mort = 1 / 365
 # Mortality rate due to disease per chicken per day
 mort = 1 / 4
 
-# Parameters to define transmission rate from virulence level
-# For low transmission tradeoff
-c1 = 0.1
-c2 = 0.3
-
 # Virulence steps virus is allowed to take
 vir_steps = seq(2, 100, 1)
-
-
-

@@ -1,3 +1,4 @@
+rm(list = ls())
 # ------------------------------------------------------------------------------
 # Model 1: SEIR
 # ------------------------------------------------------------------------------
@@ -8,6 +9,9 @@ source('~/virEvol/code/func/model_eqns.R')
 source('~/virEvol/code/func/test_invade.R')
 
 # Set model 1 specific parameters and functions --------------------------------
+# For high transmission tradeoff
+c1 = 1
+c2 = 0.4
 # Initial susceptible population
 fS_init = pop_size - 1
 # Initial strain 1 infectious population in farms
@@ -43,4 +47,4 @@ stopCluster(cl)
 pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow=F)
 pip <- pracma::flipud(pip)
 write.csv(pip, paste0('~/virEvol/code_output/pips/main/mod1_highvirselect.csv'))
-
+rm(list = ls())
