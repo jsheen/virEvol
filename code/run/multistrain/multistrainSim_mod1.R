@@ -85,6 +85,9 @@ multistrainSim_mod1 <- function(interyear=interyear_input, maxyear=maxyear_input
     
     # Introduce new strain
     I_dex_tointroduce <- which(out.df[nrow(out.df), 13:22] == min(out.df[nrow(out.df), 13:22]))[1] + 12
+
+    # Introduce the new strain 
+
     new_vir <- runif(1, min=2, max=100)
     fbet_new <- (c1 * (new_vir)^c2) / pop_size
     p_new <- (new_vir) / 100
