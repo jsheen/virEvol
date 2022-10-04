@@ -136,31 +136,32 @@ multistrainSim_mod2 <- function(interyear=interyear_input, maxyear=maxyear_input
     out.df <- as.data.frame(out)
   }
   # Last iteration
-  if (endyear != maxyear) {
-    stop('Error in end of simulation.')
-  }
-  # Set to 0 for those that are extinct
-  for (col_dex in 3:12) {
-    if ((out.df[nrow(out.df), col_dex] + out.df[nrow(out.df), (col_dex + 10)] + out.df[nrow(out.df), (col_dex + 22)] + out.df[nrow(out.df), (col_dex + 32)]) < threshold_extinction) {
-      out.df[nrow(out.df), col_dex] <- 0
-      out.df[nrow(out.df), (col_dex + 10)] <- 0
-      out.df[nrow(out.df), (col_dex + 22)] <- 0
-      out.df[nrow(out.df), (col_dex + 32)] <- 0
-      
-      # Set parameters for this strain to 0 as well
-      parameters[col_dex - 2] <- 0
-      parameters[col_dex - 2 + 10] <- 0
+  if (!all_extinct) {
+    if (endyear != maxyear) {
+      stop('Error in end of simulation.')
+    }
+    # Set to 0 for those that are extinct
+    for (col_dex in 3:12) {
+      if ((out.df[nrow(out.df), col_dex] + out.df[nrow(out.df), (col_dex + 10)] + out.df[nrow(out.df), (col_dex + 22)] + out.df[nrow(out.df), (col_dex + 32)]) < threshold_extinction) {
+        out.df[nrow(out.df), col_dex] <- 0
+        out.df[nrow(out.df), (col_dex + 10)] <- 0
+        out.df[nrow(out.df), (col_dex + 22)] <- 0
+        out.df[nrow(out.df), (col_dex + 32)] <- 0
+        
+        # Set parameters for this strain to 0 as well
+        parameters[col_dex - 2] <- 0
+        parameters[col_dex - 2 + 10] <- 0
+      }
+    }
+    # Write down current strains, cycling through ps
+    for (param_dex in 11:20) {
+      if (parameters[param_dex] != 0) {
+        virstrats[(endyear / interyear) + 1, param_dex - 10] <- parameters[param_dex] * 100
+      } else {
+        virstrats[(endyear / interyear) + 1, param_dex - 10] <- NA
+      }
     }
   }
-  # Write down current strains, cycling through ps
-  for (param_dex in 11:20) {
-    if (parameters[param_dex] != 0) {
-      virstrats[(endyear / interyear) + 1, param_dex - 10] <- parameters[param_dex] * 100
-    } else {
-      virstrats[(endyear / interyear) + 1, param_dex - 10] <- NA
-    }
-  }
-  
   return(virstrats)
 }
 
