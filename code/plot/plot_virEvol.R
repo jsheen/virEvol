@@ -86,6 +86,15 @@ find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens5', vir_ste
 find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens6', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens7', vir_steps=seq(2, 100, 1))
 
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 5)) # Ref
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens1', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens2', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens3', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens4', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens5', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens6', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens7', vir_steps=seq(2, 100, 5))
+
 # Figure 1: Conceptual diagram -------------------------------------------------
 # Done in Google slides
 

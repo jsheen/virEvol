@@ -147,50 +147,50 @@ multi_eqn_mod4 <- function(time, state, parameters){
                                                                                                                                                                           mV + mVE1 + mVE2 + mVE3 + mVE4 + mVE5 + mVE6 + mVE7 + mVE8 + mVE9 + mVE10 + mVI1 + mVI2 + mVI3 + mVI4 + mVI5 + mVI6 + mVI7 + mVI8 + mVI9 + mVI10) / ((b / (b - nat_mort)) * (pop_size)))) -
       (mbet1*mS*mI1) -(mbet2*mS*mI2) -(mbet3*mS*mI3) -(mbet4*mS*mI4) -(mbet5*mS*mI5) -(mbet6*mS*mI6) -(mbet7*mS*mI7) -(mbet8*mS*mI8) -(mbet9*mS*mI9) -(mbet10*mS*mI10) -
       (mbet1*mS*mVI1) -(mbet2*mS*mVI2) -(mbet3*mS*mVI3) -(mbet4*mS*mVI4) -(mbet5*mS*mVI5) -(mbet6*mS*mVI6) -(mbet7*mS*mVI7) -(mbet8*mS*mVI8) -(mbet9*mS*mVI9) -(mbet10*mS*mVI10) +
-      v_hat*mV -nat_mort*mS -m_mf*mS*(1-p_s) +m_fm*fS
-    dmE1 = (mbet1*mS*mI1) +(mbet1*mS*mVI1) -sig*mE1 -nat_mort*mE1 -m_mf*mE1*(1-p_s) +m_fm*fE1
-    dmE2 = (mbet2*mS*mI2) +(mbet2*mS*mVI2) -sig*mE2 -nat_mort*mE2 -m_mf*mE2*(1-p_s) +m_fm*fE2
-    dmE3 = (mbet3*mS*mI3) +(mbet2*mS*mVI3) -sig*mE3 -nat_mort*mE3 -m_mf*mE3*(1-p_s) +m_fm*fE3
-    dmE4 = (mbet4*mS*mI4) +(mbet2*mS*mVI4) -sig*mE4 -nat_mort*mE4 -m_mf*mE4*(1-p_s) +m_fm*fE4
-    dmE5 = (mbet5*mS*mI5) +(mbet2*mS*mVI5) -sig*mE5 -nat_mort*mE5 -m_mf*mE5*(1-p_s) +m_fm*fE5
-    dmE6 = (mbet6*mS*mI6) +(mbet2*mS*mVI6) -sig*mE6 -nat_mort*mE6 -m_mf*mE6*(1-p_s) +m_fm*fE6
-    dmE7 = (mbet7*mS*mI7) +(mbet2*mS*mVI7) -sig*mE7 -nat_mort*mE7 -m_mf*mE7*(1-p_s) +m_fm*fE7
-    dmE8 = (mbet8*mS*mI8) +(mbet2*mS*mVI8) -sig*mE8 -nat_mort*mE8 -m_mf*mE8*(1-p_s) +m_fm*fE8
-    dmE9 = (mbet9*mS*mI9) +(mbet2*mS*mVI9) -sig*mE9 -nat_mort*mE9 -m_mf*mE9*(1-p_s) +m_fm*fE9
-    dmE10 = (mbet10*mS*mI10) +(mbet2*mS*mVI10) -sig*mE10 -nat_mort*mE10 -m_mf*mE10*(1-p_s) +m_fm*fE10
-    dmI1 = sig*mE1 -gamm*(1-p_1)*mI1 -mort*p_1*mI1 -nat_mort*mI1 -m_mf*mI1*(1-p_s) +m_fm*fI1
-    dmI2 = sig*mE2 -gamm*(1-p_2)*mI2 -mort*p_2*mI2 -nat_mort*mI2 -m_mf*mI2*(1-p_s) +m_fm*fI2
-    dmI3 = sig*mE3 -gamm*(1-p_3)*mI3 -mort*p_3*mI3 -nat_mort*mI3 -m_mf*mI3*(1-p_s) +m_fm*fI3
-    dmI4 = sig*mE4 -gamm*(1-p_4)*mI4 -mort*p_4*mI4 -nat_mort*mI4 -m_mf*mI4*(1-p_s) +m_fm*fI4
-    dmI5 = sig*mE5 -gamm*(1-p_5)*mI5 -mort*p_5*mI5 -nat_mort*mI5 -m_mf*mI5*(1-p_s) +m_fm*fI5
-    dmI6 = sig*mE6 -gamm*(1-p_6)*mI6 -mort*p_6*mI6 -nat_mort*mI6 -m_mf*mI6*(1-p_s) +m_fm*fI6
-    dmI7 = sig*mE7 -gamm*(1-p_7)*mI7 -mort*p_7*mI7 -nat_mort*mI7 -m_mf*mI7*(1-p_s) +m_fm*fI7
-    dmI8 = sig*mE8 -gamm*(1-p_8)*mI8 -mort*p_8*mI8 -nat_mort*mI8 -m_mf*mI8*(1-p_s) +m_fm*fI8
-    dmI9 = sig*mE9 -gamm*(1-p_9)*mI9 -mort*p_9*mI9 -nat_mort*mI9 -m_mf*mI9*(1-p_s) +m_fm*fI9
-    dmI10 = sig*mE10 -gamm*(1-p_10)*mI10 -mort*p_10*mI10 -nat_mort*mI10 -m_mf*mI10*(1-p_s) +m_fm*fI10
+      v_hat*mV -nat_mort*mS -m_mf*mS +m_fm*fS
+    dmE1 = (mbet1*mS*mI1) +(mbet1*mS*mVI1) -sig*mE1 -nat_mort*mE1 -m_mf*mE1 +m_fm*fE1
+    dmE2 = (mbet2*mS*mI2) +(mbet2*mS*mVI2) -sig*mE2 -nat_mort*mE2 -m_mf*mE2 +m_fm*fE2
+    dmE3 = (mbet3*mS*mI3) +(mbet2*mS*mVI3) -sig*mE3 -nat_mort*mE3 -m_mf*mE3 +m_fm*fE3
+    dmE4 = (mbet4*mS*mI4) +(mbet2*mS*mVI4) -sig*mE4 -nat_mort*mE4 -m_mf*mE4 +m_fm*fE4
+    dmE5 = (mbet5*mS*mI5) +(mbet2*mS*mVI5) -sig*mE5 -nat_mort*mE5 -m_mf*mE5 +m_fm*fE5
+    dmE6 = (mbet6*mS*mI6) +(mbet2*mS*mVI6) -sig*mE6 -nat_mort*mE6 -m_mf*mE6 +m_fm*fE6
+    dmE7 = (mbet7*mS*mI7) +(mbet2*mS*mVI7) -sig*mE7 -nat_mort*mE7 -m_mf*mE7 +m_fm*fE7
+    dmE8 = (mbet8*mS*mI8) +(mbet2*mS*mVI8) -sig*mE8 -nat_mort*mE8 -m_mf*mE8 +m_fm*fE8
+    dmE9 = (mbet9*mS*mI9) +(mbet2*mS*mVI9) -sig*mE9 -nat_mort*mE9 -m_mf*mE9 +m_fm*fE9
+    dmE10 = (mbet10*mS*mI10) +(mbet2*mS*mVI10) -sig*mE10 -nat_mort*mE10 -m_mf*mE10 +m_fm*fE10
+    dmI1 = sig*mE1 -gamm*(1-p_1)*mI1 -mort*p_1*mI1 -nat_mort*mI1 -m_mf*mI1 +m_fm*fI1
+    dmI2 = sig*mE2 -gamm*(1-p_2)*mI2 -mort*p_2*mI2 -nat_mort*mI2 -m_mf*mI2 +m_fm*fI2
+    dmI3 = sig*mE3 -gamm*(1-p_3)*mI3 -mort*p_3*mI3 -nat_mort*mI3 -m_mf*mI3 +m_fm*fI3
+    dmI4 = sig*mE4 -gamm*(1-p_4)*mI4 -mort*p_4*mI4 -nat_mort*mI4 -m_mf*mI4 +m_fm*fI4
+    dmI5 = sig*mE5 -gamm*(1-p_5)*mI5 -mort*p_5*mI5 -nat_mort*mI5 -m_mf*mI5 +m_fm*fI5
+    dmI6 = sig*mE6 -gamm*(1-p_6)*mI6 -mort*p_6*mI6 -nat_mort*mI6 -m_mf*mI6 +m_fm*fI6
+    dmI7 = sig*mE7 -gamm*(1-p_7)*mI7 -mort*p_7*mI7 -nat_mort*mI7 -m_mf*mI7 +m_fm*fI7
+    dmI8 = sig*mE8 -gamm*(1-p_8)*mI8 -mort*p_8*mI8 -nat_mort*mI8 -m_mf*mI8 +m_fm*fI8
+    dmI9 = sig*mE9 -gamm*(1-p_9)*mI9 -mort*p_9*mI9 -nat_mort*mI9 -m_mf*mI9 +m_fm*fI9
+    dmI10 = sig*mE10 -gamm*(1-p_10)*mI10 -mort*p_10*mI10 -nat_mort*mI10 -m_mf*mI10 +m_fm*fI10
     dmR = gamm*(1-p_1)*mI1 +gamm*(1-p_2)*mI2 +gamm*(1-p_3)*mI3 +gamm*(1-p_4)*mI4 +gamm*(1-p_5)*mI5 +gamm*(1-p_6)*mI6 +gamm*(1-p_7)*mI7 +gamm*(1-p_8)*mI8 +gamm*(1-p_9)*mI9 +gamm*(1-p_10)*mI10 +
       gamm*mVI1 +gamm*mVI2 +gamm*mVI3 +gamm*mVI4 +gamm*mVI5 +gamm*mVI6 +gamm*mVI7 +gamm*mVI8 +gamm*mVI9 +gamm*mVI10 -nat_mort*mR
-    dmV = -(mbet1*mV*mI1) -(mbet2*mV*mI2) -(mbet1*mV*mVI1) -(mbet2*mV*mVI2) -v_hat*mV -nat_mort*mV -m_mf*mR*(1-p_s) +m_fm*fR
-    dmVE1 = (mbet1*mV*mI1) +(mbet1*mV*mVI1) -sig*mVE1 -nat_mort*mVE1 -m_mf*mVE1*(1-p_s) +m_fm*fVE1
-    dmVE2 = (mbet2*mV*mI2) +(mbet2*mV*mVI2) -sig*mVE2 -nat_mort*mVE2 -m_mf*mVE2*(1-p_s) +m_fm*fVE2
-    dmVE3 = (mbet3*mV*mI3) +(mbet3*mV*mVI3) -sig*mVE3 -nat_mort*mVE3 -m_mf*mVE3*(1-p_s) +m_fm*fVE3
-    dmVE4 = (mbet4*mV*mI4) +(mbet4*mV*mVI4) -sig*mVE4 -nat_mort*mVE4 -m_mf*mVE4*(1-p_s) +m_fm*fVE4
-    dmVE5 = (mbet5*mV*mI5) +(mbet5*mV*mVI5) -sig*mVE5 -nat_mort*mVE5 -m_mf*mVE5*(1-p_s) +m_fm*fVE5
-    dmVE6 = (mbet6*mV*mI6) +(mbet6*mV*mVI6) -sig*mVE6 -nat_mort*mVE6 -m_mf*mVE6*(1-p_s) +m_fm*fVE6
-    dmVE7 = (mbet7*mV*mI7) +(mbet7*mV*mVI7) -sig*mVE7 -nat_mort*mVE7 -m_mf*mVE7*(1-p_s) +m_fm*fVE7
-    dmVE8 = (mbet8*mV*mI8) +(mbet8*mV*mVI8) -sig*mVE8 -nat_mort*mVE8 -m_mf*mVE8*(1-p_s) +m_fm*fVE8
-    dmVE9 = (mbet9*mV*mI9) +(mbet9*mV*mVI9) -sig*mVE9 -nat_mort*mVE9 -m_mf*mVE9*(1-p_s) +m_fm*fVE9
-    dmVE10 = (mbet10*mV*mI10) +(mbet10*mV*mVI10) -sig*mVE10 -nat_mort*mVE10 -m_mf*mVE10*(1-p_s) +m_fm*fVE10
-    dmVI1 = sig*mVE1 -gamm*mVI1 -nat_mort*mVI1 -m_mf*mVI1*(1-p_s) +m_fm*fVI1
-    dmVI2 = sig*mVE2 -gamm*mVI2 -nat_mort*mVI2 -m_mf*mVI2*(1-p_s) +m_fm*fVI2
-    dmVI3 = sig*mVE3 -gamm*mVI3 -nat_mort*mVI3 -m_mf*mVI3*(1-p_s) +m_fm*fVI3
-    dmVI4 = sig*mVE4 -gamm*mVI4 -nat_mort*mVI4 -m_mf*mVI4*(1-p_s) +m_fm*fVI4
-    dmVI5 = sig*mVE5 -gamm*mVI5 -nat_mort*mVI5 -m_mf*mVI5*(1-p_s) +m_fm*fVI5
-    dmVI6 = sig*mVE6 -gamm*mVI6 -nat_mort*mVI6 -m_mf*mVI6*(1-p_s) +m_fm*fVI6
-    dmVI7 = sig*mVE7 -gamm*mVI7 -nat_mort*mVI7 -m_mf*mVI7*(1-p_s) +m_fm*fVI7
-    dmVI8 = sig*mVE8 -gamm*mVI8 -nat_mort*mVI8 -m_mf*mVI8*(1-p_s) +m_fm*fVI8
-    dmVI9 = sig*mVE9 -gamm*mVI9 -nat_mort*mVI9 -m_mf*mVI9*(1-p_s) +m_fm*fVI9
-    dmVI10 = sig*mVE10 -gamm*mVI10 -nat_mort*mVI10 -m_mf*mVI10*(1-p_s) +m_fm*fVI10
+    dmV = -(mbet1*mV*mI1) -(mbet2*mV*mI2) -(mbet1*mV*mVI1) -(mbet2*mV*mVI2) -v_hat*mV -nat_mort*mV -m_mf*mR +m_fm*fR
+    dmVE1 = (mbet1*mV*mI1) +(mbet1*mV*mVI1) -sig*mVE1 -nat_mort*mVE1 -m_mf*mVE1 +m_fm*fVE1
+    dmVE2 = (mbet2*mV*mI2) +(mbet2*mV*mVI2) -sig*mVE2 -nat_mort*mVE2 -m_mf*mVE2 +m_fm*fVE2
+    dmVE3 = (mbet3*mV*mI3) +(mbet3*mV*mVI3) -sig*mVE3 -nat_mort*mVE3 -m_mf*mVE3 +m_fm*fVE3
+    dmVE4 = (mbet4*mV*mI4) +(mbet4*mV*mVI4) -sig*mVE4 -nat_mort*mVE4 -m_mf*mVE4 +m_fm*fVE4
+    dmVE5 = (mbet5*mV*mI5) +(mbet5*mV*mVI5) -sig*mVE5 -nat_mort*mVE5 -m_mf*mVE5 +m_fm*fVE5
+    dmVE6 = (mbet6*mV*mI6) +(mbet6*mV*mVI6) -sig*mVE6 -nat_mort*mVE6 -m_mf*mVE6 +m_fm*fVE6
+    dmVE7 = (mbet7*mV*mI7) +(mbet7*mV*mVI7) -sig*mVE7 -nat_mort*mVE7 -m_mf*mVE7 +m_fm*fVE7
+    dmVE8 = (mbet8*mV*mI8) +(mbet8*mV*mVI8) -sig*mVE8 -nat_mort*mVE8 -m_mf*mVE8 +m_fm*fVE8
+    dmVE9 = (mbet9*mV*mI9) +(mbet9*mV*mVI9) -sig*mVE9 -nat_mort*mVE9 -m_mf*mVE9 +m_fm*fVE9
+    dmVE10 = (mbet10*mV*mI10) +(mbet10*mV*mVI10) -sig*mVE10 -nat_mort*mVE10 -m_mf*mVE10 +m_fm*fVE10
+    dmVI1 = sig*mVE1 -gamm*mVI1 -nat_mort*mVI1 -m_mf*mVI1 +m_fm*fVI1
+    dmVI2 = sig*mVE2 -gamm*mVI2 -nat_mort*mVI2 -m_mf*mVI2 +m_fm*fVI2
+    dmVI3 = sig*mVE3 -gamm*mVI3 -nat_mort*mVI3 -m_mf*mVI3 +m_fm*fVI3
+    dmVI4 = sig*mVE4 -gamm*mVI4 -nat_mort*mVI4 -m_mf*mVI4 +m_fm*fVI4
+    dmVI5 = sig*mVE5 -gamm*mVI5 -nat_mort*mVI5 -m_mf*mVI5 +m_fm*fVI5
+    dmVI6 = sig*mVE6 -gamm*mVI6 -nat_mort*mVI6 -m_mf*mVI6 +m_fm*fVI6
+    dmVI7 = sig*mVE7 -gamm*mVI7 -nat_mort*mVI7 -m_mf*mVI7 +m_fm*fVI7
+    dmVI8 = sig*mVE8 -gamm*mVI8 -nat_mort*mVI8 -m_mf*mVI8 +m_fm*fVI8
+    dmVI9 = sig*mVE9 -gamm*mVI9 -nat_mort*mVI9 -m_mf*mVI9 +m_fm*fVI9
+    dmVI10 = sig*mVE10 -gamm*mVI10 -nat_mort*mVI10 -m_mf*mVI10 +m_fm*fVI10
     return(list(c(dfS,
                   dfE1, dfE2, dfE3, dfE4, dfE5, dfE6, dfE7, dfE8, dfE9, dfE10,
                   dfI1, dfI2, dfI3, dfI4, dfI5, dfI6, dfI7, dfI8, dfI9, dfI10,
