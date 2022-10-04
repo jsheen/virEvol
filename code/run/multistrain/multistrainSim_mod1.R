@@ -1,3 +1,4 @@
+rm(list = ls())
 # ------------------------------------------------------------------------------
 # Model 1: SEIR 
 # ------------------------------------------------------------------------------
@@ -5,7 +6,7 @@
 source('~/virEvol/code/func/gen_parameters.R')
 source('~/virEvol/code/func/multistrain_eqns.R')
 set.seed(0)
-nsim <- 1000
+nsim <- 100
 interyear_input <- 1
 maxyear_input <- 100
 
@@ -87,7 +88,7 @@ multistrainSim_mod1 <- function(interyear=interyear_input, maxyear=maxyear_input
     
     # Introduce new strain
     I_dex_tointroduce <- which(out.df[nrow(out.df), 13:22] == min(out.df[nrow(out.df), 13:22]))[1] + 12
-    tobase_newvir <- mean(virstrats[nrow(virstrats),])
+    tobase_newvir <- mean(unlist(virstrats[((endyear / interyear) - 1),]), na.rm=T)
     min_newvir <- ifelse((tobase_newvir - 10) < 2, 2, (tobase_newvir - 10))
     max_newvir <- ifelse((tobase_newvir + 10) > 100, 100, (tobase_newvir + 10))
     new_vir <- runif(1, min=min_newvir, max=max_newvir)
@@ -156,4 +157,4 @@ finalMatrix <- foreach(i=1:nsim, .combine=rbind) %dopar% {
 }
 stopCluster(cl)
 write.csv(finalMatrix, paste0('~/virEvol/code_output/multistrain_res/mod1_interyear', interyear_input, '_maxyear', maxyear_input, '.csv'))
-
+rm(list = ls())

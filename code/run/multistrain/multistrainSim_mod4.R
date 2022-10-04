@@ -1,3 +1,4 @@
+rm(list = ls())
 # ------------------------------------------------------------------------------
 # Model 4: SEIR with vaccination and migration and slaughter
 # ------------------------------------------------------------------------------
@@ -5,7 +6,7 @@
 source('~/virEvol/code/func/gen_parameters.R')
 source('~/virEvol/code/func/multistrain_eqns.R')
 set.seed(0)
-nsim <- 1000
+nsim <- 100
 interyear_input <- 1
 maxyear_input <- 100
 
@@ -40,7 +41,7 @@ m_mf = 1 / 7
 bet_mf_ratio = 5
 # Threshold value for extinction
 threshold_extinction = 2.2
-# Slaughte proportion
+# Slaughter proportion
 p_s = 0.8
 # Assign model 4
 eqn <- multi_eqn_mod4
@@ -144,7 +145,7 @@ multistrainSim_mod3 <- function(interyear=interyear_input, maxyear=maxyear_input
     # Introduce new strain
     I_dex_tointroduce <- which((out.df[nrow(out.df), 13:22] + out.df[nrow(out.df), 35:44] + out.df[nrow(out.df), 56:65] + out.df[nrow(out.df), 78:87]) == 
                                  min(out.df[nrow(out.df), 13:22] + out.df[nrow(out.df), 35:44] + out.df[nrow(out.df), 56:65] + out.df[nrow(out.df), 78:87]))[1] + 12
-    tobase_newvir <- mean(virstrats[nrow(virstrats),])
+    tobase_newvir <- mean(unlist(virstrats[((endyear / interyear) - 1),]), na.rm=T)
     min_newvir <- ifelse((tobase_newvir - 10) < 2, 2, (tobase_newvir - 10))
     max_newvir <- ifelse((tobase_newvir + 10) > 100, 100, (tobase_newvir + 10))
     new_vir <- runif(1, min=min_newvir, max=max_newvir)
@@ -231,4 +232,4 @@ finalMatrix <- foreach(i=1:nsim, .combine=rbind) %dopar% {
 }
 stopCluster(cl)
 write.csv(finalMatrix, paste0('~/virEvol/code_output/multistrain_res/mod4_interyear', interyear_input, '_maxyear', maxyear_input, '.csv'))
-
+rm(list = ls())
