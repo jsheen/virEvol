@@ -7,7 +7,7 @@ source('~/virEvol/code/func/gen_parameters.R')
 source('~/virEvol/code/func/multistrain_eqns.R')
 set.seed(0)
 nsim <- 100
-interyear_input <- 10
+interyear_input <- 1
 maxyear_input <- 100
 
 # Set model 2 specific parameters and functions --------------------------------
