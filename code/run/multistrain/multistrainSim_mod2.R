@@ -18,7 +18,7 @@ fS_init = pop_size - 1
 # Initial strain 1 infectious population in farms
 fI1_init = 1
 # Percent of susceptible chickens vaccinated in each time period
-perc_vax = 0.33 
+perc_vax = 0.26
 # Time that perc_vax is vaccinated
 inter_vax_time = 120
 # Vaccination rate of chickens of farms per susceptible chicken of farm per day
@@ -108,7 +108,7 @@ multistrainSim_mod2 <- function(interyear=interyear_input, maxyear=maxyear_input
     tobase_newvir <- mean(unlist(virstrats[((endyear / interyear) - 1),]), na.rm=T)
     min_newvir <- ifelse((tobase_newvir - 10) < 2, 2, (tobase_newvir - 10))
     max_newvir <- ifelse((tobase_newvir + 10) > 100, 100, (tobase_newvir + 10))
-    new_vir <- runif(1, min=min_newvir, max=max_newvir)
+    new_vir <- runif(1, min=2, max=100)
     fbet_new <- (c1 * (new_vir)^c2) / pop_size
     p_new <- (new_vir) / 100
     parameters[I_dex_tointroduce -10 -2] <- fbet_new
