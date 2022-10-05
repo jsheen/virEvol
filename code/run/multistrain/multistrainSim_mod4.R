@@ -22,7 +22,7 @@ fI1_init = 1
 # Initial strain 1 infectious population in markets
 mI1_init = 1 
 # Percent of susceptible chickens vaccinated in each time period
-perc_vax = 0.33 
+perc_vax = 0.26
 # Time that perc_vax is vaccinated
 inter_vax_time = 120 
 # Vaccination rate of chickens of farms per susceptible chicken of farm per day
@@ -30,7 +30,7 @@ v = perc_vax / inter_vax_time
 # Rate of loss of immunity due to vaccination per chicken per day
 v_hat = 1 / 120
 # Percent sold in interval
-perc_sold_per_farm = 0.33
+perc_sold_per_farm = 0.1
 # Days between successive sales of chickens of a farm
 inter_sell_time_per_farm = 120 
 # Migration rate of chickens from farms to markets per chicken per day, if unvaccinated
@@ -148,7 +148,7 @@ multistrainSim_mod3 <- function(interyear=interyear_input, maxyear=maxyear_input
     tobase_newvir <- mean(unlist(virstrats[((endyear / interyear) - 1),]), na.rm=T)
     min_newvir <- ifelse((tobase_newvir - 10) < 2, 2, (tobase_newvir - 10))
     max_newvir <- ifelse((tobase_newvir + 10) > 100, 100, (tobase_newvir + 10))
-    new_vir <- runif(1, min=min_newvir, max=max_newvir)
+    new_vir <- runif(1, min=2, max=100)
     fbet_new <- (c1 * (new_vir)^c2) / pop_size
     mbet_new <- fbet_new * bet_mf_ratio
     p_new <- (new_vir) / 100
@@ -228,6 +228,7 @@ finalMatrix <- foreach(i=1:nsim, .combine=rbind) %dopar% {
   library(foreach)
   library(doParallel)
   tempMatrix = multistrainSim_mod3()
+  write.csv(tempMatrix, paste0("~/virEvol/temp/", i, "_mod4.csv"))
   write.csv(tempMatrix, paste0("~/virEvol/scratch/", i, ".csv")) # for debugging purposes
   tempMatrix
 }
