@@ -17,7 +17,7 @@ fS_init = pop_size - 1
 # Initial strain 1 infectious population in farms
 fI1_init = 1
 # Percent of susceptible chickens vaccinated in each time period
-perc_vax = 0.33 
+perc_vax = 0.26
 # Time that perc_vax is vaccinated
 inter_vax_time = 120 
 # Vaccination rate of chickens of farms per susceptible chicken of farm per day
@@ -54,5 +54,5 @@ finalMatrix <- foreach(i=combos, .combine=cbind) %dopar% {
 stopCluster(cl)
 pip <- matrix(finalMatrix, ncol=length(vir_steps), nrow=length(vir_steps), byrow=F)
 pip <- pracma::flipud(pip)
-write.csv(pip, paste0('~/virEvol/code_output/pips/main/mod2.csv'))
+write.csv(pip, paste0('~/virEvol/code_output/pips/mod2.csv'))
 rm(list = ls())

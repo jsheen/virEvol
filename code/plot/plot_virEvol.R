@@ -61,39 +61,32 @@ find_singular_strat <- function(name, vir_steps) {
 # Figure 3
 find_singular_strat('mod1', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod2', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod1_highvirselect', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod2_highvirselect', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_highvirselect', vir_steps=seq(2, 100, 1))
 
 # Sensitivity test (low virulence)
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff', vir_steps=seq(2, 100, 1)) # Ref
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens1', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens2', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens3', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens4', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens5', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens6', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_sens7', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4', vir_steps=seq(2, 100, 1)) # Ref
+find_singular_strat('mod4_sens1', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_sens2', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_sens3', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_sens4', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_sens5', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_sens6', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_sens7', vir_steps=seq(4, 100, 1))
+find_singular_strat('mod4_sens8', vir_steps=seq(2, 100, 1))
 
 # Sensitivity test (high virulence)
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 1)) # Ref
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens1', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens2', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens3', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens4', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens5', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens6', vir_steps=seq(2, 100, 1))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens7', vir_steps=seq(2, 100, 1))
-
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 5)) # Ref
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens1', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens2', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens3', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens4', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens5', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens6', vir_steps=seq(2, 100, 5))
-find_singular_strat('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect_sens7', vir_steps=seq(2, 100, 5))
+find_singular_strat('mod4_highvirselect', vir_steps=seq(2, 100, 1)) # Ref
+find_singular_strat('mod4_highvirselect_sens1', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_highvirselect_sens2', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_highvirselect_sens3', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_highvirselect_sens4', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_highvirselect_sens5', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_highvirselect_sens6', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_highvirselect_sens7', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_highvirselect_sens8', vir_steps=seq(2, 100, 1))
 
 # Figure 1: Conceptual diagram -------------------------------------------------
 # Done in Google slides
@@ -109,7 +102,7 @@ titles <- c("(A) Without vaccination\n  (SEIR)", "(D) Without vaccination\n  (SE
             "(C) With vaccination\n      & markets (SEIRV-m)", "(F) With vaccination\n      & markets (SEIRV-m)")
 for (name in c('mod1','mod1_highvirselect',
                'mod2', 'mod2_highvirselect',
-               'mod4_v33_mfm33_mmf7_c5_nodiff','mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect')) {
+               'mod4','mod4_highvirselect')) {
   pip <- read.csv(paste0('~/virEvol/code_output/pips/', name, '.csv'))
   pip <- pip[,c(2:ncol(pip))]
   pip <- data.matrix(pip)

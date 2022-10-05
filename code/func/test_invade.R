@@ -256,7 +256,7 @@ test_invade_mod4 <- function(res_vir, invade_vir) {
   out_eq1.df <- as.data.frame(out_eq1)
   
   # For debugging purposes
-  # plot.out.df.mod3(out_eq1.df)
+   plot.out.df.mod3(out_eq1.df)
   
   # Output result for res_vir and invade_vir combination
   res <- 5
