@@ -31,7 +31,6 @@ plot_pip <- function(name, vir_steps, title) {
   l[[1]] <- temp_plot
   ggsave(filename=paste0("~/virEvol/code_output/plots/virEvol_", name, ".png"), marrangeGrob(grobs = l, nrow=1, ncol=1, top=NULL), width=3, height=3, units='in', dpi=600)
 }
-plot_pip('mod4_v33_mfm33_mmf7_c5_nodiff_highvirselect', vir_steps=seq(2, 100, 1), 'highvirselect')
 
 # Function to find singular strategy -------------------------------------------
 find_singular_strat <- function(name, vir_steps) {
@@ -55,7 +54,8 @@ find_singular_strat <- function(name, vir_steps) {
   } else {
     col_singular_strat <- singular_strats[floor(length(singular_strats) / 2)]
     vir_singular_strat <- vir_steps[col_singular_strat]
-    print(paste0(name, ": ", vir_singular_strat))
+    #print(paste0(name, ": ", vir_singular_strat))
+    return(vir_singular_strat)
   }
 }
 # Figure 3
@@ -97,9 +97,10 @@ find_singular_strat('mod4_highvirselect_sens8', vir_steps=seq(2, 100, 1))
 # Figure 3: Main comparison ----------------------------------------------------
 l <- list()
 l_dex <- 1
-titles <- c("(A) Without vaccination\n  (SEIR)", "(D) Without vaccination\n  (SEIR)",  
-            "(B) With vaccination\n  (SEIRV)", "(E) With vaccination\n  (SEIRV)", 
-            "(C) With vaccination\n      & markets (SEIRV-m)", "(F) With vaccination\n      & markets (SEIRV-m)")
+titles <- c("(A) Without vaccination\n  (SEIR)", "",  
+            "(B) With vaccination\n  (SEIRV)", "", 
+            "(C) With vaccination\n      & markets (SEIRV-m)", "")
+#singular_strats <- c(28, 45, 40, 53, 41, 60)
 for (name in c('mod1','mod1_highvirselect',
                'mod2', 'mod2_highvirselect',
                'mod4','mod4_highvirselect')) {
@@ -115,16 +116,18 @@ for (name in c('mod1','mod1_highvirselect',
   if (length(which(pip_toPlot != 1 & pip_toPlot != 0)) > 0) { print(paste0('Error in pip: ', name)) }
   melted <- melt(pip_toPlot)
   colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
+  singular_strat <- singular_strats[l_dex]
   temp_plot <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
     scale_fill_manual(values = c("black", "gray"), na.value='white') +theme(legend.position="none") +
     xlab('') + ylab('') + ggtitle(titles[l_dex]) +
     theme(text = element_text(size = 24)) + theme(plot.title = element_text(hjust = 0.5)) +
-    theme(plot.title = element_text(size=18)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    theme(plot.title = element_text(size=18)) #+ geom_point(aes(x=singular_strat, y=singular_strat), colour="red") +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                                       panel.background = element_blank(), axis.line = element_line(colour = "black"))
   l[[l_dex]] <- temp_plot
   l_dex <- l_dex + 1
 }
-ggsave(filename=paste0("~/virEvol/code_output/plots/main/Fig3.jpg"), marrangeGrob(grobs = l, nrow=2, ncol=3, top=NULL, common.legend = TRUE, legend="bottom"), width=12, height=8, units='in', dpi=600)
+ggsave(filename=paste0("~/virEvol/code_output/plots/main/Fig3.jpg"), marrangeGrob(grobs = l, nrow=2, ncol=3, top=NULL, common.legend = FALSE), width=12, height=8, units='in', dpi=600)
 
 # Figure S1: Tradeoff curves ---------------------------------------------------
 c1 = 1

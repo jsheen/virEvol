@@ -25,14 +25,6 @@ plot_prevs <- function(forhist, threshold) {
 }
 
 # Model 1: SEIR ----------------------------------------------------------------
-finalMatrix <- read.csv('~/virEvol/code_output/multistrain_res/mod1_interyear10_maxyear100.csv')
-finalMatrix <- finalMatrix[,2:ncol(finalMatrix)]
-forhist <- c()
-for (row_dex in seq(11, 11000, 11)) {
-  forhist <- c(forhist, finalMatrix[row_dex,][which(!is.na(finalMatrix[row_dex,]))])
-}
-hist(as.numeric(forhist), xlab='Distribution of strain virulences', main='', breaks=100)
-
 finalMatrix <- read.csv('~/virEvol/code_output/multistrain_res/mod1_interyear1_maxyear100.csv')
 finalMatrix <- finalMatrix[,2:ncol(finalMatrix)]
 forhist <- c()
@@ -42,14 +34,6 @@ for (row_dex in seq(101, 101000, 101)) {
 hist(as.numeric(forhist), xlab='Distribution of strain virulences', main='', breaks=100, xlim=c(0,100))
 
 # Model 2: SEIR with vaccination -----------------------------------------------
-finalMatrix <- read.csv('~/virEvol/code_output/multistrain_res/mod2_interyear10_maxyear100.csv')
-finalMatrix <- finalMatrix[,2:ncol(finalMatrix)]
-forhist <- c()
-for (row_dex in seq(11, 1100, 11)) {
-  forhist <- c(forhist, finalMatrix[row_dex,][which(!is.na(finalMatrix[row_dex,]))])
-}
-hist(as.numeric(forhist), xlab='Distribution of strain virulences', main='', breaks=100)
-
 finalMatrix <- read.csv('~/virEvol/code_output/multistrain_res/mod2_interyear1_maxyear100.csv')
 finalMatrix <- finalMatrix[,2:ncol(finalMatrix)]
 forhist <- c()
@@ -58,25 +42,8 @@ for (row_dex in seq(101, 101000, 101)) {
 }
 hist(as.numeric(forhist), xlab='Distribution of strain virulences', main='', breaks=100, xlim=c(0, 100))
 
-# Model 3: SEIR with vaccination and differential migration --------------------
-finalMatrix <- read.csv('~/virEvol/code_output/multistrain_res/mod3_interyear10_maxyear100.csv')
-finalMatrix <- finalMatrix[,2:ncol(finalMatrix)]
-forhist <- c()
-for (row_dex in seq(11, 1100, 11)) {
-  forhist <- c(forhist, finalMatrix[row_dex,][which(!is.na(finalMatrix[row_dex,]))])
-}
-hist(as.numeric(forhist), xlab='Distribution of strain virulences', main='', breaks=100)
-
-finalMatrix <- read.csv('~/virEvol/code_output/multistrain_res/mod3_interyear1_maxyear100.csv')
-finalMatrix <- finalMatrix[,2:ncol(finalMatrix)]
-forhist <- c()
-for (row_dex in seq(101, 101000, 101)) {
-  forhist <- c(forhist, finalMatrix[row_dex,][which(!is.na(finalMatrix[row_dex,]))])
-}
-hist(as.numeric(forhist), xlab='Distribution of strain virulences', main='', breaks=100)
-
-# Model 3: SEIR with vaccination and differential migration (large market patch)
-finalMatrix <- read.csv('~/virEvol/code_output/multistrain_res/mod3_mpatch_interyear1_maxyear100.csv')
+# Model 4: SEIR with vaccination and differential migration and slaughter ------
+finalMatrix <- read.csv('~/virEvol/code_output/multistrain_res/mod4_interyear1_maxyear100.csv')
 finalMatrix <- finalMatrix[,2:ncol(finalMatrix)]
 forhist <- c()
 for (row_dex in seq(101, 101000, 101)) {
@@ -86,109 +53,48 @@ hist(as.numeric(forhist), xlab='Distribution of strain virulences', main='', bre
 
 # Figure 4 ---------------------------------------------------------------------
 year_horizon <- 10
-titles <- c('(A) Without vaccination\n', '(B) With vaccination\n', '(C) With vaccination\n& markets')
+titles <- c('(A) Without vaccination\n(SEIR)', '',
+            '(B) With vaccination\n(SEIRV)', '',
+            '(C) With vaccination\n& markets (SEIRV-m)', '')
 l <- list()
 l_dex <- 1
-for (name in c('mod1_interyear1_maxyear100', 'mod2_interyear1_maxyear100',
-               'mod3_mpatch_interyear1_maxyear100')) {
+for (name in c('mod1_interyear1_maxyear100', 'mod1_interyear1_maxyear100_highvirselect',
+               'mod2_interyear1_maxyear100', 'mod2_interyear1_maxyear100_highvirselect',
+               'mod4_interyear1_maxyear100', 'mod4_interyear1_maxyear100_highvirselect')) {
   finalMatrix <- read.csv(paste0('~/virEvol/code_output/multistrain_res/', name, '.csv'))
   finalMatrix <- finalMatrix[,2:ncol(finalMatrix)]
   forhist <- c()
-  for (row_dex in seq(101, 101000, 101)) {
+  for (row_dex in seq(101, 10100, 101)) {
     new_strains <- c()
     base_row <- finalMatrix[(row_dex - (year_horizon + 1)),]
-    base_row <- base_row[!is.na(base_row)]
-    for (i in year_horizon:1) {
-      new_row <- finalMatrix[(row_dex - i),]
-      new_row <- new_row[!is.na(new_row)]
-      new_strain <- setdiff(new_row, base_row)
-      if (length(new_strain) != 1) {
-        print(row_dex)
-        print(new_strain)
-        stop('Error in loop.')
+    if (any(!is.na(base_row))) {
+      base_row <- base_row[!is.na(base_row)]
+      for (i in year_horizon:1) {
+        new_row <- finalMatrix[(row_dex - i),]
+        new_row <- new_row[!is.na(new_row)]
+        new_strain <- setdiff(new_row, base_row)
+        if (length(new_strain) != 1 ) {
+          print(row_dex)
+          print(new_strain)
+          stop('Error in loop.')
+        }
+        new_strains <- c(new_strains, new_strain)
+        base_row <- new_row
       }
-      new_strains <- c(new_strains, new_strain)
-      base_row <- new_row
     }
     last_row <- finalMatrix[row_dex,][which(!is.na(finalMatrix[row_dex,]))]
     forhist <- c(forhist, setdiff(last_row, new_strains)[1,1])
   }
   forhist.df <- data.frame(forhist)
-  if (l_dex == 1) {
-    l[[l_dex]] <- ggplot(forhist.df, aes(x = forhist)) + 
-      geom_histogram(aes(y = ..density..),
-                     colour = 'white', fill = "cornflowerblue", bins=30) + 
-      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-            panel.background = element_blank(), axis.line = element_line(colour = "black")) + theme(plot.title = element_text(hjust = 0.5)) +
-      xlab('Surviving virulences') + ylab('Density') + scale_x_continuous(limits = c(0, 100), oob = scales::oob_keep) +
-      ggtitle(titles[l_dex]) + theme(text = element_text(size = 24)) + ylim(0, 0.1) +
-      theme(plot.title = element_text(size=22))
-  } else {
-    l[[l_dex]] <- ggplot(forhist.df, aes(x = forhist)) + 
-      geom_histogram(aes(y = ..density..),
-                     colour = 'white', fill = "cornflowerblue", bins=30) + 
-      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-            panel.background = element_blank(), axis.line = element_line(colour = "black")) + theme(plot.title = element_text(hjust = 0.5)) +
-      xlab('Surviving virulences') + ylab('') + scale_x_continuous(limits = c(0, 100), oob = scales::oob_keep) +
-      ggtitle(titles[l_dex]) + theme(text = element_text(size = 22)) + ylim(0, 0.1) +
-      theme(plot.title = element_text(size=22))
-  }
+  l[[l_dex]] <- ggplot(forhist.df, aes(x = forhist)) + 
+    geom_histogram(aes(y = ..density..),
+                   colour = 'white', fill = "cornflowerblue", bins=20) + 
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+          panel.background = element_blank(), axis.line = element_line(colour = "black")) + theme(plot.title = element_text(hjust = 0.5)) +
+    xlab('') + ylab('') + scale_x_continuous(limits = c(0, 100), oob = scales::oob_keep) +
+    ggtitle(titles[l_dex]) + theme(text = element_text(size = 22)) + ylim(0, 0.1) +
+    theme(plot.title = element_text(size=22)) #+ geom_vline(xintercept=c(mean(forhist.df$forhist)), linetype="dashed", size=2)
   print(paste0(titles[l_dex], ": ", mean(forhist.df$forhist), " [", var(forhist.df$forhist), "]"))
   l_dex <- l_dex + 1
 }
-ggsave(filename=paste0("~/virEvol/code_output/plots/main/Fig4.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=3, top=NULL), width=13, height=4, units='in', dpi=600)
-
-# Figure S5: 10 years instead of 1 year ----------------------------------------
-year_horizon <- 1
-titles <- c('(A) Without vaccination\n', '(B) With vaccination\n', '(C) With vaccination\n& markets')
-l <- list()
-l_dex <- 1
-for (name in c('mod1_interyear10_maxyear100', 'mod2_interyear10_maxyear100',
-               'mod3_mpatch_interyear10_maxyear100')) {
-  finalMatrix <- read.csv(paste0('~/virEvol/code_output/multistrain_res/', name, '.csv'))
-  finalMatrix <- finalMatrix[,2:ncol(finalMatrix)]
-  forhist <- c()
-  for (row_dex in seq(11, 11000, 11)) {
-    new_strains <- c()
-    base_row <- finalMatrix[(row_dex - (year_horizon + 1)),]
-    base_row <- base_row[!is.na(base_row)]
-    for (i in year_horizon:1) {
-      new_row <- finalMatrix[(row_dex - i),]
-      new_row <- new_row[!is.na(new_row)]
-      new_strain <- setdiff(new_row, base_row)
-      if (length(new_strain) != 1) {
-        print(row_dex)
-        print(new_strain)
-        stop('Error in loop.')
-      }
-      new_strains <- c(new_strains, new_strain)
-      base_row <- new_row
-    }
-    last_row <- finalMatrix[row_dex,][which(!is.na(finalMatrix[row_dex,]))]
-    forhist <- c(forhist, setdiff(last_row, new_strains)[1,1])
-  }
-  forhist.df <- data.frame(forhist)
-  if (l_dex == 1) {
-    l[[l_dex]] <- ggplot(forhist.df, aes(x = forhist)) + 
-      geom_histogram(aes(y = ..density..),
-                     colour = 'white', fill = "cornflowerblue", bins=30) + 
-      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-            panel.background = element_blank(), axis.line = element_line(colour = "black")) + theme(plot.title = element_text(hjust = 0.5)) +
-      xlab('Surviving virulences') + ylab('Density') + scale_x_continuous(limits = c(0, 100), oob = scales::oob_keep) +
-      ggtitle(titles[l_dex]) + theme(text = element_text(size = 24)) + ylim(0, 0.1) +
-      theme(plot.title = element_text(size=22))
-  } else {
-    l[[l_dex]] <- ggplot(forhist.df, aes(x = forhist)) + 
-      geom_histogram(aes(y = ..density..),
-                     colour = 'white', fill = "cornflowerblue", bins=30) + 
-      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-            panel.background = element_blank(), axis.line = element_line(colour = "black")) + theme(plot.title = element_text(hjust = 0.5)) +
-      xlab('Surviving virulences') + ylab('') + scale_x_continuous(limits = c(0, 100), oob = scales::oob_keep) +
-      ggtitle(titles[l_dex]) + theme(text = element_text(size = 24)) + ylim(0, 0.1) +
-      theme(plot.title = element_text(size=22))
-  }
-  print(paste0(titles[l_dex], ": ", mean(forhist.df$forhist), " [", var(forhist.df$forhist), "]"))
-  l_dex <- l_dex + 1
-}
-ggsave(filename=paste0("~/virEvol/code_output/plots/supplementary/FigS5.jpg"), marrangeGrob(grobs = l, nrow=1, ncol=3, top=NULL), width=13, height=4, units='in', dpi=600)
-
+ggsave(filename=paste0("~/virEvol/code_output/plots/main/Fig4.jpg"), marrangeGrob(grobs = l, nrow=2, ncol=3, top=NULL), width=13, height=8, units='in', dpi=600)
