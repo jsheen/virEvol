@@ -68,6 +68,7 @@ find_singular_strat('mod4_sens5', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_sens6', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_sens7', vir_steps=seq(4, 100, 1))
 find_singular_strat('mod4_sens8', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_sens9', vir_steps=seq(2, 100, 1))
 
 # Tradeoff curve 2 sensitivity tests
 find_singular_strat('mod4_highvirselect', vir_steps=seq(2, 100, 1)) # Ref
@@ -79,6 +80,7 @@ find_singular_strat('mod4_highvirselect_sens5', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_highvirselect_sens6', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_highvirselect_sens7', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_highvirselect_sens8', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_highvirselect_sens9', vir_steps=seq(2, 100, 1))
 
 # Figure 3
 find_singular_strat('mod1', vir_steps=seq(2, 100, 1))
