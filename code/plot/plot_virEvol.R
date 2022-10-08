@@ -81,6 +81,8 @@ find_singular_strat('mod4_highvirselect_sens6', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_highvirselect_sens7', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_highvirselect_sens8', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_highvirselect_sens9', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_highvirselect_sens10', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_highvirselect_sens11', vir_steps=seq(2, 100, 1))
 
 # Figure 3
 find_singular_strat('mod1', vir_steps=seq(2, 100, 1))
