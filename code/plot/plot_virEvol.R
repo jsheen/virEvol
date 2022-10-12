@@ -68,6 +68,14 @@ find_singular_strat('mod4_sens6', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_sens7', vir_steps=seq(4, 100, 1))
 find_singular_strat('mod4_sens8', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_sens9', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_sens10', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_sens11', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod1_sens12', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod1_sens13', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod2_sens12', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod3_sens13', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_sens12', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_sens13', vir_steps=seq(2, 100, 1))
 
 # Tradeoff curve 2 sensitivity tests
 find_singular_strat('mod4_highvirselect', vir_steps=seq(2, 100, 1)) # Ref
@@ -82,6 +90,12 @@ find_singular_strat('mod4_highvirselect_sens8', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_highvirselect_sens9', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_highvirselect_sens10', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_highvirselect_sens11', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod1_highvirselect_sens12', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod1_highvirselect_sens13', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod2_highvirselect_sens12', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod2_highvirselect_sens13', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_highvirselect_sens12', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_highvirselect_sens13', vir_steps=seq(2, 100, 1))
 
 # Figure 3
 find_singular_strat('mod1', vir_steps=seq(2, 100, 1))
@@ -130,6 +144,20 @@ find_singular_strat('mod4_sens6', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_sens11', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_highvirselect_sens6', vir_steps=seq(2, 100, 1))
 find_singular_strat('mod4_highvirselect_sens11', vir_steps=seq(2, 100, 1))
+
+# Figure S7
+find_singular_strat('mod1_sens12', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod1_sens13', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod2_sens12', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod2_sens13', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_sens12', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_sens13', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod1_highvirselect_sens12', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod1_highvirselect_sens13', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod2_highvirselect_sens12', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod2_highvirselect_sens13', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_highvirselect_sens12', vir_steps=seq(2, 100, 1))
+find_singular_strat('mod4_highvirselect_sens13', vir_steps=seq(2, 100, 1))
 
 # Figure 1: Conceptual diagram -------------------------------------------------
 # Done in Google slides
@@ -418,6 +446,133 @@ for (name in c('mod4_sens6','mod4_highvirselect_sens6',
   l_dex <- l_dex + 1
 }
 ggsave(filename=paste0("~/virEvol/code_output/plots/supplementary/FigS6.jpg"), marrangeGrob(grobs = l, nrow=2, ncol=2, top=NULL, common.legend = FALSE), width=8, height=8, units='in', dpi=600)
+
+# Figure 7: robustness to introduction of invader at other time steps ----------
+vir_steps <- seq(2, 100, 1)
+dir <- '~/virEvol/code_output/pips/'
+names <- c('mod1', 'mod1_highvirselect', 'mod2', 'mod2_highvirselect', 'mod4', 'mod4_highvirselect')
+titles <- c("(A) Without vaccination\n  (SEIR)", "",  
+            "(B) With vaccination\n  (SEIRV)", "", 
+            "(C) With vaccination\n      & markets (SEIRV-m)", "")
+paper_ls <- list()
+paper_ls_dex <- 1
+for (name in names) {
+  print(name)
+  main_pip <- read.csv(paste0(dir, name, '.csv'))
+  main_pip <- main_pip[,2:ncol(main_pip)]
+  sens12_pip <- read.csv(paste0(dir, name, '_sens12.csv'))
+  sens12_pip <- sens12_pip[,2:ncol(sens12_pip)]
+  sens13_pip <- read.csv(paste0(dir, name, '_sens13.csv'))
+  sens13_pip <- sens13_pip[,2:ncol(sens13_pip)]
+  if (nrow(main_pip) != ncol(main_pip) | nrow(sens12_pip) != ncol(sens12_pip) | nrow(sens13_pip) != ncol(sens13_pip)) {
+    stop('Error in number of rows or number of columns.')
+  }
+  if (nrow(main_pip) != length(vir_steps) | nrow(sens12_pip) != length(vir_steps) | nrow(sens13_pip) != length(vir_steps)) {
+    stop('Error in number of vir_steps.')
+  }
+  if ((nrow(main_pip) != nrow(sens12_pip)) | (ncol(main_pip) != ncol(sens12_pip))) {
+    stop('Error in sens12')
+  }
+  if ((nrow(main_pip) != nrow(sens13_pip)) | (ncol(main_pip) != ncol(sens13_pip))) {
+    stop('Error in sens12')
+  }
+  main_pip_sens12 <- main_pip # 100 will mean there is a difference
+  main_pip_sens13 <- main_pip
+  paper_pip <- main_pip
+  print('+180 days res:')
+  for (i in 1:nrow(main_pip)) {
+    for (j in 1:ncol(main_pip)) {
+      if (main_pip[i,j] != sens12_pip[i,j]) {
+        print(paste0(vir_steps[i], '; ', vir_steps[j]))
+        main_pip_sens12[i, j] <- 100
+        paper_pip[i, j] <- 100
+      }
+    }
+  }
+  print('-180 days res:')
+  for (i in 1:nrow(main_pip)) {
+    for (j in 1:ncol(main_pip)) {
+      if (main_pip[i,j] != sens13_pip[i,j]) {
+        print(paste0(vir_steps[i], '; ', vir_steps[j]))
+        main_pip_sens13[i, j] <- 100
+        paper_pip[i, j] <- 100
+      }
+    }
+  }
+  # Plot: main_pip with red where there is a difference from sens12
+  l <- list()
+  l_dex <- 1
+  pip <- main_pip_sens12
+  pip <- data.matrix(pip)
+  vir_steps <- seq(2, 100, 1)
+  colnames(pip) <- vir_steps
+  rownames(pip) <- rev(vir_steps)
+  pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
+  pip_toPlot <- ifelse((pip_toPlot == 2), NA, pip_toPlot) # Extinction of resident before introduction of invader
+  pip_toPlot <- ifelse((pip_toPlot == 4), NA, pip_toPlot) # Extinction of both strains by the end of ten years
+  if (length(which(pip_toPlot != 1 & pip_toPlot != 0 & pip_toPlot != 100)) > 0) { print(paste0('Error in pip: ', name)) }
+  melted <- melt(pip_toPlot)
+  colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
+  l[[l_dex]] <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
+    scale_fill_manual(values = c("black", "gray", 'red'), na.value='white') +theme(legend.position="none") +
+    xlab('') + ylab('') + ggtitle(paste0(name, '_sens12')) +
+    theme(text = element_text(size = 24)) + theme(plot.title = element_text(hjust = 0.5)) +
+    theme(plot.title = element_text(size=18)) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+          panel.background = element_blank(), axis.line = element_line(colour = "black"))
+  l_dex <- l_dex + 1
+  # Plot: main_pip with red where there is a difference from sens13
+  pip <- main_pip_sens13
+  pip <- data.matrix(pip)
+  vir_steps <- seq(2, 100, 1)
+  colnames(pip) <- vir_steps
+  rownames(pip) <- rev(vir_steps)
+  pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
+  pip_toPlot <- ifelse((pip_toPlot == 2), NA, pip_toPlot) # Extinction of resident before introduction of invader
+  pip_toPlot <- ifelse((pip_toPlot == 4), NA, pip_toPlot) # Extinction of both strains by the end of ten years
+  if (length(which(pip_toPlot != 1 & pip_toPlot != 0 & pip_toPlot != 100)) > 0) { print(paste0('Error in pip: ', name)) }
+  melted <- melt(pip_toPlot)
+  colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
+  l[[l_dex]] <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
+    scale_fill_manual(values = c("black", "gray", 'red'), na.value='white') +theme(legend.position="none") +
+    xlab('') + ylab('') + ggtitle(paste0(name, '_sens13')) +
+    theme(text = element_text(size = 24)) + theme(plot.title = element_text(hjust = 0.5)) +
+    theme(plot.title = element_text(size=18)) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+          panel.background = element_blank(), axis.line = element_line(colour = "black"))
+  # Plot: pip for paper (both sens12 and sens13 differences)
+  pip <- main_pip_sens13
+  pip <- data.matrix(pip)
+  vir_steps <- seq(2, 100, 1)
+  colnames(pip) <- vir_steps
+  rownames(pip) <- rev(vir_steps)
+  pip_toPlot <- ifelse((pip == 3), 1, pip) # Coexistence counted as successful invasion
+  pip_toPlot <- ifelse((pip_toPlot == 2), NA, pip_toPlot) # Extinction of resident before introduction of invader
+  pip_toPlot <- ifelse((pip_toPlot == 4), NA, pip_toPlot) # Extinction of both strains by the end of ten years
+  if (length(which(pip_toPlot != 1 & pip_toPlot != 0 & pip_toPlot != 100)) > 0) { print(paste0('Error in pip: ', name)) }
+  melted <- melt(pip_toPlot)
+  colnames(melted) <- c('invader_virulence', 'resident_virulence', 'value')
+  paper_ls[[paper_ls_dex]] <- ggplot(melted, aes(y = invader_virulence, x = resident_virulence, fill = factor(value))) + geom_tile() +
+    scale_fill_manual(values = c("black", "gray", 'red'), na.value='white') +theme(legend.position="none") +
+    xlab('') + ylab('') + ggtitle(titles[paper_ls_dex]) +
+    theme(text = element_text(size = 24)) + theme(plot.title = element_text(hjust = 0.5)) +
+    theme(plot.title = element_text(size=18)) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+          panel.background = element_blank(), axis.line = element_line(colour = "black"))
+  paper_ls_dex <- paper_ls_dex + 1
+  # Save jpeg
+  ggsave(filename=paste0("~/virEvol/code_output/testing/sens12_sens13/", name, ".jpg"), marrangeGrob(grobs = l, nrow=1, ncol=2, top=NULL, common.legend = FALSE), width=4, height=8, units='in', dpi=600)
+}
+# Save jpeg for paper
+ggsave(filename=paste0("~/virEvol/code_output/plots/supplementary/FigS7.jpg"), marrangeGrob(grobs = paper_ls, nrow=2, ncol=3, top=NULL, common.legend = FALSE), width=12, height=8, units='in', dpi=600)
+
+
+
+
+
+
+
+
 
 
 
