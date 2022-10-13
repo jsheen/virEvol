@@ -450,7 +450,7 @@ ggsave(filename=paste0("~/virEvol/code_output/plots/supplementary/FigS6.jpg"), m
 # Figure 7: robustness to introduction of invader at other time steps ----------
 vir_steps <- seq(2, 100, 1)
 dir <- '~/virEvol/code_output/pips/'
-names <- c('mod1', 'mod1_highvirselect')#, 'mod2', 'mod2_highvirselect', 'mod4', 'mod4_highvirselect')
+names <- c('mod1', 'mod1_highvirselect', 'mod2', 'mod2_highvirselect', 'mod4', 'mod4_highvirselect')
 titles <- c("(A) Without vaccination\n  (SEIR)", "",  
             "(B) With vaccination\n  (SEIRV)", "", 
             "(C) With vaccination\n      & markets (SEIRV-m)", "")
@@ -591,15 +591,4 @@ for (name in names) {
 }
 # Save jpeg for paper
 ggsave(filename=paste0("~/virEvol/code_output/plots/supplementary/FigS7.jpg"), marrangeGrob(grobs = paper_ls, nrow=2, ncol=3, top=NULL, common.legend = FALSE), width=12, height=8, units='in', dpi=600)
-
-
-
-
-
-
-
-
-
-
-
 
