@@ -450,7 +450,7 @@ ggsave(filename=paste0("~/virEvol/code_output/plots/supplementary/FigS6.jpg"), m
 # Figure 7: robustness to introduction of invader at other time steps ----------
 vir_steps <- seq(2, 100, 1)
 dir <- '~/virEvol/code_output/pips/'
-names <- c('mod1', 'mod1_highvirselect', 'mod2', 'mod2_highvirselect', 'mod4', 'mod4_highvirselect')
+names <- c('mod1', 'mod1_highvirselect')#, 'mod2', 'mod2_highvirselect', 'mod4', 'mod4_highvirselect')
 titles <- c("(A) Without vaccination\n  (SEIR)", "",  
             "(B) With vaccination\n  (SEIRV)", "", 
             "(C) With vaccination\n      & markets (SEIRV-m)", "")
@@ -464,6 +464,10 @@ for (name in names) {
   sens12_pip <- sens12_pip[,2:ncol(sens12_pip)]
   sens13_pip <- read.csv(paste0(dir, name, '_sens13.csv'))
   sens13_pip <- sens13_pip[,2:ncol(sens13_pip)]
+  sens14_pip <- read.csv(paste0(dir, name, '_sens14.csv'))
+  sens14_pip <- sens14_pip[,2:ncol(sens14_pip)]
+  sens15_pip <- read.csv(paste0(dir, name, '_sens15.csv'))
+  sens15_pip <- sens15_pip[,2:ncol(sens15_pip)]
   if (nrow(main_pip) != ncol(main_pip) | nrow(sens12_pip) != ncol(sens12_pip) | nrow(sens13_pip) != ncol(sens13_pip)) {
     stop('Error in number of rows or number of columns.')
   }
@@ -478,6 +482,8 @@ for (name in names) {
   }
   main_pip_sens12 <- main_pip # 100 will mean there is a difference
   main_pip_sens13 <- main_pip
+  main_pip_sens14 <- main_pip
+  main_pip_sens15 <- main_pip
   paper_pip <- main_pip
   print('+180 days res:')
   for (i in 1:nrow(main_pip)) {
@@ -495,6 +501,26 @@ for (name in names) {
       if (main_pip[i,j] != sens13_pip[i,j]) {
         print(paste0(vir_steps[i], '; ', vir_steps[j]))
         main_pip_sens13[i, j] <- 100
+        paper_pip[i, j] <- 100
+      }
+    }
+  }
+  print('+365 days res:')
+  for (i in 1:nrow(main_pip)) {
+    for (j in 1:ncol(main_pip)) {
+      if (main_pip[i,j] != sens14_pip[i,j]) {
+        print(paste0(vir_steps[i], '; ', vir_steps[j]))
+        main_pip_sens14[i, j] <- 100
+        paper_pip[i, j] <- 100
+      }
+    }
+  }
+  print('-365 days res:')
+  for (i in 1:nrow(main_pip)) {
+    for (j in 1:ncol(main_pip)) {
+      if (main_pip[i,j] != sens15_pip[i,j]) {
+        print(paste0(vir_steps[i], '; ', vir_steps[j]))
+        main_pip_sens15[i, j] <- 100
         paper_pip[i, j] <- 100
       }
     }
@@ -540,8 +566,8 @@ for (name in names) {
     theme(plot.title = element_text(size=18)) +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
           panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  # Plot: pip for paper (both sens12 and sens13 differences)
-  pip <- main_pip_sens13
+  # Plot: pip for paper (sens12 through sens15 differences)
+  pip <- paper_pip
   pip <- data.matrix(pip)
   vir_steps <- seq(2, 100, 1)
   colnames(pip) <- vir_steps
@@ -561,7 +587,7 @@ for (name in names) {
           panel.background = element_blank(), axis.line = element_line(colour = "black"))
   paper_ls_dex <- paper_ls_dex + 1
   # Save jpeg
-  ggsave(filename=paste0("~/virEvol/code_output/testing/sens12_sens13/", name, ".jpg"), marrangeGrob(grobs = l, nrow=1, ncol=2, top=NULL, common.legend = FALSE), width=4, height=8, units='in', dpi=600)
+  ggsave(filename=paste0("~/virEvol/code_output/testing/sens12_sens15/", name, ".jpg"), marrangeGrob(grobs = l, nrow=1, ncol=2, top=NULL, common.legend = FALSE), width=4, height=8, units='in', dpi=600)
 }
 # Save jpeg for paper
 ggsave(filename=paste0("~/virEvol/code_output/plots/supplementary/FigS7.jpg"), marrangeGrob(grobs = paper_ls, nrow=2, ncol=3, top=NULL, common.legend = FALSE), width=12, height=8, units='in', dpi=600)
