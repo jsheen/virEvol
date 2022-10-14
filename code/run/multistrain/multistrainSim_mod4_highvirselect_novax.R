@@ -11,8 +11,8 @@ interyear_input <- 1
 maxyear_input <- 100
 
 # Set model 4 specific parameters and functions --------------------------------
-c1=0.1
-c2=0.3
+c1=1
+c2=0.4
 # Initial susceptible population in farms
 fS_init = (pop_size * 1/2) - 1
 # Initial susceptible population in markets
@@ -22,9 +22,9 @@ fI1_init = 1
 # Initial strain 1 infectious population in markets
 mI1_init = 1 
 # Percent of susceptible chickens vaccinated in each time period
-perc_vax = 0.26
+perc_vax = 0
 # Time that perc_vax is vaccinated
-inter_vax_time = 120 
+inter_vax_time = 120
 # Vaccination rate of chickens of farms per susceptible chicken of farm per day
 v = perc_vax / inter_vax_time 
 # Rate of loss of immunity due to vaccination per chicken per day
@@ -41,7 +41,7 @@ m_mf = 1 / 7
 bet_mf_ratio = 5
 # Threshold value for extinction
 threshold_extinction = 2.2
-# Slaughter proportion
+# Slaughte proportion
 p_s = 0.8
 # Assign model 4
 eqn <- multi_eqn_mod4
@@ -90,6 +90,7 @@ multistrainSim_mod4 <- function(interyear=interyear_input, maxyear=maxyear_input
   out <- ode(y=init, times=time, func=eqn, parms=parameters)
   out.df <- as.data.frame(out)
   while (endyear < maxyear) {
+    print(endyear)
     # Set to 0 for those that are extinct
     for (col_dex in 3:12) {
       if ((out.df[nrow(out.df), col_dex] + out.df[nrow(out.df), (col_dex + 10)] + 
@@ -232,5 +233,5 @@ finalMatrix <- foreach(i=1:nsim, .combine=rbind) %dopar% {
   tempMatrix
 }
 stopCluster(cl)
-write.csv(finalMatrix, paste0('~/virEvol/code_output/multistrain_res/mod4_interyear', interyear_input, '_maxyear', maxyear_input, '.csv'))
+write.csv(finalMatrix, paste0('~/virEvol/code_output/multistrain_res/mod4_interyear', interyear_input, '_maxyear', maxyear_input, '_highvirselect_novax.csv'))
 rm(list = ls())

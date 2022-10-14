@@ -22,7 +22,7 @@ fI1_init = 1
 # Initial strain 1 infectious population in markets
 mI1_init = 1 
 # Percent of susceptible chickens vaccinated in each time period
-perc_vax = 0.26
+perc_vax = 0
 # Time that perc_vax is vaccinated
 inter_vax_time = 120 
 # Vaccination rate of chickens of farms per susceptible chicken of farm per day
@@ -232,5 +232,5 @@ finalMatrix <- foreach(i=1:nsim, .combine=rbind) %dopar% {
   tempMatrix
 }
 stopCluster(cl)
-write.csv(finalMatrix, paste0('~/virEvol/code_output/multistrain_res/mod4_interyear', interyear_input, '_maxyear', maxyear_input, '.csv'))
+write.csv(finalMatrix, paste0('~/virEvol/code_output/multistrain_res/mod4_interyear', interyear_input, '_maxyear', maxyear_input, '_novax.csv'))
 rm(list = ls())
