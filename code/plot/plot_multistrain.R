@@ -120,15 +120,15 @@ ggsave(filename=paste0("~/virEvol/code_output/plots/main/Fig4.jpg"), marrangeGro
 # Figure 4 mod -----------------------------------------------------------------
 year_horizon <- 10
 titles <- c('(A) Without vaccination\n(SEIR)', '',
-            '(B) With vaccination\n(SEIRV)', '',
-            '(C) With vaccination\n& markets (SEIRV-m)', '',
-            '(D) No vax', '')
+            '(B) With vaccination\n& without markets(SEIRV)', '',
+            '(C) Without vaccination\n& with markets (SEIRV-m)', '',
+            '(D) With vaccination\n& markets (SEIRV-m)', '')
 l <- list()
 l_dex <- 1
 for (name in c('mod1_interyear1_maxyear100', 'mod1_interyear1_maxyear100_highvirselect',
                'mod2_interyear1_maxyear100', 'mod2_interyear1_maxyear100_highvirselect',
-               'mod4_interyear1_maxyear100', 'mod4_interyear1_maxyear100_highvirselect',
-               'mod4_interyear1_maxyear100_novax', 'mod4_interyear1_maxyear100_highvirselect_novax')) {
+               'mod4_interyear1_maxyear100_novax', 'mod4_interyear1_maxyear100_highvirselect_novax',
+               'mod4_interyear1_maxyear100', 'mod4_interyear1_maxyear100_highvirselect')) {
   finalMatrix <- read.csv(paste0('~/virEvol/code_output/multistrain_res/', name, '.csv'))
   finalMatrix <- finalMatrix[,2:ncol(finalMatrix)]
   forhist <- c()
@@ -165,5 +165,5 @@ for (name in c('mod1_interyear1_maxyear100', 'mod1_interyear1_maxyear100_highvir
   print(paste0(titles[l_dex], ": ", mean(forhist.df$forhist), " [", var(forhist.df$forhist), "]"))
   l_dex <- l_dex + 1
 }
-ggsave(filename=paste0("~/virEvol/code_output/plots/main/Fig4_mod.jpg"), marrangeGrob(grobs = l, nrow=2, ncol=4, top=NULL), width=13, height=8, units='in', dpi=600)
+ggsave(filename=paste0("~/virEvol/code_output/plots/main/Fig4_mod.jpg"), marrangeGrob(grobs = l, nrow=2, ncol=4, top=NULL), width=20, height=8, units='in', dpi=600)
 
